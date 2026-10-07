@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Arabic Trainer — allenamento interattivo per imparare l'alfabeto arabo, leggere, scrivere e ripassare.">
+<meta name="theme-color" content="#2f3fb0">
+<title>Arabic Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--tx:#17203a;--mu:#5d667e;--ac:#2f3fb0;--sel:#e4e8ff;--ok:#157a3d;--ko:#b3261e;--bd:#d9deea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131d;--card:#1a1f2e;--tx:#e8ebf5;--mu:#98a1ba;--ac:#8c9bff;--sel:#262d52;--ok:#5fd18a;--ko:#ff8a80;--bd:#2d3450}}
+:root[data-theme="dark"]{--bg:#10131d;--card:#1a1f2e;--tx:#e8ebf5;--mu:#98a1ba;--ac:#8c9bff;--sel:#262d52;--ok:#5fd18a;--ko:#ff8a80;--bd:#2d3450}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.ar{font-family:"Noto Naskh Arabic","Geeza Pro","Traditional Arabic","Arial",serif;direction:rtl;unicode-bidi:isolate}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
+header div{max-width:860px;margin:0 auto;padding:8px 16px}
+header b{font-size:1.15rem}
+nav{display:flex;gap:4px;margin-top:6px;overflow-x:auto}
+nav button{flex:1;min-width:max-content;padding:8px 10px;border:0;background:none;color:var(--mu);border-radius:8px;font:inherit;cursor:pointer;transition:background .15s}
+nav button:hover{background:var(--sel)}nav button.on{background:var(--ac);color:var(--bg);font-weight:600}
+main{max-width:860px;margin:0 auto;padding:16px 16px 120px}
+h2{font-size:1.25rem;margin:18px 0 6px}h3{font-size:1rem;margin:18px 0 8px}
+p.sub,.sub{color:var(--mu);margin:0 0 12px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,.card:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;user-select:none;transition:transform .12s,border-color .12s}
+.card:hover{border-color:var(--ac)}.card:active{transform:scale(.97)}
+.card.on{border-color:var(--ac);background:var(--sel)}
+.card .big{font-size:3rem;line-height:1.3}.card b{display:block}
+.card small{color:var(--mu);display:block;font-size:.8rem;line-height:1.3}
+.card .forms{font-size:1.25rem;display:flex;justify-content:center;gap:8px;margin-top:4px;direction:ltr}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
+.bar div{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar strong{flex:1 1 100%}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);transition:transform .1s,background .15s}
+.btn:hover{background:var(--sel)}.btn:active{transform:scale(.97)}
+.btn.p{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+.btn.on{background:var(--sel);border-color:var(--ac);font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.mc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.mc .card{text-align:left;padding:12px}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;text-align:center}
+.word{font-size:4.2rem;line-height:1.6;min-height:1.6em}
+.latin{font-size:2rem;font-weight:600;letter-spacing:.03em}
+input[type=text]{width:100%;max-width:340px;padding:12px;font:inherit;font-size:1.2rem;border:2px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);text-align:center}
+.fb{min-height:3em;margin:12px 0;font-size:1.05rem;text-align:left;max-width:520px;margin-left:auto;margin-right:auto}
+.ok{color:var(--ok)}.ko{color:var(--ko)}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.key{min-width:52px;padding:6px 10px;font-size:1.8rem;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);line-height:1.4}
+.key:active{transform:scale(.95)}
+.score{color:var(--mu);margin-bottom:8px}
+.pb{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:6px 0 10px}.pb i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:10px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}.stat small{display:block;color:var(--mu)}.stat b{font-size:1.15rem}
+.lt{font-size:1.5rem;margin:0 2px}
+.detail{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-top:14px}
+.detail .big{font-size:4rem;line-height:1.2}
+.fm{display:flex;gap:14px;font-size:1.6rem;direction:ltr}.fm span{text-align:center}.fm small{display:block;font-size:.75rem;color:var(--mu);font-family:system-ui}
+.good{animation:pulse .5s}.bad{animation:shake .4s}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--ok) 35%,transparent)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+details{margin:18px 0;color:var(--mu);font-size:.92rem}details p{margin:6px 0}
+button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .keys,.tst .nt{display:none}.stat{text-align:left}.stat .lt{vertical-align:middle}body{background:radial-gradient(900px 420px at 100% -10%,color-mix(in srgb,var(--ac) 14%,transparent),transparent),var(--bg)}
+:root{--sh:0 1px 2px rgba(20,30,70,.06),0 8px 22px rgba(20,30,70,.07)}
+.card,.panel,.stat,.detail{box-shadow:var(--sh)}.card.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 28%,transparent)}
+.hero{position:relative;overflow:hidden;display:flex;gap:16px;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#2f3fb0,#0f8f86);color:#fff;border-radius:20px;padding:24px;box-shadow:var(--sh)}
+.hero h2{margin:0 0 4px;font-size:1.6rem}.hero p{margin:4px 0 12px;opacity:.92}.hero>*{position:relative;z-index:1}
+.hero .wm{position:absolute;right:-10px;bottom:-60px;font-size:12rem;line-height:1;opacity:.12;z-index:0;pointer-events:none}
+.hb{background:#fff;color:#1f2a80;border-color:#fff;font-weight:700}.hb2{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.ring{width:96px;height:96px;flex:none}
+#app>*{animation:fin .3s both}@keyframes fin{from{opacity:0;transform:translateY(8px)}}
+.hw{position:relative;width:min(100%,380px);aspect-ratio:1;margin:12px auto;border:2px dashed var(--bd);border-radius:16px;background:var(--bg)}
+.hw canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+#gh{position:absolute;inset:0;display:grid;place-items:center;font-size:min(55vw,230px);opacity:0;pointer-events:none;color:var(--ac);transition:opacity .2s}
+.les{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh)}
+.les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
+@media(min-width:900px){header{position:fixed;top:0;left:0;bottom:0;width:230px;border-right:1px solid var(--bd);border-bottom:0}header div{padding:22px 14px}nav{flex-direction:column;overflow:visible;margin-top:14px}nav button{flex:none;text-align:left;padding:11px 12px}body{padding-left:230px}.bar{left:230px}}
+</style>
+</head>
+<body>
+<header><div><b>Arabic Trainer</b>
+<nav id="nav"></nav></div></header>
+<main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="aud" class="score" style="display:none" aria-live="polite"></div>
+<div id="app"></div>
+<details><summary>Come vengono scritte le pronunce</summary>
+<p>Convenzione semplificata: ث = th, ذ = dh, خ = kh, غ = gh, ش = sh, ج = j, ع = ' (apostrofo). Le enfatiche si scrivono come le simili: ص = s, ض = d, ط = t, ظ = z. ق = q (k accettata), ح e ه = h.</p>
+<p>Senza harakāt si leggono solo le lettere, senza aggiungere vocali: بت = bt (ا = a). Con le harakāt: fatha = a, kasra = i, damma = u (بَت = bat, بِت = bit, بُت = but). Alif dopo una fatha allunga la a. Il controllo ignora maiuscole, spazi e trattini e accetta varianti come dj, x, ch, c, g e vocali doppie.</p>
+</details>
+</main>
+<div class="bar" id="bar"><div>
+<strong id="cnt"></strong>
+<button class="btn" onclick="selAll()">Seleziona tutte</button>
+<button class="btn" onclick="selNone()">Deseleziona tutte</button>
+<button class="btn p" onclick="quick('read')">Leggi</button>
+<button class="btn p" onclick="quick('write')">Scrivi</button>
+</div></div>
+<script>
+/* ===== Dati ===== */
+const J="\u200D",HK=["\u064E","\u0650","\u064F"],HV={"\u064E":"a","\u0650":"i","\u064F":"u"},HN={"\u064E":"fatha","\u0650":"kasra","\u064F":"damma"};
+const L=[["ا","Alif","a",0,"a lunga"],["ب","Ba","b",1,"b di bene"],["ت","Ta","t",1,"t di tavolo"],["ث","Tha","th",1,"th inglese di think"],["ج","Jim","j",1,"g di gelo"],["ح","Ha","h",1,"h aspirata, forte"],["خ","Kha","kh",1,"r/ch gutturale"],["د","Dal","d",0,"d di dado"],["ذ","Dhal","dh",0,"th inglese di this"],["ر","Ra","r",0,"r vibrata"],["ز","Zay","z",0,"s di rosa"],["س","Sin","s",1,"s di sole"],["ش","Shin","sh",1,"sc di scena"],["ص","Sad","s",1,"s enfatica"],["ض","Dad","d",1,"d enfatica"],["ط","Ta","t",1,"t enfatica"],["ظ","Za","z",1,"z enfatica"],["ع","Ayn","'",1,"suono gutturale"],["غ","Ghayn","gh",1,"r gutturale"],["ف","Fa","f",1,"f di fare"],["ق","Qaf","q",1,"k profonda"],["ك","Kaf","k",1,"c di casa"],["ل","Lam","l",1,"l di luna"],["م","Mim","m",1,"m di mare"],["ن","Nun","n",1,"n di nave"],["ه","Ha","h",1,"h soffiata"],["و","Waw","w",0,"u/w di uovo"],["ي","Ya","y",1,"i/y di ieri"]];
+const AN=["ألف","باء","تاء","ثاء","جيم","حاء","خاء","دال","ذال","راء","زاي","سين","شين","صاد","ضاد","طاء","ظاء","عين","غين","فاء","قاف","كاف","لام","ميم","نون","هاء","واو","ياء"];
+const PRESET={Principiante:[0,1,2,3,19,21,22,23,24],Intermedio:[0,1,2,3,4,5,6,7,8,9,10,11,12,19,21,22,23,24,26,27],Completo:L.map((_,i)=>i)};
+const OPT={kind:[["r","🔤 Riconoscimento delle lettere","Impara a identificare le consonanti"],["v","🔊 Lettura con vocali","Impara a leggere lettere e harakāt"],["m","🔀 Modalità mista","Alterna entrambi gli esercizi"]],
+dir:[["read","Arabo → Latino"],["write","Latino → Arabo"],["audio","Audio → Arabo"]],src:[["fake","🔤 Sequenze inventate"],["real","📖 Parole reali"]],diff:[[0,"Facile"],[1,"Medio"],[2,"Difficile"]],count:[[5,"5"],[10,"10"],[20,"20"],[30,"30"],[0,"∞"]],
+method:[["custom","Personalizzato","Scegli tutto tu."],["prog","Progressivo","La difficoltà sale dopo 3 risposte corrette di fila e scende dopo 2 errori."],["rev","Ripasso errori","Riproposti soprattutto gli esercizi sbagliati."],["free","Allenamento libero","Domande illimitate, finisci quando vuoi."],["test","Test","Nessun aiuto né suggerimento né pronuncia automatica; niente tastiera virtuale; risultato finale con gli errori."]]};
+const SIM=[[1,2,3,24],[4,5,6],[7,8],[9,10],[11,12],[13,14],[15,16],[17,18],[19,20]];
+const DOT=["nessun punto","1 punto sotto","2 punti sopra","3 punti sopra","1 punto sotto","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","3 punti sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","1 punto sopra","2 punti sopra","nessun punto","nessun punto","nessun punto","1 punto sopra","nessun punto","nessun punto","2 punti sotto"];
+/* ===== Utilità ===== */
+const $=id=>document.getElementById(id),esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const pick=a=>a[Math.floor(Math.random()*a.length)],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const idx=c=>L.findIndex(l=>l[0]===c);
+/* ===== Traslitterazione ===== */
+const Tr={
+ read(ar){let o="",lp=0,lc="";for(const c of ar){const i=idx(c);if(i>=0){lp=o.length;lc=L[i][2];o+=lc}else if(c==="\u0651")o=o.slice(0,lp)+lc+o.slice(lp);else o+=HV[c]||""}return o},
+ norm:s=>s.toLowerCase().replace(/[\s.\-]/g,"").replace(/[’ʿ`‘3]/g,"'").replace(/dj/g,"j").replace(/kh|ch|x/g,"K").replace(/gh/g,"G").replace(/sh/g,"S").replace(/th/g,"T").replace(/dh/g,"D").replace(/[qc]/g,"k").replace(/g/g,"j").replace(/ee/g,"i").replace(/oo/g,"u").replace(/([aiu])\1+/g,"$1"),
+ strip:s=>s.replace(/[\u064B-\u065F]/g,""),
+ vc:s=>(s.match(/[aiu]/g)||[]).length
+};
+/* ===== Generatore ===== */
+const Gen={
+ R:{r:[[2,3],[3,4],[4,5]],v:[[1,2],[2,3],[3,4]]},
+ letters(pool,n){let a="",p=-1;const many=new Set(pool).size>1;for(let k=0;k<n;k++){let i;do{i=pick(pool)}while(many&&i===p);a+=L[i][0];p=i}return a},
+ vowels(pool,n){const cons=pool.filter(i=>i);if(!cons.length)return null;let a="";
+  for(let k=0;k<n;k++){const i=pick(cons),v=pick(HK);
+   if(k===n-1&&Math.random()<.4)a+=L[i][0];else{a+=L[i][0]+v;if(pool.includes(0)&&v===HK[0]&&Math.random()<.35)a+=L[0][0]}}return a},
+ make(kind,diff,pool){
+  if(kind==="m")kind=pool.some(i=>i)?pick(["r","v"]):"r";
+  const r=this.R[kind][diff],n=rnd(r[0],r[1]),ar=kind==="r"?this.letters(pool,n):this.vowels(pool,n);
+  return ar&&{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0)}}
+};
+/* ===== Progressi (localStorage) ===== */
+const St={d:null,
+ load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10},o||{})},
+ save(){try{localStorage.setItem("at1",JSON.stringify(this.d))}catch(e){}},
+ log(ls,sk,ok,mode,ms){const d=this.d;d.n++;if(ok){d.ok++;d.streak++;d.best=Math.max(d.best,d.streak)}else d.streak=0;
+  ls.forEach(i=>{const m=d.M[i]||(d.M[i]={}),x=m[sk]||(m[sk]=[0,0]);x[0]++;if(ok)x[1]++;if(!ok){const e=d.E[i]||(d.E[i]={c:0});e.c++;e.t=Date.now();e.m=mode}});
+  const k=d.mode[mode]||(d.mode[mode]=[0,0]);k[0]++;if(ok)k[1]++;const y=d.days[today()]||(d.days[today()]={q:0,ms:0});y.q++;y.ms+=ms;d.ms+=ms;this.save();chk()},
+ rec(q,ok,sk,mode,ms){this.log(q.ls,sk,ok,mode,ms);const d=this.d;d.err=d.err.filter(e=>e.ar!==q.ar);if(!ok)d.err.unshift({ar:q.ar,lat:q.lat,kind:q.kind,ls:q.ls});d.err=d.err.slice(0,30);this.save()},
+ reset(){const s=this.d.sel;this.d=null;try{localStorage.removeItem("at1")}catch(e){}this.load();this.d.sel=s}
+};
+/* ===== Audio ===== */
+const Au={vs:[],
+ init(){try{this.vs=speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{this.vs=speechSynthesis.getVoices()}}catch(e){}},
+ note(t){const n=$("aud");n.textContent=t;n.style.display=t?"":"none"},
+ say(t){
+  if(!St.d.au)return;
+  if(!window.speechSynthesis||typeof SpeechSynthesisUtterance==="undefined"){this.note("Questo browser non supporta la pronuncia audio.");return}
+  const u=new SpeechSynthesisUtterance(t);u.lang="ar-SA";u.rate=.8;u.volume=1;
+  const v=this.vs.find(x=>/^ar/i.test(x.lang))||speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));
+  if(v){u.voice=v;u.lang=v.lang;this.note("")}else this.note("Nessuna voce araba rilevata in questo browser: l'audio potrebbe non partire.");
+  u.onerror=e=>{if(e.error!=="canceled"&&e.error!=="interrupted")this.note("Audio non riuscito ("+(e.error||"errore")+").")};
+  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),120)}else speechSynthesis.speak(u)}
+};
+const say=t=>Au.say(t);
+/* ===== Quiz ===== */
+const S={view:"home",sel:new Set(),last:null,ml:null,cfg:{kind:"v",dir:"read",src:"fake",diff:1,count:10,method:"custom"},reset:false};
+const Q={cur:null,checked:false,buf:"",ua:"",res:"",fb:"",n:0,ok:0,diff:1,up:0,dn:0,cfg:null,
+ start(over){this.cfg=Object.assign({},S.cfg,over||{});this.n=this.ok=this.up=this.dn=0;if(this.cfg.method==="test"&&!this.cfg.count)this.cfg.count=20;this.t0s=Date.now();this.errs=[];this.diff=this.cfg.diff;go("quiz",1);this.next()},
+ pool(){return[...S.sel]},
+ make(){const c=this.cfg,pool=this.pool();if(c.src==="real")return this.real(c);
+  if(c.method!=="test"){const e=St.d.err.filter(x=>x.ls.every(i=>S.sel.has(i))&&(!this.cur||x.ar!==this.cur.ar));if(e.length&&Math.random()<(c.method==="rev"?.8:.15))return Object.assign({fromErr:1},pick(e))}
+  const wk=new Set(Ms.weak()),p=pool.flatMap(i=>wk.has(i)?[i,i,i]:[i]);let q;for(let k=0;k<5;k++){q=Gen.make(c.kind,c.method==="prog"?this.diff:c.diff,p);if(!q||q.ar!==(this.cur||{}).ar)break}return q},
+ next(){const c=this.cfg;if(c.count&&this.n>=c.count)return this.finish();
+  this.cur=this.make();this.checked=false;this.buf=this.ua=this.res=this.fb="";
+  if(!this.cur){Au.note(c.src==="real"?"Nessuna parola reale con queste lettere: selezionane altre o usa le sequenze inventate.":"Aggiungi almeno una lettera oltre ad Alif per formare le parole.");return go("cfg")}this.t0=Date.now();render();if(c.dir==="audio")say(this.cur.ar)},
+ finish(){if(this.n){St.d.done++;lessonDone(this.cfg.lesson,this.ok,this.n)}St.save();this.ms=Date.now()-this.t0s;this.cur=null;render()},
+ check(){let ok;const q=this.cur,w=this.cfg.dir;
+  if(w==="read"){const v=$("ans").value;if(!v.trim())return;this.ua=v;ok=Tr.norm(v)===Tr.norm(q.lat)}
+  else{if(!this.buf)return;ok=this.buf===q.ar}
+  this.checked=true;this.n++;this.res=ok?"good":"bad";if(ok)this.ok++;St.rec(q,ok,w==="read"?"read":"write",w,Math.min(Date.now()-this.t0,6e4));if(!ok)this.errs.push(q);
+  if(ok){this.dn=0;if(++this.up>=3){this.diff=Math.min(2,this.diff+1);this.up=0}}else{this.up=0;if(++this.dn>=2){this.diff=Math.max(0,this.diff-1);this.dn=0}}
+  const got=w==="read"?this.ua:this.buf,marks=[...new Set([...q.ar].filter(c=>HV[c]))].map(c=>"la "+HN[c]+" indica «"+HV[c]+"»").join(", ");
+  this.fb=ok?'<span class="ok">✅ <b>Corretto!</b></span>'+(q.kind==="v"&&marks&&this.cfg.method!=="test"?'<br><span class="sub">In questa parola: '+marks+'.</span>':""):
+   '<span class="ko">❌ <b>Non corretto</b></span><br>Hai scritto: <b class="'+(w!=="read"?"ar":"")+'">'+esc(got)+'</b><br>Risposta corretta: <b class="'+(w!=="read"?"ar":"")+'" style="font-size:'+(w!=="read"?"1.6rem":"inherit")+'">'+(w==="read"?q.lat:q.ar)+'</b><br>'+(this.cfg.method==="test"?"":'<b>Perché?</b> '+this.why(q,got,w,marks)+this.hint(q));
+  if(St.d.days[today()].q===St.d.goal)this.fb+='<br>🎉 <b>Obiettivo giornaliero completato!</b>';if(q.mean)this.fb+='<br><span class="sub">Parola reale: significa «'+q.mean+'»</span>';render();if(ok&&w==="write"&&this.cfg.method!=="test")say(q.ar)},
+ hint(q){for(const i of q.ls){const a=Ms.acc(i),g=SIM.find(x=>x.includes(i));if(a!==null&&a<.6&&Ms.sc(i).n>=2&&g)return'<br>💡 <b>Suggerimento</b> La lettera '+lt(i)+' viene spesso confusa con '+g.filter(x=>x!==i).map(lt).join(" ")+': guarda numero e posizione dei punti.'}return""},
+ why(q,got,w,marks){let t;
+  if(w==="read"){const g=Tr.norm(got),e=Tr.norm(q.lat),more=Tr.vc(g)>Tr.vc(e),less=Tr.vc(g)<Tr.vc(e);
+   if(q.kind==="r")t=more?"La sequenza non contiene harakāt: hai aggiunto una vocale che non è scritta. Senza harakāt si leggono solo le lettere (بت = bt).":"Senza harakāt si leggono solo le lettere, ognuna con il suo suono (ا = a). Controlla le consonanti.";
+   else t=less?"Mancano delle vocali: ogni haraka scritta va letta. ":more?"Hai aggiunto una vocale che non è scritta: una lettera senza haraka si legge solo come consonante. ":"Controlla lettere e vocali. ";
+   if(q.kind==="v"&&marks)t+=" In questa parola: "+marks+".";}
+  else if(Tr.strip(got)===Tr.strip(q.ar))t=q.kind==="r"?"Le lettere sono giuste, ma qui non servono harakāt: la sequenza ne è priva.":"Le lettere sono giuste, ma le harakāt non corrispondono: "+(marks||"controlla fatha, kasra e damma")+".";
+  else t="Controlla le lettere: la sequenza è formata da "+[...Tr.strip(q.ar)].join(" ")+".";
+  return t}
+};
+/* ===== UI ===== */
+const fm=(c,j)=>[c,j?c+J:c,j?J+c+J:J+c,J+c];
+const FN=["Isolata","Iniziale","Mediale","Finale"];
+function go(v,keep){S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
+function sav(){St.d.sel=[...S.sel];St.save()}
+function toggle(i){say(AN[i]);S.sel.has(i)?S.sel.delete(i):S.sel.add(i);S.last=i;sav();render()}
+function selAll(){L.forEach((_,i)=>S.sel.add(i));sav();render()}
+function selNone(){S.sel.clear();sav();render()}
+function level(n){S.sel=new Set(PRESET[n]);sav();render()}
+function setC(k,i){S.cfg[k]=OPT[k][i][0];render()}
+function quick(dir){if(!S.sel.size){Au.note("Seleziona almeno una lettera per iniziare.");return}Q.start({dir})}
+function grid(){return'<div class="grid">'+L.map((l,i)=>'<div class="card'+(S.sel.has(i)?" on":"")+'" tabindex="0" role="button" aria-pressed="'+S.sel.has(i)+'" onclick="toggle('+i+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggle('+i+')}"><div class="big ar">'+l[0]+'</div><b>'+l[1]+'</b><small>'+l[4]+'</small><div class="forms ar">'+fm(l[0],l[3]).map(f=>'<span>'+f+'</span>').join("")+'</div></div>').join("")+'</div>'}
+function detail(){const i=S.last;if(i==null)return'<p class="sub" style="margin-top:14px">Tocca una lettera per selezionarla, ascoltarla e vedere le sue forme.</p>';const l=L[i];
+ return'<div class="detail"><div class="big ar">'+l[0]+'</div><div><b>'+l[1]+'</b> <span class="sub">('+l[4]+')</span><div class="fm ar" style="margin:6px 0">'+fm(l[0],l[3]).map((f,k)=>'<span>'+f+'<small>'+FN[k]+'</small></span>').join("")+'</div>'+(l[3]?"":'<div class="sub">Non si collega alla lettera successiva.</div>')+'<button class="btn" onclick="say(AN['+i+'])">🔊 Ascolta</button></div></div>'}
+function chips(k,cls){return'<div class="chips">'+OPT[k].map((o,i)=>'<button class="btn'+(S.cfg[k]===o[0]?" on":"")+'" onclick="setC(\''+k+'\','+i+')">'+o[1]+'</button>').join("")+'</div>'}
+function cfgView(){const c=S.cfg,m=OPT.method.find(o=>o[0]===c.method),n=S.sel.size;
+ return'<h2>Cosa vuoi allenare?</h2><h3>01 — Scegli le lettere</h3><div class="chips" style="margin-bottom:10px">'+Object.keys(PRESET).map(k=>'<button class="btn" onclick="level(\''+k+'\')">'+k+'</button>').join("")+'</div>'+grid()
+  +'<h3>02 — Scegli cosa allenare</h3><div class="mc">'+OPT.kind.map((o,i)=>'<div class="card'+(c.kind===o[0]?" on":"")+'" tabindex="0" role="button" onclick="setC(\'kind\','+i+')" onkeydown="if(event.key===\'Enter\')setC(\'kind\','+i+')"><b>'+o[1]+'</b><small>'+o[2]+'</small></div>').join("")+'</div>'
+  +'<h3>03 — Scegli la direzione</h3>'+chips("dir")+'<h3>Parole</h3>'+chips("src")+'<h3>04 — Difficoltà</h3>'+chips("diff")+'<h3>05 — Numero di domande</h3>'+chips("count")
+  +'<h3>06 — Allenamento</h3>'+chips("method")+'<p class="sub" style="margin-top:8px">'+m[2]+'</p>'
+  +'<h3>Esercizi speciali</h3><div class="chips"><button class="btn" onclick="exs(\'find\')">🔎 Trova la lettera</button><button class="btn" onclick="exs(\'hear\')">🎧 Ascolta e riconosci</button><button class="btn" onclick="exs(\'form\')">🔡 Quattro forme</button><button class="btn" onclick="exs(\'inword\')">🧩 Lettera nella parola</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button></div><p class="sub" style="margin-top:8px">10 domande con le lettere selezionate e la difficoltà scelta.</p><div class="panel" style="margin-top:16px"><p class="sub">Riepilogo: '+n+' lettere · '+OPT.kind.find(o=>o[0]===c.kind)[1]+' · '+OPT.dir.find(o=>o[0]===c.dir)[1]+' · '+OPT.diff.find(o=>o[0]===c.diff)[1]+' · '+(c.count||"∞")+' domande · '+m[1]+'</p><button class="btn p" onclick="quick(S.cfg.dir)">Inizia allenamento →</button></div>'}
+function quizView(){const q=Q.cur,c=Q.cfg;
+ if(!q)return resView(Q.ok,Q.n,Q.ms,"Q.start(Q.cfg)",(c.lesson!=null?lesNote(Q.ok,Q.n):"")+(c.method==="test"&&Q.errs.length?'<p>Errori:</p><div>'+Q.errs.map(e=>'<span class="ar lt">'+e.ar+'</span> '+e.lat).join("<br>")+'</div>':""));
+ const dis=Q.checked?" disabled":"",tot=c.count,pb='<div class="pb"><i style="width:'+(tot?100*Q.n/tot:0)+'%"></i></div>',
+ head='<div class="score">'+(tot?"Domanda "+Math.min(Q.n+(Q.checked?0:1),tot)+" di "+tot:"Domanda "+(Q.n+(Q.checked?0:1)))+' · Lettere selezionate: '+S.sel.size+' · Corrette: '+Q.ok+' su '+Q.n+" · "+(c.src==="real"?"📖 Parola reale":"🔤 Sequenza inventata")+(c.method==="prog"?" · Livello: "+OPT.diff[Q.diff][1]:"")+'</div>'+pb,
+ end='<div class="row"><button class="btn" onclick="Q.finish()">Termina allenamento</button></div>',
+ go='<button class="btn p" onclick="Q.checked?Q.next():Q.check()">'+(Q.checked?"Avanti":"Controlla")+'</button>';
+ if(c.dir==="read")return head+'<div class="panel '+Q.res+(c.method==="test"?" tst":"")+'"><div class="word ar">'+q.ar+'</div><button class="btn nt" onclick="say(Q.cur.ar)">🔊 Ascolta pronuncia</button><p>Scrivi come si pronuncia, con caratteri latini</p><input type="text" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="es. bata" value="'+esc(Q.ua)+'"'+dis+' onkeydown="if(event.key===\'Enter\')Q.checked?Q.next():Q.check()"><div class="fb">'+Q.fb+'</div>'+go+'</div>'+end;
+ return head+'<div class="panel '+Q.res+(c.method==="test"?" tst":"")+'"><p>Scrivi in arabo la parola che '+(c.dir==="audio"?"senti":"si legge")+'</p>'+(c.dir==="audio"?'<button class="btn p" onclick="say(Q.cur.ar)">🔊 Riascolta</button>':'<div class="latin">'+q.lat+'</div>')+'<div class="word ar" id="out">'+(esc(Q.buf)||"&nbsp;")+'</div><input type="text" id="kb" class="ar" dir="rtl" lang="ar" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="⌨️ Puoi anche digitare con la tastiera araba" value="'+esc(Q.buf)+'" '+dis+' oninput="Q.buf=this.value;$(\'out\').textContent=Q.buf||\'\\u00a0\'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();Q.checked?Q.next():Q.check()}"><div class="row ar keys">'+[...S.sel].map(i=>'<button class="key"'+dis+' onclick="add(\''+L[i][0]+'\')">'+L[i][0]+'</button>').join("")+'</div><div class="row ar keys">'+HK.map(v=>'<button class="key"'+dis+' onclick="add(\''+v+'\')">ـ'+v+'</button>').join("")+'</div><div class="row"><button class="btn"'+dis+' onclick="Q.buf=Array.from(Q.buf).slice(0,-1).join(\'\');render()">Cancella ultimo</button><button class="btn"'+dis+' onclick="Q.buf=\'\';render()">Svuota</button></div><div class="fb">'+Q.fb+'</div>'+go+'</div>'+end}
+function add(c){Q.buf+=c;render()}
+/* ===== Mastery, giorni, obiettivi ===== */
+const today=()=>{const x=new Date();return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const fmt=ms=>{const s=Math.round(ms/1e3);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+const MN={read:"Arabo → Latino",write:"Latino → Arabo",audio:"Audio → Arabo",find:"Trova la lettera",hear:"Ascolta e riconosci",form:"Quattro forme"};
+const SK=[["rec","Riconoscimento"],["form","Forme"],["read","Lettura"],["write","Scrittura"]];
+const Ms={
+ sc(i){const m=St.d.M[i]||{};let w=0,s=0,n=0;for(const k in m){const[a,b]=m[k],t=Math.min(a,5);w+=t;s+=t*b/a;n+=a}return{p:w?Math.round(100*s/w):0,n}},
+ st(i){const{p,n}=this.sc(i);return!n?["○","Non ancora studiata"]:n>=5&&p>=80?["✓","Padroneggiata"]:p>=60?["◐","Da migliorare"]:["!","Da ripassare"]},
+ acc(i){const m=St.d.M[i]||{};let a=0,b=0;for(const k in m){a+=m[k][0];b+=m[k][1]}return a?b/a:null},
+ weak(){return L.map((_,i)=>i).filter(i=>{const a=this.acc(i);return a!==null&&this.sc(i).n>=2&&a<.7}).sort((x,y)=>this.acc(x)-this.acc(y))}
+};
+function dstreak(){const D=St.d.days,t=new Date(),f=x=>new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10);let c=0;if(!D[f(t)])t.setDate(t.getDate()-1);while(D[f(t)]){c++;t.setDate(t.getDate()-1)}return c}
+const overall=()=>Math.round(L.reduce((s,_,i)=>s+Ms.sc(i).p,0)/28);
+const ACH=()=>{const d=St.d;return[["Prima sessione",d.done>0],["50 risposte corrette",d.ok>=50],["100 risposte corrette",d.ok>=100],["Prima settimana",dstreak()>=7],["90% di precisione",d.n>=20&&d.ok/d.n>=.9],["Tutte le lettere sopra il 70%",L.every((_,i)=>Ms.sc(i).n&&Ms.sc(i).p>=70)]]};
+const bar=(p,l)=>'<div class="pb" role="progressbar" aria-label="'+l+'" aria-valuenow="'+p+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p+'%"></i></div>';
+const lt=i=>'<span class="ar lt">'+L[i][0]+'</span>';
+/* ===== Esercizi speciali: trova, ascolta, forme ===== */
+const Ex={t:null,n:0,ok:0,q:null,fb:"",t0:0,ts:0,ms:0,
+ start(t){this.t=t;this.n=this.ok=0;this.ts=Date.now();S.view="ex";this.next()},
+ make(){const p=[...S.sel],t=this.t,df=S.cfg.diff,w=pick(p.flatMap(i=>{const a=Ms.acc(i);return a!==null&&a<.7?[i,i,i]:[i]}));
+  if(t==="form"){const j=p.filter(i=>L[i][3]);if(!j.length)return null;const tg=pick(j);return{tg,f:rnd(0,3),ls:[tg],sk:"form"}}
+  if(t==="inword"){const jp=p.filter(i=>L[i][3]&&i!==w),len=rnd(3,4);if(!jp.length||p.length<2)return null;const pos=L[w][3]?rnd(0,len-1):len-1,o=[];for(let k=0;k<len;k++)o.push(k===pos?w:pick(k<len-1?jp:p.filter(i=>i!==w)));return{tg:w,word:o.map(i=>L[i][0]).join(""),f:pos===0?1:pos===len-1?3:2,ls:[w],sk:"form"}}
+  if(p.length<2)return null;
+  if(t==="hear")return{tg:w,ch:[w,...p.filter(i=>i!==w).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5),ls:[w],sk:"rec"};
+  const len=[6,8,10][df],nd=[2,3,3][df],g=(SIM.find(x=>x.includes(w))||[]).filter(i=>i!==w&&S.sel.has(i)),o=p.filter(i=>i!==w),dp=df===2&&g.length?g:o,pos=new Set();
+  while(pos.size<nd)pos.add(rnd(0,len-1));
+  return{tg:w,seq:Array.from({length:len},(_,k)=>pos.has(k)?w:pick(dp)),pos:[...pos],cl:[],ls:[w],sk:"rec"}},
+ next(){if(this.n>=10){St.d.done++;lessonDone(this.lesson,this.ok,this.n);this.ms=Date.now()-this.ts;this.q=null;return render()}
+  this.q=this.make();this.fb="";this.done=false;
+  if(!this.q){Au.note("Servono almeno 2 lettere selezionate (per le forme, almeno una che si colleghi).");return go("cfg")}
+  this.t0=Date.now();render();if(this.t==="hear")say(AN[this.q.tg])},
+ tog(k){if(this.done)return;const c=this.q.cl,i=c.indexOf(k);i<0?c.push(k):c.splice(i,1);render()},
+ ans(c){if(this.done)return;const q=this.q;this.res(this.t==="find"?q.cl.length===q.pos.length&&q.cl.every(k=>q.pos.includes(k)):c===(this.t==="form"||this.t==="inword"?q.f:q.tg))},
+ res(ok){const q=this.q;this.done=true;this.n++;if(ok)this.ok++;St.log(q.ls,q.sk,ok,this.t,Math.min(Date.now()-this.t0,6e4));
+  const g=L[q.tg],x=this.t==="hear"?"Era la lettera <b>"+g[1]+"</b> ("+g[4]+").":this.t==="form"||this.t==="inword"?"Questa è la forma <b>"+FN[q.f].toLowerCase()+"</b> di "+g[1]+".":ok?"Le hai trovate tutte.":"Le lettere cercate erano nelle posizioni evidenziate.";
+  this.fb=(ok?'<span class="ok">✅ <b>Corretto!</b></span>':'<span class="ko">❌ <b>Non corretto</b></span>')+"<br>"+x+(!ok?this.hintOf(q):"");
+  if(St.d.days[today()].q===St.d.goal)this.fb+='<br>🎉 <b>Obiettivo giornaliero completato!</b>';render()},
+ hintOf(q){return Q.hint(q)}
+};
+function exs(t){if(!S.sel.size){Au.note("Seleziona almeno una lettera per iniziare.");return}Ex.lesson=null;Ex.start(t)}
+function exView(){const q=Ex.q,e=Ex;
+ if(!q)return resView(e.ok,e.n,e.ms,"exs(Ex.t)",e.lesson!=null?lesNote(e.ok,e.n):"");
+ const head='<div class="score">'+(MN[e.t])+' · Domanda '+Math.min(e.n+(e.done?0:1),10)+' di 10 · Corrette: '+e.ok+' su '+e.n+'</div>'+bar(10*e.n,"Avanzamento"),dis=e.done?" disabled":"";let b;
+ if(e.t==="hear")b='<p>Quale lettera hai sentito?</p><button class="btn p" onclick="say(AN[Ex.q.tg])">🔊 Ascolta</button><div class="row ar">'+q.ch.map(i=>'<button class="key" aria-label="'+L[i][1]+'"'+dis+' onclick="Ex.ans('+i+')">'+L[i][0]+'</button>').join("")+'</div>';
+ else if(e.t==="form"){const l=L[q.tg];b='<p>Quale forma di <b>'+l[1]+'</b> è questa?</p><div class="word ar">'+fm(l[0],l[3])[q.f]+'</div><div class="row">'+FN.map((n,k)=>'<button class="btn"'+dis+' onclick="Ex.ans('+k+')">'+n+'</button>').join("")+'</div>'}
+ else if(e.t==="inword")b='<p>In che posizione compare <b>'+L[q.tg][1]+'</b> ('+lt(q.tg)+') in questa parola?</p><div class="word ar">'+q.word+'</div><div class="row">'+[1,2,3].map(k=>'<button class="btn"'+dis+' onclick="Ex.ans('+k+')">'+FN[k]+'</button>').join("")+'</div><p class="sub">Si legge da destra a sinistra: la prima lettera è la più a destra.</p>';
+ else b='<p>Trova tutte le lettere:</p><div class="word ar" style="min-height:0">'+L[q.tg][0]+'</div><div class="row ar">'+q.seq.map((i,k)=>'<button class="key'+(q.cl.includes(k)?" on":"")+'" aria-pressed="'+q.cl.includes(k)+'" style="'+(q.cl.includes(k)?"background:var(--sel);border-color:var(--ac);":"")+(e.done&&q.pos.includes(k)?"outline:3px solid var(--ok);":"")+'" onclick="Ex.tog('+k+')">'+L[i][0]+'</button>').join("")+'</div>'+(e.done?"":'<button class="btn p" onclick="Ex.ans()">Controlla</button>');
+ return head+'<div class="panel">'+b+'<div class="fb">'+e.fb+'</div>'+(e.done?'<button class="btn p" onclick="Ex.next()">Avanti</button>':"")+'</div><div class="row"><button class="btn" onclick="Ex.n=10;Ex.next()">Termina</button></div>'}
+/* ===== Risultato e scorciatoie ===== */
+function resView(ok,n,ms,again,extra){const w=Ms.weak().slice(0,5),p=Math.round(100*ok/Math.max(n,1));
+ return'<div class="panel good"><h2>🎉 Quiz completato</h2><p class="latin">'+ok+' / '+n+'</p><p class="latin">'+p+'%</p><p class="sub">Tempo: '+fmt(ms)+'</p>'+extra+(w.length?'<p>Lettere da ripassare:</p><div>'+w.map(lt).join(" ")+'</div>':"")+'<div class="row"><button class="btn p" onclick="'+again+'">Ripeti quiz</button><button class="btn" onclick="reviewW()">Ripassa errori</button><button class="btn" onclick="go(\'home\')">Torna alla Home</button></div></div>'}
+function reviewW(){const w=Ms.weak(),s=w.length?w:[...new Set(St.d.err.flatMap(e=>e.ls))];if(!s.length){Au.note("Nessun errore da ripassare.");return go("prog")}S.sel=new Set(s);sav();Q.start({method:"rev",kind:"m",dir:"read",count:10})}
+function cont(){if(!S.sel.size)S.sel=new Set(PRESET.Principiante);sav();Q.start({method:"prog",kind:"m",dir:"read",count:10})}
+function trainL(i){S.sel=new Set([i]);sav();Q.start({method:"prog",kind:"m",dir:"read",count:10})}
+function trainG(g,t){S.sel=new Set(g);sav();S.cfg.diff=2;Ex.lesson=null;Ex.start(t)}
+/* ===== Viste ===== */
+function progView(){const d=St.d;if(!d.n)return'<h2>Progressi</h2>'+homeView();
+ const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>',wk=Ms.weak(),days=[...Array(7)].map((_,k)=>{const x=new Date();x.setDate(x.getDate()-6+k);return[x.getDate(),(d.days[new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)]||{q:0}).q]}),mx=Math.max(1,...days.map(x=>x[1])),mi=S.ml;
+ const sk=i=>{const m=d.M[i]||{};return SK.map(([k,n])=>{const v=m[k],p=v?Math.round(100*v[1]/v[0]):0;return'<div>'+n+': <b>'+(v?p+"%":"non ancora allenata")+'</b>'+bar(p,n)+'</div>'}).join("")};
+ return'<h2>Progressi</h2><div class="stats">'+s("Precisione generale",Math.round(100*d.ok/d.n)+"%")+s("Esercizi svolti",d.n+" ("+d.ok+" corretti)")+s("Quiz completati",d.done)+s("Tempo di studio",Math.round(d.ms/6e4)+" min")+s("Giorni consecutivi","🔥 "+dstreak())+s("Serie di risposte corrette",d.streak+" (record "+d.best+")")+'</div>'
+ +'<h3>Precisione per modalità</h3><div class="stats">'+Object.entries(d.mode).map(([k,v])=>s(MN[k]||k,Math.round(100*v[1]/v[0])+"% ("+v[1]+"/"+v[0]+")")).join("")+'</div>'
+ +'<h3>Ultimi 7 giorni (domande)</h3><div class="row" style="align-items:flex-end;height:90px;justify-content:space-around">'+days.map(x=>'<div style="text-align:center"><div style="width:26px;background:var(--ac);border-radius:4px;height:'+Math.max(3,Math.round(60*x[1]/mx))+'px"></div><small>'+x[0]+'<br>'+x[1]+'</small></div>').join("")+'</div>'
+ +'<h3>Mappa delle 28 lettere</h3><p class="sub">✓ Padroneggiata · ◐ Da migliorare · ! Da ripassare · ○ Non ancora studiata</p><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(92px,1fr))">'+L.map((l,i)=>{const[ic,t]=Ms.st(i);return'<button class="card'+(mi===i?" on":"")+'" aria-label="'+l[1]+': '+t+', '+Ms.sc(i).p+'%" onclick="S.ml='+i+';render()"><div class="ar lt" style="font-size:2rem">'+l[0]+'</div><small>'+ic+' '+Ms.sc(i).p+'%</small></button>'}).join("")+'</div>'
+ +(mi!=null?'<div class="detail" style="display:block"><div class="ar lt" style="font-size:3rem">'+L[mi][0]+'</div> <b>'+L[mi][1]+'</b> · '+Ms.st(mi)[0]+' '+Ms.st(mi)[1]+' · Mastery '+Ms.sc(mi).p+'%'+sk(mi)+'<p class="sub">Errori: '+((d.E[mi]||{}).c||0)+'</p><button class="btn p" onclick="trainL('+mi+')">Allenati su questa lettera →</button></div>':"")
+ +'<h3>Da ripassare</h3>'+(wk.length?'<div class="stats">'+wk.slice(0,6).map(i=>s(lt(i),Math.round(100*Ms.acc(i))+"% corrette")).join("")+'</div><button class="btn p" onclick="reviewW()">Ripassa queste lettere →</button>':'<p class="sub">Nessuna lettera da ripassare per ora.</p>')
+ +'<h3>Errori recenti</h3>'+(Object.keys(d.E).length?'<div class="stats">'+Object.entries(d.E).sort((a,b)=>b[1].t-a[1].t).slice(0,8).map(([i,e])=>'<button class="stat" style="text-align:left;color:var(--tx);cursor:pointer" onclick="trainL('+i+')" aria-label="Ripassa '+L[i][1]+'">'+lt(i)+'<b> '+e.c+' errori</b><small>'+Math.round(100*Ms.acc(i))+'% corrette · '+MN[e.m]+' · ultimo: '+new Date(e.t).toLocaleDateString("it")+'</small></button>').join("")+'</div><p class="sub">Tocca una voce per ripassare subito.</p>':'<p class="sub">Nessun errore registrato.</p>')
+ +'<h3>Traguardi</h3><div class="chips">'+ACH().map(a=>'<span class="btn'+(a[1]?" on":"")+'">'+(a[1]?"🏆 ":"🔒 ")+a[0]+'</span>').join("")+'</div>'}
+function learnView(){const HX=[["بَ","ba","fatha: vocale a"],["بِ","bi","kasra: vocale i"],["بُ","bu","damma: vocale u"],["بْ","b","sukūn: nessuna vocale"],["بّ","bb","shadda: raddoppia la consonante"],["بً","ban","tanwin fatha: finale -an"],["بٍ","bin","tanwin kasra: finale -in"],["بٌ","bun","tanwin damma: finale -un"]];
+ const nx=LES.findIndex((_,i)=>(St.d.les[i]||0)<70),dn=LES.filter((_,i)=>(St.d.les[i]||0)>=70).length;
+ return'<h2>Impara</h2><h3>Percorso</h3><p class="sub">Dieci lezioni progressive. Puoi sempre usare anche l\'allenamento personalizzato.</p>'+bar(dn*10,"Lezioni completate")+LES.map((l,i)=>{const b=St.d.les[i]||0;return'<div class="les'+(i===nx?" next":"")+'"><div><b>Lezione '+(i+1)+' · '+l[0]+'</b><small>'+l[1]+'</small>'+(b?'<small>Miglior risultato: '+b+'%'+(b>=70?" ✅ completata":"")+'</small>':i===nx?'<small>Consigliata</small>':'')+'</div><button class="btn'+(i===nx?" p":"")+'" onclick="lesson('+i+')">'+(b?"Ripeti":"Inizia")+'</button></div>'}).join("")+'<h3>Le harakāt</h3><p class="sub">Senza segni si leggono solo le consonanti (بت = bt). I segni sopra o sotto la lettera aggiungono la vocale.</p><div class="stats">'+HX.map(h=>'<div class="stat"><span class="ar lt" style="font-size:2.4rem">'+h[0]+'</span> <b>'+h[1]+'</b><small>'+h[2]+'</small></div>').join("")+'</div>'
+ +'<h3>Non confonderle</h3><p class="sub">Molte lettere hanno lo stesso scheletro: cambiano solo numero e posizione dei punti.</p>'+SIM.map(g=>'<div class="detail" style="margin-top:8px"><div class="fm ar">'+g.map(i=>'<span>'+L[i][0]+'<small>'+L[i][1]+': '+DOT[i]+'</small></span>').join("")+'</div><button class="btn" onclick="trainG(['+g+'],\'find\')">Allenati: trova la lettera</button></div>').join("")}
+function setView(){const gs=[5,10,20,30];return'<h2>Impostazioni</h2><div class="panel" style="text-align:left"><p><b>Audio</b><br><span class="sub">Pronuncia di lettere e parole.</span></p><button class="btn" onclick="St.d.au=!St.d.au;St.save();render()">'+(St.d.au?"🔊 Audio attivo":"🔇 Audio disattivato")+'</button><p style="margin-top:18px"><b>Obiettivo giornaliero</b><br><span class="sub">Numero di domande al giorno.</span></p><div class="chips">'+gs.map(g=>'<button class="btn'+(St.d.goal===g?" on":"")+'" onclick="St.d.goal='+g+';St.save();render()">'+g+' domande</button>').join("")+'</div><p style="margin-top:18px"><b>Tema</b></p><div class="chips">'+[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]].map(t=>'<button class="btn'+((St.d.theme||"auto")===t[0]?" on":"")+'" onclick="setTheme(\''+t[0]+'\')">'+t[1]+'</button>').join("")+'</div><p style="margin-top:18px"><b>Backup</b><br><span class="sub">Copia il codice per spostare i progressi su un altro dispositivo, poi incollalo qui e ripristina.</span></p><textarea id="bk" rows="3" aria-label="Codice di backup" style="width:100%;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px"></textarea><div class="chips" style="margin-top:6px"><button class="btn" onclick="$(\'bk\').value=JSON.stringify(St.d)">Mostra codice</button><button class="btn" onclick="restore()">Ripristina</button></div><p style="margin-top:18px"><b>Progressi</b><br><span class="sub">Statistiche ed errori sono salvati su questo dispositivo.</span></p><button class="btn" onclick="if(S.reset){St.reset();S.reset=false}else S.reset=true;render()">'+(S.reset?"Conferma: azzera tutto":"Azzera progressi")+'</button></div>'}
+/* ===== Parole reali, percorso, scrivi a mano, extra ===== */
+const WORDS=[["بَاب","porta"],["كِتَاب","libro"],["قَلَم","penna"],["بَيْت","casa"],["شَمْس","sole"],["قَمَر","luna"],["وَلَد","bambino"],["بِنْت","ragazza"],["نَهْر","fiume"],["لَبَن","latte"],["سَمَك","pesce"],["جَمَل","cammello"],["دَار","dimora"],["رَجُل","uomo"],["بَحْر","mare"],["كَلْب","cane"],["مَلِك","re"],["فَم","bocca"],["كَتَبَ","ha scritto"],["مَكْتَب","ufficio"],["نَبَات","pianta"],["كَمْ","quanto"],["مِنْ","da"],["لَوْن","colore"],["يَوْم","giorno"],["قَلْب","cuore"],["دَرْس","lezione"],["عَيْن","occhio"],["تَمْر","datteri"],["نَار","fuoco"],["جَدّ","nonno"],["سِتّ","sei"],["كُلّ","tutto"],["حَقّ","diritto"],["مُدَرِّس","insegnante"]];
+const LES=[["Prime lettere","Ba, Ta, Tha, Alif, Nun: riconoscile senza vocali.",[0,1,2,3,24],{kind:"r",dir:"read",diff:0,count:10}],
+["Nuove lettere","Aggiungi Mim, Lam, Kaf, Fa.",[0,1,2,3,24,23,22,21,19],{kind:"r",dir:"read",diff:1,count:10}],
+["Lettere simili","Distingui ج ح خ e د ذ ر ز dai punti.",[4,5,6,7,8,9,10],{ex:"find",diff:2}],
+["Forme iniziali e finali","Riconosci la posizione di una lettera nella parola.",[1,2,3,24,23,21],{ex:"inword",diff:1}],
+["Collegamento delle lettere","Scrivi sequenze con lettere che non si collegano: ا د ر و.",[0,1,2,24,7,9,26],{kind:"r",dir:"write",diff:1,count:10}],
+["Harakāt","Fatha, kasra e damma: ora le vocali contano.",[1,2,3,24,23,21,22],{kind:"v",dir:"read",diff:0,count:10}],
+["Sukūn","Lettere senza vocale, con parole vere (بَيْت, يَوْم).",[1,27,2,26,22,24,23],{kind:"v",dir:"read",src:"real",diff:1,count:5}],
+["Shadda","La consonante raddoppiata (كُلّ = kull).",[4,7,11,2,21,22,5,20,23,9],{kind:"v",dir:"read",src:"real",diff:1,count:5}],
+["Parole semplici","Leggi vere parole arabe con le prime lettere.",PRESET.Principiante,{kind:"v",dir:"read",src:"real",diff:1,count:10}],
+["Lettura","Sequenze lunghe con tutte le lettere.",PRESET.Completo,{kind:"m",dir:"read",diff:2,count:10}]];
+Object.assign(MN,{inword:"Lettera nella parola",hand:"Scrivi a mano"});
+Q.real=function(c){const ok=WORDS.filter(w=>[...w[0]].every(ch=>idx(ch)<0||S.sel.has(idx(ch)))&&(!this.cur||w[0]!==this.cur.full));if(!ok.length)return null;const w=pick(ok),kind=c.kind==="m"?pick(["r","v"]):c.kind,ar=kind==="r"?Tr.strip(w[0]):w[0];return{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0),mean:w[1],full:w[0]}};
+function lessonDone(i,ok,n){chk();if(i!=null&&n){const p=Math.round(100*ok/n);St.d.les[i]=Math.max(St.d.les[i]||0,p)}St.save()}
+const lesNote=(ok,n)=>'<p>'+(ok/n>=.7?"✅ <b>Lezione completata</b>":"Raggiungi almeno il 70% per completare la lezione.")+'</p>';
+function lesson(i){const l=LES[i],c=l[3];S.sel=new Set(l[2]);sav();S.cfg.src=c.src||"fake";
+ if(c.ex){S.cfg.diff=c.diff;Ex.lesson=i;Ex.start(c.ex)}else Q.start(Object.assign({method:"custom",lesson:i,src:"fake"},c))}
+function chk(){const d=St.d,u=ACH().filter(a=>a[1]&&!(d.ach||[]).includes(a[0]));if(u.length){d.ach=[...(d.ach||[]),...u.map(a=>a[0])];toast("🏆 Nuovo traguardo: "+u[0][0])}}
+function toast(t){const e=$("toast");e.textContent=t;e.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.opacity=0,3500)}
+function applyTheme(){const r=document.documentElement,t=St.d.theme||"auto";t==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",t)}
+function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
+function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
+const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
+const Hd={q:null,n:0,ok:0,ms:0,ts:0,t0:0,
+ start(){this.n=this.ok=0;this.ts=Date.now();S.view="hand";this.next()},
+ next(){if(this.n>=10){St.d.done++;lessonDone(null,0,0);this.ms=Date.now()-this.ts;this.q=null;return render()}
+  this.q=pick([...S.sel].flatMap(i=>{const a=Ms.acc(i);return a!==null&&a<.7?[i,i,i]:[i]}));this.t0=Date.now();render();this.init()},
+ init(){const c=$("cv");if(!c||!c.getContext)return;const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;const x=c.getContext("2d");x.scale(d,d);x.lineWidth=7;x.lineCap=x.lineJoin="round";x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--tx")||"#000";let dr=false;
+  const pt=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+  c.onpointerdown=e=>{dr=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...pt(e));x.lineTo(...pt(e));x.stroke()};c.onpointermove=e=>{if(dr){x.lineTo(...pt(e));x.stroke()}};c.onpointerup=c.onpointercancel=()=>{dr=false}},
+ ex(){const g=$("gh");g.style.opacity=g.style.opacity==="0.28"?"0":"0.28"},
+ rate(ok){this.n++;if(ok)this.ok++;St.log([this.q],"write",ok,"hand",Math.min(Date.now()-this.t0,6e4));this.next()}};
+function hs(){if(!S.sel.size){Au.note("Seleziona almeno una lettera per iniziare.");return}Hd.start()}
+function handView(){const h=Hd,q=h.q;if(q==null)return resView(h.ok,h.n,h.ms,"Hd.start()","");const l=L[q];
+ return'<div class="score">Scrivi a mano · Lettera '+Math.min(h.n+1,10)+' di 10 · Riuscite: '+h.ok+' su '+h.n+'</div>'+bar(10*h.n,"Avanzamento")+'<div class="panel"><p>Scrivi la lettera <b>'+l[1]+'</b> <span class="sub">('+l[4]+')</span></p><button class="btn" onclick="say(AN['+q+'])">🔊 Ascolta</button><div class="hw"><div id="gh" class="ar" aria-hidden="true">'+l[0]+'</div><canvas id="cv" aria-label="Area di scrittura: disegna con dito, mouse o trackpad"></canvas></div><div class="row"><button class="btn" onclick="Hd.init()">Cancella</button><button class="btn" onclick="Hd.ex()">👁 Mostra esempio</button></div><p class="sub">Non c\'è riconoscimento automatico: confronta il disegno con l\'esempio e valutati. L\'ordine dei tratti non è mostrato.</p><div class="row"><button class="btn p" onclick="Hd.rate(true)">✓ Scritta bene</button><button class="btn" onclick="Hd.rate(false)">✗ Da rifare</button></div></div><div class="row"><button class="btn" onclick="Hd.n=10;Hd.next()">Termina</button></div>'}
+function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
+ const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
+ if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
+ return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di arabo</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi</p><button class="btn hb" onclick="cont()">Continua allenamento →</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div>'}
+const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["learn","📚 Impara"],["prog","📊 Progressi"],["set","⚙️ Impostazioni"]];
+function render(){const v=S.view,t=["quiz","ex","hand"].includes(v)?"cfg":v;
+ $("nav").innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
+ $("cnt").textContent="Lettere selezionate: "+S.sel.size;$("bar").style.display=v==="alf"||v==="cfg"?"":"none";
+ $("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand"?handView():v==="learn"?learnView():v==="prog"?progView():setView();
+ if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus()}
+St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
+</script>
+</body>
+</html>
