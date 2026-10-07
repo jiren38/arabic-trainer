@@ -83,6 +83,16 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
 @media(min-width:900px){header{position:fixed;top:0;left:0;bottom:0;width:230px;border-right:1px solid var(--bd);border-bottom:0}header div{padding:22px 14px}nav{flex-direction:column;overflow:visible;margin-top:14px}nav button{flex:none;text-align:left;padding:11px 12px}body{padding-left:230px}.bar{left:230px}}
 </style>
+
+<meta name="theme-color" content="#2f3fb0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Arabic Trainer">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+
 </head>
 <body>
 <header><div><b>Arabic Trainer</b>
@@ -342,5 +352,14 @@ function render(){const v=S.view,t=["quiz","ex","hand"].includes(v)?"cfg":v;
  if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus()}
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+</script>
+
 </body>
 </html>
