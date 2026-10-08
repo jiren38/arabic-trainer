@@ -347,12 +347,14 @@ const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="
 /* ===== Sistema di Scrittura Guidata Avanzato con Tolleranza e Animazione ===== */
 /* ===== SISTEMA SCRITTURA HANDTRAINER COMPLETO E TESTATO ===== */
 /* ===== SISTEMA DI RICONOSCIMENTO VETTORIALE $P / GEOMETRICO DENSE ===== */
+/* ===== SISTEMA SCRITTURA RIGIDO ANTI-SCARABOCCHIO CON DEMO ANIMATA ===== */
 const SmartHand = {
   curIdx: 0,
   guided: true,
   ctx: null,
+  guideCtx: null,
   drawing: false,
-  strokes: [],      // Array di tratti, ogni tratto è un array di punti {x, y}
+  strokes: [],
   currentStroke: [],
   animTimer: null,
 
@@ -371,7 +373,8 @@ const SmartHand = {
 
   initCanvas() {
     const canvas = $("hw_cv");
-    if (!canvas) return;
+    const guideCanvas = $("hw_guide_cv");
+    if (!canvas || !guideCanvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -384,7 +387,23 @@ const SmartHand = {
     this.ctx.lineCap = this.ctx.lineJoin = "round";
     this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
 
+    guideCanvas.width = rect.width * dpr;
+    guideCanvas.height = rect.height * dpr;
+    this.guideCtx = guideCanvas.getContext("2d");
+    this.guideCtx.scale(dpr, dpr);
+
+    this.drawGuideText(rect.width, rect.height);
     this.bindEvents(canvas);
+  },
+
+  drawGuideText(w, h) {
+    const l = L[this.curIdx];
+    this.guideCtx.clearRect(0, 0, w, h);
+    this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.textAlign = "center";
+    this.guideCtx.textBaseline = "middle";
+    this.guideCtx.fillStyle = "#000";
+    this.guideCtx.fillText(l[0], w / 2, h / 2);
   },
 
   bindEvents(c) {
@@ -441,49 +460,95 @@ const SmartHand = {
     if (res) res.innerHTML = "";
   },
 
+  // FUNZIONE DEMO RIPRISTINATA E PERFETTAMENTE SINCRONIZZATA
+  playDemo() {
+    this.clear();
+    const l = L[this.curIdx];
+    const c = $("hw_cv");
+    if (!c) return;
+    const rect = c.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    const fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+
+    this.guideCtx.clearRect(0, 0, w, h);
+    this.guideCtx.font = fontStr;
+    this.guideCtx.textAlign = "center";
+    this.guideCtx.textBaseline = "middle";
+    this.guideCtx.fillStyle = "#000";
+    this.guideCtx.fillText(l[0], w / 2, h / 2);
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tCtx = tempCanvas.getContext("2d");
+    tCtx.font = fontStr;
+    tCtx.textAlign = "center";
+    tCtx.textBaseline = "middle";
+    tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
+    tCtx.fillText(l[0], w / 2, h / 2);
+
+    let progress = 0;
+
+    const step = () => {
+      progress += 0.03;
+      this.ctx.clearRect(0, 0, w, h);
+
+      this.ctx.save();
+      this.ctx.beginPath();
+      const currentX = w - w * progress;
+      this.ctx.rect(currentX, 0, w, h);
+      this.ctx.clip();
+      this.ctx.drawImage(tempCanvas, 0, 0);
+      this.ctx.restore();
+
+      if (progress < 1) {
+        this.animTimer = requestAnimationFrame(step);
+      } else {
+        if (typeof say === "function") say(AN[this.curIdx]);
+      }
+    };
+
+    step();
+  },
+
   stopAnim() {
     if (this.animTimer) cancelAnimationFrame(this.animTimer);
   },
 
-  /* --- ALGORITMO DI ANALISI VETTORIALE E STRUTTURALE --- */
+  /* VALUTAZIONE SEVERA ANTI-SCARABOCCHIO */
   evaluate() {
+    const resEl = $("hw_result");
+
     if (this.strokes.length === 0) {
       if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!");
       return;
     }
 
-    const targetChar = L[this.curIdx][0]; // Lettera araba richiesta (es. "ا", "ب", "ت")
-    const resEl = $("hw_result");
+    const targetChar = L[this.curIdx][0];
 
-    // 1. Estrazione Bounding Box globale e tratti principali vs punti/diacritici
-    let allPoints = [];
-    let mainStrokes = [];
-    let dotStrokes = [];
+    // 1. REGOLA SEVERA: CONTEGGIO TRATTI
+    // Se l'utente fa più di 3-4 tratti per lettere semplici, è uno scarabocchio!
+    const numStrokes = this.strokes.length;
+    let maxAllowedStrokes = 2; // Default per Alif, Dal, Raa...
+    if (["ب", "ت", "ث", "ك", "ي", "ط", "ظ"].includes(targetChar)) maxAllowedStrokes = 4;
 
-    this.strokes.forEach(stroke => {
-      if (stroke.length < 2) return;
-      
-      // Calcolo lunghezza tracciato
-      let len = 0;
-      for (let i = 1; i < stroke.length; i++) {
-        len += Math.hypot(stroke[i].x - stroke[i-1].x, stroke[i].y - stroke[i-1].y);
-      }
-
-      // Un tratto molto corto (lunghezza < 25px) viene classificato come punto/diacritico
-      if (len < 25) {
-        dotStrokes.push(stroke);
-      } else {
-        mainStrokes.push(stroke);
-      }
-      allPoints.push(...stroke);
-    });
-
-    if (allPoints.length < 5) {
-      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto troppo breve o illeggibile.</div>`;
+    if (numStrokes > maxAllowedStrokes) {
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti casuali! Hai fatto ${numStrokes} tratti.</div>`;
+      if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000);
       return;
     }
 
-    // Bounding Box
+    // 2. RACCOLTA PUNTI E CALCOLO BOUNDING BOX
+    let allPoints = [];
+    this.strokes.forEach(s => allPoints.push(...s));
+
+    if (allPoints.length < 8) {
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`;
+      return;
+    }
+
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     allPoints.forEach(p => {
       if (p.x < minX) minX = p.x;
@@ -492,151 +557,81 @@ const SmartHand = {
       if (p.y > maxY) maxY = p.y;
     });
 
-    const width = maxX - minX;
-    const height = maxY - minY;
-    const aspectRatio = width / (height || 1);
+    const userW = maxX - minX;
+    const userH = maxY - minY;
+    const aspectRatio = userW / (userH || 1);
 
-    // 2. Regole di controllo topologico basate sulla lettera richiesta
+    // 3. VERIFICA GEOMETRICA PER SPECIFICA LETTERA
     let score = 100;
-    let reason = "";
+    let errorMsg = "";
 
-    // A) ANALISI PER ALIF (ا) -> Deve essere un tratto prevalentemente verticale
+    // SE È ALIF (ا) -> DEVE ESSERE RIGIDAMENTE VERTICALE
     if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") {
-      if (aspectRatio > 0.8) { 
-        score -= 60; // Penalità severa se è orizzontale o quadrata
-        reason = "La Alif deve essere un tratto verticale piatto.";
+      if (aspectRatio > 0.55 || userH < 35) {
+        score = 0;
+        errorMsg = "La Alif deve essere una linea verticale ben definita!";
       }
-      if (dotStrokes.length > 2) {
-        score -= 30;
-        reason = "Troppi punti o tratti extra.";
-      }
-    }
-
-    // B) ANALISI PER BA/TA/THA (ب / ت / ث) -> Corpo orizzontale/conca + numero preciso di punti
-    else if (["ب", "ت", "ث", "ن", "ي"].includes(targetChar)) {
-      if (aspectRatio < 0.6) {
-        score -= 50;
-        reason = "Il corpo principale deve svilupparsi in orizzontale.";
-      }
-
-      // Conteggio punti richiesti
-      const expectedDots = targetChar === "ب" ? 1 : targetChar === "ت" ? 2 : targetChar === "ث" ? 3 : targetChar === "ن" ? 1 : 2;
-      if (dotStrokes.length !== expectedDots && mainStrokes.length === 1) {
-        score -= Math.abs(dotStrokes.length - expectedDots) * 25;
-        reason = `Lettera ${targetChar}: previsti ${expectedDots} puntini diacritici.`;
+    } 
+    // SE È BA / TA / THA -> DEVE ESSERE ORIZZONTALE
+    else if (["ب", "ت", "ث"].includes(targetChar)) {
+      if (aspectRatio < 0.8) {
+        score = 0;
+        errorMsg = "Questa lettera deve svilupparsi in orizzontale!";
       }
     }
 
-    // C) ANALISI DIREZIONALITA' GENERALE (Resampling & Vector Normalization)
-    const sampledUser = this.resample(allPoints, 32);
-    const userAngles = this.getAngleSequence(sampledUser);
-    
-    // Incoerenza della curvatura eccessiva (scarabocchio)
-    let totalAngleChange = 0;
-    for (let i = 1; i < userAngles.length; i++) {
-      let diff = Math.abs(userAngles[i] - userAngles[i - 1]);
-      if (diff > Math.PI) diff = 2 * Math.PI - diff;
-      totalAngleChange += diff;
+    // 4. VERIFICA SOVRAPPOSIZIONE E PENALITÀ PER TRATTI FUORI POSTO
+    if (score > 0) {
+      const cv = $("hw_cv");
+      const w = cv.width;
+      const h = cv.height;
+
+      const userImg = this.ctx.getImageData(0, 0, w, h).data;
+      const guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
+
+      let guidePixels = 0;
+      let hitPixels = 0;
+      let outPixels = 0;
+
+      for (let y = 0; y < h; y += 4) {
+        for (let x = 0; x < w; x += 4) {
+          const idx = (y * w + x) * 4;
+          const uA = userImg[idx + 3];
+          const gA = guideImg[idx + 3];
+
+          if (gA > 50) guidePixels++;
+
+          if (uA > 50) {
+            if (gA > 50) {
+              hitPixels++;
+            } else {
+              outPixels++; // Tratto disegnato fuori dalla lettera!
+            }
+          }
+        }
+      }
+
+      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
+      const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 40 : 0; // Penalità severa per chi scarabocchia fuori
+
+      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty));
+      score = Math.min(100, score);
     }
 
-    // Se l'utente ha disegnato cerchi o scarabocchi continui non congruenti
-    if (totalAngleChange > Math.PI * 6 && !["ه", "م", "و", "ق", "ف"].includes(targetChar)) {
-      score -= 50;
-      reason = "Disegno troppo confuso o con troppi ghirigori.";
-    }
-
-    // Normalizzazione punteggio finale
-    score = Math.max(0, Math.min(100, Math.round(score)));
-
-    // 3. Sistema di feedback a tre livelli
-    const isGood = score >= 60;
+    // 5. GIUDIZIO E SCORE SOGLIA MINIMA 50%
+    const isGood = score >= 50;
     if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
 
     if (resEl) {
-      if (score >= 60) {
-        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottima scrittura! (${score}%)</div>`;
+      if (score >= 50) {
+        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`;
         if (typeof say === "function") say(AN[this.curIdx]);
-      } else if (score >= 40) {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${reason || "Migliora la forma del tratto."}</div>`;
       } else {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${reason || "Forma non riconosciuta."}</div>`;
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma non valida o troppe sbavature."}</div>`;
       }
     }
-  },
-
-  // Campiona N punti equidistanti dal tracciato
-  resample(points, n) {
-    if (points.length === 0) return [];
-    let I = this.pathLength(points) / (n - 1);
-    let D = 0;
-    let newPoints = [points[0]];
-    let pts = [...points];
-
-    for (let i = 1; i < pts.length; i++) {
-      let d = Math.hypot(pts[i].x - pts[i-1].x, pts[i].y - pts[i-1].y);
-      if ((D + d) >= I) {
-        let qx = pts[i-1].x + ((I - D) / d) * (pts[i].x - pts[i-1].x);
-        let qy = pts[i-1].y + ((I - D) / d) * (pts[i].y - pts[i-1].y);
-        let q = { x: qx, y: qy };
-        newPoints.push(q);
-        pts.splice(i, 0, q);
-        D = 0;
-      } else {
-        D += d;
-      }
-    }
-    if (newPoints.length === n - 1) newPoints.push(pts[pts.length - 1]);
-    return newPoints;
-  },
-
-  pathLength(points) {
-    let d = 0;
-    for (let i = 1; i < points.length; i++) {
-      d += Math.hypot(points[i].x - points[i-1].x, points[i].y - points[i-1].y);
-    }
-    return d;
-  },
-
-  getAngleSequence(points) {
-    let angles = [];
-    for (let i = 1; i < points.length; i++) {
-      angles.push(Math.atan2(points[i].y - points[i-1].y, points[i].x - points[i-1].x));
-    }
-    return angles;
   }
 };
-
-function hs() { SmartHand.start(true); }
-
-function smartHandView() {
-  const l = L[SmartHand.curIdx];
-  return `
-    <h2>Scrittura a Mano Interattiva</h2>
-    <div class="panel">
-      <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
-      
-      <div class="chips" style="justify-content:center; margin-bottom:10px;">
-        <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
-        <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
-        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
-      </div>
-
-      <div class="hw-container">
-        <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
-        <canvas id="hw_cv" class="hw-canvas"></canvas>
-        <canvas id="hw_guide_cv" style="display:none;"></canvas>
-      </div>
-
-      <div id="hw_result"></div>
-
-      <div class="row" style="margin-top:12px;">
-        <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
-        <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
-        <button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button>
-      </div>
-    </div>
-  `;
-}
 function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
  if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
