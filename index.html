@@ -81,7 +81,7 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
   width: min(100%, 300px); 
   aspect-ratio: 1; 
   margin: 16px auto; 
-  background: #ffffff;
+  background: #2a2f3d;
   border: 3px solid var(--bd); 
   border-radius: 16px; 
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
@@ -495,25 +495,46 @@ const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="
 /* ===== Sistema Scrittura Smart Hand ===== */
 const SmartHand = {
   curIdx: 0, guided: true, ctx: null, guideCtx: null, drawing: false, strokes: [], currentStroke: [], animTimer: null,
+  
   start(guidedMode = true) {
     if (!S.sel || !S.sel.size) { if (typeof Au !== "undefined" && Au.note) Au.note("Seleziona almeno una lettera per iniziare."); return; }
     this.stopAnim(); this.guided = guidedMode; this.curIdx = pick([...S.sel]); S.view = "hand_smart"; render();
     setTimeout(() => this.initCanvas(), 60);
   },
+
   initCanvas() {
-    const canvas = $("hw_cv"), guideCanvas = $("hw_guide_cv"); if (!canvas || !guideCanvas) return;
+    const canvas = $("hw_cv"), guideCanvas = $("hw_guide_cv"); 
+    if (!canvas || !guideCanvas) return;
     const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
-    this.ctx = canvas.getContext("2d"); this.ctx.scale(dpr, dpr); this.ctx.lineWidth = 12; this.ctx.lineCap = this.ctx.lineJoin = "round";
-    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
-    guideCanvas.width = rect.width * dpr; guideCanvas.height = rect.height * dpr;
-    this.guideCtx = guideCanvas.getContext("2d"); this.guideCtx.scale(dpr, dpr);
-    this.drawGuideText(rect.width, rect.height); this.bindEvents(canvas);
+    
+    canvas.width = rect.width * dpr; 
+    canvas.height = rect.height * dpr;
+    this.ctx = canvas.getContext("2d"); 
+    this.ctx.scale(dpr, dpr); 
+    this.ctx.lineWidth = 12; 
+    this.ctx.lineCap = this.ctx.lineJoin = "round";
+    
+    // TRATTO DI SCRITTURA BIANCO
+    this.ctx.strokeStyle = "#ffffff";
+
+    guideCanvas.width = rect.width * dpr; 
+    guideCanvas.height = rect.height * dpr;
+    this.guideCtx = guideCanvas.getContext("2d"); 
+    this.guideCtx.scale(dpr, dpr);
+    this.drawGuideText(rect.width, rect.height); 
+    this.bindEvents(canvas);
   },
+
   drawGuideText(w, h) {
-    const l = L[this.curIdx]; this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-    this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
+    const l = L[this.curIdx]; 
+    this.guideCtx.clearRect(0, 0, w, h); 
+    this.guideCtx.font = `${h * 0.55}px "Amiri", "Noto Naskh Arabic", serif`;
+    this.guideCtx.textAlign = "center"; 
+    this.guideCtx.textBaseline = "middle"; 
+    this.guideCtx.fillStyle = "#ffffff"; 
+    this.guideCtx.fillText(l[0], w / 2, h / 2);
   },
+
   bindEvents(c) {
     let pt = e => { const b = c.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
     c.onpointerdown = e => {
@@ -524,30 +545,92 @@ const SmartHand = {
       if (!this.drawing) return; const p = pt(e); this.currentStroke.push(p); this.ctx.lineTo(p.x, p.y); this.ctx.stroke();
       if (this.guided && this.getTotalPointsCount() > 15) { const g = $("hw_ghost"); if (g) g.classList.add("fade-out"); }
     };
-    c.onpointerup = c.onpointercancel = () => { if (this.drawing && this.currentStroke.length > 0) { this.strokes.push(this.currentStroke); this.currentStroke = []; } this.drawing = false; };
+    c.onpointerup = c.onpointercancel = () => { 
+      if (this.drawing && this.currentStroke.length > 0) { this.strokes.push(this.currentStroke); this.currentStroke = []; } 
+      this.drawing = false; 
+    };
   },
+
   getTotalPointsCount() { return this.strokes.reduce((acc, s) => acc + s.length, 0) + this.currentStroke.length; },
+
   clear() {
     this.stopAnim(); const c = $("hw_cv"); if (c && this.ctx) this.ctx.clearRect(0, 0, c.width, c.height);
     this.strokes = []; this.currentStroke = []; const g = $("hw_ghost"); if (this.guided && g) g.classList.remove("fade-out");
     const res = $("hw_result"); if (res) res.innerHTML = "";
   },
+
   stopAnim() { if (this.animTimer) cancelAnimationFrame(this.animTimer); },
+
   playDemo() {
-    this.clear(); const l = L[this.curIdx], c = $("hw_cv"); if (!c) return;
-    const rect = c.getBoundingClientRect(), w = rect.width, h = rect.height, fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-    this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = fontStr; this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
-    const tempCanvas = document.createElement("canvas"); tempCanvas.width = w; tempCanvas.height = h;
-    const tCtx = tempCanvas.getContext("2d"); tCtx.font = fontStr; tCtx.textAlign = "center"; tCtx.textBaseline = "middle"; tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0"; tCtx.fillText(l[0], w / 2, h / 2);
+    this.clear();
+    const l = L[this.curIdx], c = $("hw_cv");
+    if (!c) return;
+    const rect = c.getBoundingClientRect(), w = rect.width, h = rect.height;
+    
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = w * (window.devicePixelRatio || 1);
+    tempCanvas.height = h * (window.devicePixelRatio || 1);
+    const tCtx = tempCanvas.getContext("2d");
+    tCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    
+    tCtx.font = `${h * 0.55}px "Amiri", "Noto Naskh Arabic", serif`;
+    tCtx.textAlign = "center";
+    tCtx.textBaseline = "middle";
+    tCtx.fillStyle = "#ffffff"; 
+    tCtx.fillText(l[0], w / 2, h / 2);
+
     let progress = 0;
-    const step = () => {
-      progress += 0.03; this.ctx.clearRect(0, 0, w, h); this.ctx.save(); this.ctx.beginPath();
-      const currentX = w - w * progress; this.ctx.rect(currentX, 0, w, h); this.ctx.clip(); this.ctx.drawImage(tempCanvas, 0, 0); this.ctx.restore();
-      if (progress < 1) { this.animTimer = requestAnimationFrame(step); } else { if (typeof say === "function") say(AN[this.curIdx]); }
+    const animateLoop = () => {
+      progress += 0.018;
+      if (progress > 1.3) progress = 0;
+
+      this.ctx.clearRect(0, 0, w, h);
+      
+      if (progress <= 1) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        const currentX = w - w * Math.min(1, progress);
+        this.ctx.rect(currentX, 0, w, h);
+        this.ctx.clip();
+        this.ctx.drawImage(tempCanvas, 0, 0, w, h);
+        this.ctx.restore();
+      }
+
+      this.drawStrokeIndicators(w, h, progress);
+      this.animTimer = requestAnimationFrame(animateLoop);
     };
-    step();
+
+    this.stopAnim();
+    animateLoop();
   },
- evaluate() {
+
+  drawStrokeIndicators(w, h, progress) {
+    this.ctx.save();
+    this.ctx.fillStyle = "#e74c3c";
+    this.ctx.strokeStyle = "#e74c3c";
+    this.ctx.lineWidth = 2;
+    this.ctx.font = "bold 14px system-ui";
+
+    const startX = w * 0.7, startY = h * 0.35;
+    this.ctx.beginPath();
+    this.ctx.arc(startX, startY, 10, 0, Math.PI * 2);
+    this.ctx.fillStyle = "#e74c3c";
+    this.ctx.fill();
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillText("1", startX, startY);
+
+    this.ctx.beginPath();
+    this.ctx.setLineDash([3, 3]);
+    this.ctx.moveTo(startX - 12, startY);
+    this.ctx.lineTo(startX - 45, startY + 15);
+    this.ctx.stroke();
+
+    this.ctx.restore();
+  },
+
+  evaluate() {
     const resEl = $("hw_result"); 
     if (this.strokes.length === 0) { 
       if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!"); 
@@ -602,7 +685,7 @@ const SmartHand = {
             else outPixels++; 
           } 
         } 
-      }
+      } 
       
       const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
       const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 40 : 0;
@@ -638,20 +721,22 @@ function smartHandView() {
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
         <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
-        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra Tratto</button>
+        <button class="btn" onclick="SmartHand.playDemo()">🎬 Tutorial Animato</button>
       </div>
 
-      <!-- Quadrato con Griglia Tratteggiata -->
+      <!-- Quadrato Grigio con Griglia Tratteggiata Grigia -->
       <div class="hw-container">
         <svg class="hw-grid-svg" viewBox="0 0 100 100">
-          <line x1="33.3" y1="0" x2="33.3" y2="100" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
-          <line x1="66.6" y1="0" x2="66.6" y2="100" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
-          <line x1="0" y1="33.3" x2="100" y2="33.3" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
-          <line x1="0" y1="66.6" x2="100" y2="66.6" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
-          <line x1="0" y1="0" x2="100" y2="100" stroke="#000" stroke-dasharray="2" stroke-width="0.5"/>
-          <line x1="100" y1="0" x2="0" y2="100" stroke="#000" stroke-dasharray="2" stroke-width="0.5"/>
+          <!-- Linee tratteggiate grigie -->
+          <line x1="50" y1="0" x2="50" y2="100" stroke="#8a94a6" stroke-dasharray="3" stroke-width="0.8"/>
+          <line x1="0" y1="25" x2="100" y2="25" stroke="#8a94a6" stroke-dasharray="3" stroke-width="0.6"/>
+          <line x1="0" y1="75" x2="100" y2="75" stroke="#8a94a6" stroke-dasharray="3" stroke-width="0.6"/>
+          <!-- Linea di Base Calligrafica Principale (Rigo arabo) -->
+          <line x1="0" y1="58" x2="100" y2="58" stroke="#8c9bff" stroke-width="2" opacity="0.8"/>
         </svg>
+
         <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
+        
         <canvas id="hw_cv" class="hw-canvas"></canvas>
         <canvas id="hw_guide_cv" style="display:none;"></canvas>
       </div>
@@ -666,7 +751,6 @@ function smartHandView() {
     </div>
   `;
 }
-
 /* ===== Sezione Vocaboli ===== */
 function vocabView() {
   const rawWords = St.d.vocab || [];
