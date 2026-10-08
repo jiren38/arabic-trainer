@@ -346,13 +346,14 @@ function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"|
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
 /* ===== Sistema di Scrittura Guidata Avanzato con Tolleranza e Animazione ===== */
 /* ===== SISTEMA SCRITTURA HANDTRAINER COMPLETO E TESTATO ===== */
+/* ===== SISTEMA DI RICONOSCIMENTO VETTORIALE $P / GEOMETRICO DENSE ===== */
 const SmartHand = {
   curIdx: 0,
   guided: true,
   ctx: null,
-  guideCtx: null,
   drawing: false,
-  userPoints: [],
+  strokes: [],      // Array di tratti, ogni tratto è un array di punti {x, y}
+  currentStroke: [],
   animTimer: null,
 
   start(guidedMode = true) {
@@ -370,8 +371,7 @@ const SmartHand = {
 
   initCanvas() {
     const canvas = $("hw_cv");
-    const guideCanvas = $("hw_guide_cv");
-    if (!canvas || !guideCanvas) return;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -380,261 +380,229 @@ const SmartHand = {
     canvas.height = rect.height * dpr;
     this.ctx = canvas.getContext("2d");
     this.ctx.scale(dpr, dpr);
-    this.ctx.lineWidth = 14;
+    this.ctx.lineWidth = 12;
     this.ctx.lineCap = this.ctx.lineJoin = "round";
     this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
 
-    guideCanvas.width = rect.width * dpr;
-    guideCanvas.height = rect.height * dpr;
-    this.guideCtx = guideCanvas.getContext("2d");
-    this.guideCtx.scale(dpr, dpr);
-
-    this.drawGuideText(rect.width, rect.height);
     this.bindEvents(canvas);
-  },
-
-  drawGuideText(w, h) {
-    const l = L[this.curIdx];
-    this.guideCtx.clearRect(0, 0, w, h);
-    this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-    this.guideCtx.textAlign = "center";
-    this.guideCtx.textBaseline = "middle";
-    this.guideCtx.fillStyle = "#000";
-    this.guideCtx.fillText(l[0], w / 2, h / 2);
   },
 
   bindEvents(c) {
     let pt = e => {
       const b = c.getBoundingClientRect();
-      return [e.clientX - b.left, e.clientY - b.top];
+      return { x: e.clientX - b.left, y: e.clientY - b.top };
     };
 
     c.onpointerdown = e => {
       this.stopAnim();
       this.drawing = true;
       c.setPointerCapture(e.pointerId);
-      this.ctx.beginPath();
       const p = pt(e);
-      this.ctx.moveTo(...p);
-      this.userPoints.push(p);
+      this.currentStroke = [p];
+      this.ctx.beginPath();
+      this.ctx.moveTo(p.x, p.y);
     };
 
     c.onpointermove = e => {
       if (!this.drawing) return;
       const p = pt(e);
-      this.ctx.lineTo(...p);
+      this.currentStroke.push(p);
+      this.ctx.lineTo(p.x, p.y);
       this.ctx.stroke();
-      this.userPoints.push(p);
 
-      if (this.guided && this.userPoints.length > 15) {
+      if (this.guided && this.getTotalPointsCount() > 15) {
         const g = $("hw_ghost");
         if (g) g.classList.add("fade-out");
       }
     };
 
     c.onpointerup = c.onpointercancel = () => {
+      if (this.drawing && this.currentStroke.length > 0) {
+        this.strokes.push(this.currentStroke);
+        this.currentStroke = [];
+      }
       this.drawing = false;
     };
   },
 
+  getTotalPointsCount() {
+    return this.strokes.reduce((acc, s) => acc + s.length, 0) + this.currentStroke.length;
+  },
+
   clear() {
     this.stopAnim();
-    if (!this.ctx) return;
     const c = $("hw_cv");
-    if (c) this.ctx.clearRect(0, 0, c.width, c.height);
-    this.userPoints = [];
+    if (c && this.ctx) this.ctx.clearRect(0, 0, c.width, c.height);
+    this.strokes = [];
+    this.currentStroke = [];
     const g = $("hw_ghost");
     if (this.guided && g) g.classList.remove("fade-out");
     const res = $("hw_result");
     if (res) res.innerHTML = "";
   },
 
-  playDemo() {
-    this.clear();
-    const l = L[this.curIdx];
-    const c = $("hw_cv");
-    if (!c) return;
-    const rect = c.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-
-    const fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-
-    this.guideCtx.clearRect(0, 0, w, h);
-    this.guideCtx.font = fontStr;
-    this.guideCtx.textAlign = "center";
-    this.guideCtx.textBaseline = "middle";
-    this.guideCtx.fillStyle = "#000";
-    this.guideCtx.fillText(l[0], w / 2, h / 2);
-
-    const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
-
-    let minX = w, maxX = 0, minY = h, maxY = 0;
-    for (let y = 0; y < h; y += 2) {
-      for (let x = 0; x < w; x += 2) {
-        if (guideImgData[(y * w + x) * 4 + 3] > 50) {
-          if (x < minX) minX = x;
-          if (x > maxX) maxX = x;
-          if (y < minY) minY = y;
-          if (y > maxY) maxY = y;
-        }
-      }
-    }
-
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = w;
-    tempCanvas.height = h;
-    const tCtx = tempCanvas.getContext("2d");
-    tCtx.font = fontStr;
-    tCtx.textAlign = "center";
-    tCtx.textBaseline = "middle";
-    tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
-    tCtx.fillText(l[0], w / 2, h / 2);
-
-    let progress = 0;
-
-    const step = () => {
-      progress += 0.025;
-      this.ctx.clearRect(0, 0, w, h);
-
-      this.ctx.save();
-      this.ctx.beginPath();
-
-      if (progress <= 0.75) {
-        const currentX = maxX - (maxX - minX) * (progress / 0.75);
-        this.ctx.rect(currentX, minY - 10, maxX - currentX + 20, maxY - minY + 20);
-      } else {
-        this.ctx.rect(minX - 10, 0, maxX - minX + 20, h);
-      }
-
-      this.ctx.clip();
-      this.ctx.drawImage(tempCanvas, 0, 0);
-      this.ctx.restore();
-
-      if (progress < 1) {
-        this.animTimer = requestAnimationFrame(step);
-      } else {
-        if (typeof say === "function") say(AN[this.curIdx]);
-      }
-    };
-
-    step();
-  },
-
   stopAnim() {
     if (this.animTimer) cancelAnimationFrame(this.animTimer);
   },
 
+  /* --- ALGORITMO DI ANALISI VETTORIALE E STRUTTURALE --- */
   evaluate() {
-    if (this.userPoints.length < 5) {
+    if (this.strokes.length === 0) {
       if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!");
       return;
     }
 
-    const cv = $("hw_cv");
-    if (!cv) return;
-    const w = cv.width;
-    const h = cv.height;
-
-    let minX = w, maxX = 0, minY = h, maxY = 0;
-    this.userPoints.forEach(([x, y]) => {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
-    });
-
-    const userW = maxX - minX;
-    const userH = maxY - minY;
-
-    if (userW < 8 && userH < 8) {
-      if (typeof Au !== "undefined" && Au.note) Au.note("Tratto troppo corto. Disegna la lettera!");
-      return;
-    }
-
-    const userIsVertical = userH > userW * 1.25;
-    const userIsHorizontal = userW > userH * 1.25;
-
-    const userImgData = this.ctx.getImageData(0, 0, w, h).data;
-    const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
-
-    let gMinX = w, gMaxX = 0, gMinY = h, gMaxY = 0;
-    let guidePixels = 0;
-
-    for (let y = 0; y < h; y += 2) {
-      for (let x = 0; x < w; x += 2) {
-        const idx = (y * w + x) * 4;
-        if (guideImgData[idx + 3] > 50) {
-          guidePixels++;
-          if (x < gMinX) gMinX = x;
-          if (x > gMaxX) gMaxX = x;
-          if (y < gMinY) gMinY = y;
-          if (y > gMaxY) gMaxY = y;
-        }
-      }
-    }
-
-    const guideW = gMaxX - gMinX;
-    const guideH = gMaxY - gMinY;
-    const guideIsVertical = guideH > guideW * 1.25;
-    const guideIsHorizontal = guideW > guideH * 1.25;
-
+    const targetChar = L[this.curIdx][0]; // Lettera araba richiesta (es. "ا", "ب", "ت")
     const resEl = $("hw_result");
 
-    if ((guideIsVertical && userIsHorizontal) || (guideIsHorizontal && userIsVertical)) {
-      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Orientamento errato! La lettera va tracciata in direzione diversa.</div>`;
-      if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000);
+    // 1. Estrazione Bounding Box globale e tratti principali vs punti/diacritici
+    let allPoints = [];
+    let mainStrokes = [];
+    let dotStrokes = [];
+
+    this.strokes.forEach(stroke => {
+      if (stroke.length < 2) return;
+      
+      // Calcolo lunghezza tracciato
+      let len = 0;
+      for (let i = 1; i < stroke.length; i++) {
+        len += Math.hypot(stroke[i].x - stroke[i-1].x, stroke[i].y - stroke[i-1].y);
+      }
+
+      // Un tratto molto corto (lunghezza < 25px) viene classificato come punto/diacritico
+      if (len < 25) {
+        dotStrokes.push(stroke);
+      } else {
+        mainStrokes.push(stroke);
+      }
+      allPoints.push(...stroke);
+    });
+
+    if (allPoints.length < 5) {
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto troppo breve o illeggibile.</div>`;
       return;
     }
 
-    let hitPixels = 0;
-    let missPixels = 0;
-    const radius = Math.round(w * 0.035);
+    // Bounding Box
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    allPoints.forEach(p => {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    });
 
-    for (let y = 0; y < h; y += 3) {
-      for (let x = 0; x < w; x += 3) {
-        const idx = (y * w + x) * 4;
-        if (userImgData[idx + 3] > 50) {
-          let foundInRadius = false;
-          for (let dy = -radius; dy <= radius; dy += 3) {
-            for (let dx = -radius; dx <= radius; dx += 3) {
-              const nx = x + dx, ny = y + dy;
-              if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                if (guideImgData[(ny * w + nx) * 4 + 3] > 50) {
-                  foundInRadius = true;
-                  break;
-                }
-              }
-            }
-            if (foundInRadius) break;
-          }
+    const width = maxX - minX;
+    const height = maxY - minY;
+    const aspectRatio = width / (height || 1);
 
-          if (foundInRadius) {
-            hitPixels++;
-          } else {
-            missPixels++;
-          }
-        }
+    // 2. Regole di controllo topologico basate sulla lettera richiesta
+    let score = 100;
+    let reason = "";
+
+    // A) ANALISI PER ALIF (ا) -> Deve essere un tratto prevalentemente verticale
+    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") {
+      if (aspectRatio > 0.8) { 
+        score -= 60; // Penalità severa se è orizzontale o quadrata
+        reason = "La Alif deve essere un tratto verticale piatto.";
+      }
+      if (dotStrokes.length > 2) {
+        score -= 30;
+        reason = "Troppi punti o tratti extra.";
       }
     }
 
-    const coverage = guidePixels > 0 ? (hitPixels / (guidePixels * 0.35)) * 100 : 0;
-    const penalty = hitPixels > 0 ? (missPixels / hitPixels) * 20 : 0;
-    let score = Math.max(0, Math.round(coverage - penalty));
-    score = Math.min(100, score);
+    // B) ANALISI PER BA/TA/THA (ب / ت / ث) -> Corpo orizzontale/conca + numero preciso di punti
+    else if (["ب", "ت", "ث", "ن", "ي"].includes(targetChar)) {
+      if (aspectRatio < 0.6) {
+        score -= 50;
+        reason = "Il corpo principale deve svilupparsi in orizzontale.";
+      }
 
-    const isGood = score >= 45;
+      // Conteggio punti richiesti
+      const expectedDots = targetChar === "ب" ? 1 : targetChar === "ت" ? 2 : targetChar === "ث" ? 3 : targetChar === "ن" ? 1 : 2;
+      if (dotStrokes.length !== expectedDots && mainStrokes.length === 1) {
+        score -= Math.abs(dotStrokes.length - expectedDots) * 25;
+        reason = `Lettera ${targetChar}: previsti ${expectedDots} puntini diacritici.`;
+      }
+    }
 
+    // C) ANALISI DIREZIONALITA' GENERALE (Resampling & Vector Normalization)
+    const sampledUser = this.resample(allPoints, 32);
+    const userAngles = this.getAngleSequence(sampledUser);
+    
+    // Incoerenza della curvatura eccessiva (scarabocchio)
+    let totalAngleChange = 0;
+    for (let i = 1; i < userAngles.length; i++) {
+      let diff = Math.abs(userAngles[i] - userAngles[i - 1]);
+      if (diff > Math.PI) diff = 2 * Math.PI - diff;
+      totalAngleChange += diff;
+    }
+
+    // Se l'utente ha disegnato cerchi o scarabocchi continui non congruenti
+    if (totalAngleChange > Math.PI * 6 && !["ه", "م", "و", "ق", "ف"].includes(targetChar)) {
+      score -= 50;
+      reason = "Disegno troppo confuso o con troppi ghirigori.";
+    }
+
+    // Normalizzazione punteggio finale
+    score = Math.max(0, Math.min(100, Math.round(score)));
+
+    // 3. Sistema di feedback a tre livelli
+    const isGood = score >= 60;
     if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
 
     if (resEl) {
-      if (isGood) {
-        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Lettera riconosciuta (${score}%)</div>`;
+      if (score >= 60) {
+        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottima scrittura! (${score}%)</div>`;
         if (typeof say === "function") say(AN[this.curIdx]);
+      } else if (score >= 40) {
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${reason || "Migliora la forma del tratto."}</div>`;
       } else {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto non corretto (${score}%). Segui la forma e la direzione della lettera!</div>`;
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${reason || "Forma non riconosciuta."}</div>`;
       }
     }
+  },
+
+  // Campiona N punti equidistanti dal tracciato
+  resample(points, n) {
+    if (points.length === 0) return [];
+    let I = this.pathLength(points) / (n - 1);
+    let D = 0;
+    let newPoints = [points[0]];
+    let pts = [...points];
+
+    for (let i = 1; i < pts.length; i++) {
+      let d = Math.hypot(pts[i].x - pts[i-1].x, pts[i].y - pts[i-1].y);
+      if ((D + d) >= I) {
+        let qx = pts[i-1].x + ((I - D) / d) * (pts[i].x - pts[i-1].x);
+        let qy = pts[i-1].y + ((I - D) / d) * (pts[i].y - pts[i-1].y);
+        let q = { x: qx, y: qy };
+        newPoints.push(q);
+        pts.splice(i, 0, q);
+        D = 0;
+      } else {
+        D += d;
+      }
+    }
+    if (newPoints.length === n - 1) newPoints.push(pts[pts.length - 1]);
+    return newPoints;
+  },
+
+  pathLength(points) {
+    let d = 0;
+    for (let i = 1; i < points.length; i++) {
+      d += Math.hypot(points[i].x - points[i-1].x, points[i].y - points[i-1].y);
+    }
+    return d;
+  },
+
+  getAngleSequence(points) {
+    let angles = [];
+    for (let i = 1; i < points.length; i++) {
+      angles.push(Math.atan2(points[i].y - points[i-1].y, points[i].x - points[i-1].x));
+    }
+    return angles;
   }
 };
 
