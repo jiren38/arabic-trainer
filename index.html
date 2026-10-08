@@ -6,7 +6,7 @@
 <meta name="description" content="Arabic Trainer — allenamento interattivo per imparare l'alfabeto arabo, leggere, scrivere e ripassare.">
 <meta name="theme-color" content="#2f3fb0">
 <title>Arabic Trainer</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f3f5f9;--card:#fff;--tx:#17203a;--mu:#5d667e;--ac:#2f3fb0;--sel:#e4e8ff;--ok:#157a3d;--ko:#b3261e;--bd:#d9deea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131d;--card:#1a1f2e;--tx:#e8ebf5;--mu:#98a1ba;--ac:#8c9bff;--sel:#262d52;--ok:#5fd18a;--ko:#ff8a80;--bd:#2d3450}}
@@ -154,9 +154,10 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 <nav id="nav"></nav>
 
 <header>
-  <div style="display:flex; align-items:center;">
-    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-    <b>Arabic Trainer</b>
+  <div style="display:grid; grid-template-columns: 40px 1fr 40px; align-items:center; max-width:860px; margin:0 auto; padding:8px 16px;">
+    <button class="menu-toggle" onclick="toggleSidebar()" style="margin:0; justify-self:start;">☰</button>
+    <b onclick="go('home')" style="font-family:'Amiri', serif; font-size:1.6rem; text-align:center; cursor:pointer; letter-spacing:0.02em;" title="Torna alla Home">Arabic Trainer</b>
+    <div></div>
   </div>
 </header>
 
