@@ -82,8 +82,17 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
 @media(min-width:900px){header{position:fixed;top:0;left:0;bottom:0;width:230px;border-right:1px solid var(--bd);border-bottom:0}header div{padding:22px 14px}nav{flex-direction:column;overflow:visible;margin-top:14px}nav button{flex:none;text-align:left;padding:11px 12px}body{padding-left:230px}.bar{left:230px}}
+
+/* Stili per il tracciamento dinamico e la scrittura guidata */
+.hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
+.hw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
+.hw-guide { position: absolute; inset: 0; display: grid; place-items: center; font-size: min(50vw, 200px); color: var(--ac); opacity: 0.25; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+.hw-guide.fade-out { opacity: 0 !important; }
+.accuracy-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
+ 
 </style>
 
+ 
 <meta name="theme-color" content="#2f3fb0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -335,18 +344,187 @@ function applyTheme(){const r=document.documentElement,t=St.d.theme||"auto";t===
 function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
 function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
-const Hd={q:null,n:0,ok:0,ms:0,ts:0,t0:0,
- start(){this.n=this.ok=0;this.ts=Date.now();S.view="hand";this.next()},
- next(){if(this.n>=10){St.d.done++;lessonDone(null,0,0);this.ms=Date.now()-this.ts;this.q=null;return render()}
-  this.q=pick([...S.sel].flatMap(i=>{const a=Ms.acc(i);return a!==null&&a<.7?[i,i,i]:[i]}));this.t0=Date.now();render();this.init()},
- init(){const c=$("cv");if(!c||!c.getContext)return;const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;const x=c.getContext("2d");x.scale(d,d);x.lineWidth=7;x.lineCap=x.lineJoin="round";x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--tx")||"#000";let dr=false;
-  const pt=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
-  c.onpointerdown=e=>{dr=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...pt(e));x.lineTo(...pt(e));x.stroke()};c.onpointermove=e=>{if(dr){x.lineTo(...pt(e));x.stroke()}};c.onpointerup=c.onpointercancel=()=>{dr=false}},
- ex(){const g=$("gh");g.style.opacity=g.style.opacity==="0.28"?"0":"0.28"},
- rate(ok){this.n++;if(ok)this.ok++;St.log([this.q],"write",ok,"hand",Math.min(Date.now()-this.t0,6e4));this.next()}};
-function hs(){if(!S.sel.size){Au.note("Seleziona almeno una lettera per iniziare.");return}Hd.start()}
-function handView(){const h=Hd,q=h.q;if(q==null)return resView(h.ok,h.n,h.ms,"Hd.start()","");const l=L[q];
- return'<div class="score">Scrivi a mano · Lettera '+Math.min(h.n+1,10)+' di 10 · Riuscite: '+h.ok+' su '+h.n+'</div>'+bar(10*h.n,"Avanzamento")+'<div class="panel"><p>Scrivi la lettera <b>'+l[1]+'</b> <span class="sub">('+l[4]+')</span></p><button class="btn" onclick="say(AN['+q+'])">🔊 Ascolta</button><div class="hw"><div id="gh" class="ar" aria-hidden="true">'+l[0]+'</div><canvas id="cv" aria-label="Area di scrittura: disegna con dito, mouse o trackpad"></canvas></div><div class="row"><button class="btn" onclick="Hd.init()">Cancella</button><button class="btn" onclick="Hd.ex()">👁 Mostra esempio</button></div><p class="sub">Non c\'è riconoscimento automatico: confronta il disegno con l\'esempio e valutati. L\'ordine dei tratti non è mostrato.</p><div class="row"><button class="btn p" onclick="Hd.rate(true)">✓ Scritta bene</button><button class="btn" onclick="Hd.rate(false)">✗ Da rifare</button></div></div><div class="row"><button class="btn" onclick="Hd.n=10;Hd.next()">Termina</button></div>'}
+const SmartHand = {
+  curIdx: 0,
+  guided: true,
+  ctx: null,
+  guideCtx: null,
+  drawing: false,
+  userPoints: [],
+  
+  start(guidedMode = true) {
+    if (!S.sel.size) {
+      Au.note("Seleziona almeno una lettera per iniziare.");
+      return;
+    }
+    this.guided = guidedMode;
+    this.curIdx = pick([...S.sel]);
+    S.view = "hand_smart";
+    render();
+    setTimeout(() => this.initCanvas(), 50);
+  },
+
+  initCanvas() {
+    const canvas = $("hw_cv");
+    const guideCanvas = $("hw_guide_cv");
+    if (!canvas || !guideCanvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    // Configura Canvas Utente
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    this.ctx = canvas.getContext("2d");
+    this.ctx.scale(dpr, dpr);
+    this.ctx.lineWidth = 12;
+    this.ctx.lineCap = this.ctx.lineJoin = "round";
+    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
+
+    // Configura Canvas Guida
+    guideCanvas.width = rect.width * dpr;
+    guideCanvas.height = rect.height * dpr;
+    this.guideCtx = guideCanvas.getContext("2d");
+    this.guideCtx.scale(dpr, dpr);
+    
+    this.drawGuideText(rect.width, rect.height);
+    this.bindEvents(canvas);
+  },
+
+  drawGuideText(w, h) {
+    const l = L[this.curIdx];
+    this.guideCtx.clearRect(0, 0, w, h);
+    this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.textAlign = "center";
+    this.guideCtx.textBaseline = "middle";
+    this.guideCtx.fillStyle = "#000";
+    this.guideCtx.fillText(l[0], w / 2, h / 2);
+  },
+
+  bindEvents(c) {
+    let pt = e => {
+      const b = c.getBoundingClientRect();
+      return [e.clientX - b.left, e.clientY - b.top];
+    };
+
+    c.onpointerdown = e => {
+      this.drawing = true;
+      c.setPointerCapture(e.pointerId);
+      this.ctx.beginPath();
+      const p = pt(e);
+      this.ctx.moveTo(...p);
+      this.userPoints.push(p);
+    };
+
+    c.onpointermove = e => {
+      if (!this.drawing) return;
+      const p = pt(e);
+      this.ctx.lineTo(...p);
+      this.ctx.stroke();
+      this.userPoints.push(p);
+
+      if (this.guided && this.userPoints.length > 20) {
+        const g = $("hw_ghost");
+        if (g) g.classList.add("fade-out");
+      }
+    };
+
+    c.onpointerup = c.onpointercancel = () => {
+      this.drawing = false;
+    };
+  },
+
+  clear() {
+    if (!this.ctx) return;
+    const c = $("hw_cv");
+    this.ctx.clearRect(0, 0, c.width, c.height);
+    this.userPoints = [];
+    const g = $("hw_ghost");
+    if (this.guided && g) g.classList.remove("fade-out");
+    $("hw_result").innerHTML = "";
+  },
+
+  evaluate() {
+    if (this.userPoints.length < 10) {
+      Au.note("Disegna la lettera prima di verificare!");
+      return;
+    }
+
+    const cv = $("hw_cv");
+    const w = cv.width;
+    const h = cv.height;
+
+    const userImgData = this.ctx.getImageData(0, 0, w, h).data;
+    const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
+
+    let guidePixels = 0;
+    let hitPixels = 0;
+    let missPixels = 0;
+
+    for (let i = 3; i < userImgData.length; i += 4) {
+      const userAlpha = userImgData[i];
+      const guideAlpha = guideImgData[i];
+
+      if (guideAlpha > 50) guidePixels++;
+
+      if (userAlpha > 50) {
+        if (guideAlpha > 50) {
+          hitPixels++;
+        } else {
+          missPixels++;
+        }
+      }
+    }
+
+    const coverage = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
+    const penalty = hitPixels > 0 ? (missPixels / hitPixels) * 15 : 0;
+    let score = Math.max(0, Math.round(coverage - penalty));
+    score = Math.min(100, Math.round(score * 1.3));
+
+    const isGood = score >= 50;
+
+    St.log([this.curIdx], "write", isGood, "hand", 10000);
+
+    const resEl = $("hw_result");
+    if (isGood) {
+      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Precisione: ${score}%</div>`;
+      say(AN[this.curIdx]);
+    } else {
+      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Da rifare. Precisione: ${score}%</div>`;
+    }
+  }
+};
+
+function hs() { SmartHand.start(true); }
+
+function smartHandView() {
+  const l = L[SmartHand.curIdx];
+  return `
+    <h2>Scrittura a Mano Interattiva</h2>
+    <div class="panel">
+      <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
+      
+      <div class="chips" style="justify-content:center; margin-bottom:10px;">
+        <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
+        <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
+      </div>
+
+      <div class="hw-container">
+        <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
+        <canvas id="hw_cv" class="hw-canvas"></canvas>
+        <canvas id="hw_guide_cv" style="display:none;"></canvas>
+      </div>
+
+      <div id="hw_result"></div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
+        <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
+        <button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button>
+      </div>
+    </div>
+  `;
+}
 function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
  if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
@@ -446,7 +624,7 @@ const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento
 function render(){const v=S.view,t=["quiz","ex","hand"].includes(v)?"cfg":v;
  $("nav").innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
  $("cnt").textContent="Lettere selezionate: "+S.sel.size;$("bar").style.display=v==="alf"||v==="cfg"?"":"none";
-$("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand"?handView():v==="learn"?learnView():v==="prog"?progView():setView();
+$("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="learn"?learnView():v==="prog"?progView():setView();
  if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus()}
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
