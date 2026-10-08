@@ -218,7 +218,9 @@ const Gen={
 /* ===== Progressi (localStorage) ===== */
 const St={d:null,
  load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10,vocab:[]},o||{});if(!this.d.vocab)this.d.vocab=[];},
- save(){
+save(){
+  if(!this.d.vocab) this.d.vocab = [];
+  try{ localStorage.setItem("at_vocab", JSON.stringify(this.d.vocab)); }catch(e){}
   try{ localStorage.setItem("at1",JSON.stringify(this.d)); }catch(e){}
   if(window.saveCloudProgress){ window.saveCloudProgress(); }
  },
@@ -411,10 +413,17 @@ const LES=[["Prime lettere","Ba, Ta, Tha, Alif, Nun: riconoscile senza vocali.",
 ["Parole semplici","Leggi vere parole arabe con le prime lettere.",PRESET.Principiante,{kind:"v",dir:"read",src:"real",diff:1,count:10}],
 ["Lettura","Sequenze lunghe con tutte le lettere.",PRESET.Completo,{kind:"m",dir:"read",diff:2,count:10}]];
 Object.assign(MN,{inword:"Lettera nella parola",hand:"Scrivi a mano"});
-Q.real=function(c){const ok=WORDS.filter(w=>[...w[0]].every(ch=>idx(ch)<0||S.sel.has(idx(ch)))&&(!this.cur||w[0]!==this.cur.full));if(!ok.length)return null;const w=pick(ok),kind=c.kind==="m"?pick(["r","v"]):c.kind,ar=kind==="r"?Tr.strip(w[0]):w[0];
-  if(!St.d.vocab)St.d.vocab=[];
-  if(!St.d.vocab.some(v=>v[0]===w[0])) { St.d.vocab.push([w[0],w[1]]); St.save(); }
-  return{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0),mean:w[1],full:w[0]}};
+Q.real=function(c){
+  const ok=WORDS.filter(w=>[...w[0]].every(ch=>idx(ch)<0||S.sel.has(idx(ch)))&&(!this.cur||w[0]!==this.cur.full));
+  if(!ok.length)return null;
+  const w=pick(ok),kind=c.kind==="m"?pick(["r","v"]):c.kind,ar=kind==="r"?Tr.strip(w[0]):w[0];
+  if(!St.d.vocab) St.d.vocab = [];
+  if(!St.d.vocab.some(v=>v[0]===w[0])){
+    St.d.vocab.push([w[0],w[1]]);
+    St.save();
+  }
+  return{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0),mean:w[1],full:w[0]};
+};
 function lessonDone(i,ok,n){chk();if(i!=null&&n){const p=Math.round(100*ok/n);St.d.les[i]=Math.max(St.d.les[i]||0,p)}St.save()}
 const lesNote=(ok,n)=>'<p>'+(ok/n>=.7?"✅ <b>Lezione completata</b>":"Raggiungi almeno il 70% per completare la lezione.")+'</p>';
 function lesson(i){const l=LES[i],c=l[3];S.sel=new Set(l[2]);sav();S.cfg.src=c.src||"fake";
