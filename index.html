@@ -678,17 +678,22 @@ if ("serviceWorker" in navigator) {
     }
   };
 
-  async function loadCloudProgress(uid) {
+ async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        const cloudData = snap.data().data;
-        if (cloudData) {
-         St.d = Object.assign(St.d, cloudData);
-if (!St.d.vocab) St.d.vocab = [];
-          try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
-        }
+        const cloudData = snap.data().data || {};
+        const localVocab = St.d.vocab || [];
+        const cloudVocab = cloudData.vocab || [];
+        
+        // Unisce i vocaboli locali e cloud senza duplicati
+        const mergedVocabMap = new Map();
+        [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) mergedVocabMap.set(w[0], w); });
+        
+        St.d = Object.assign({}, cloudData, St.d, { vocab: Array.from(mergedVocabMap.values()) });
+        try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
+        window.saveCloudProgress();
       } else {
         window.saveCloudProgress();
       }
