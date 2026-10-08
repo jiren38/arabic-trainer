@@ -687,7 +687,7 @@ if ("serviceWorker" in navigator) {
     }
   };
 
- async function loadCloudProgress(uid) {
+async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
@@ -696,15 +696,23 @@ if ("serviceWorker" in navigator) {
         const localVocab = St.d.vocab || [];
         const cloudVocab = cloudData.vocab || [];
         
-        // Unisce i vocaboli locali e cloud senza duplicati
         const mergedVocabMap = new Map();
         [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) mergedVocabMap.set(w[0], w); });
         
-        St.d = Object.assign({}, cloudData, St.d, { vocab: Array.from(mergedVocabMap.values()) });
+        // Fonde i dati prendendo i valori più alti tra PC e iPhone
+        St.d = Object.assign({}, St.d, cloudData, {
+          vocab: Array.from(mergedVocabMap.values()),
+          ok: Math.max(St.d.ok || 0, cloudData.ok || 0),
+          n: Math.max(St.d.n || 0, cloudData.n || 0),
+          done: Math.max(St.d.done || 0, cloudData.done || 0),
+          streak: Math.max(St.d.streak || 0, cloudData.streak || 0)
+        });
+
         try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
-        window.saveCloudProgress();
+        try { localStorage.setItem("at_vocab", JSON.stringify(St.d.vocab)); } catch(e){}
+        await window.saveCloudProgress();
       } else {
-        window.saveCloudProgress();
+        await window.saveCloudProgress();
       }
     } catch (e) {
       console.error("Errore nel caricamento dal Cloud:", e);
