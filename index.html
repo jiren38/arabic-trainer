@@ -842,8 +842,265 @@ function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.
   return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div class="panel" style="text-align:center; margin-top:16px; background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, transparent), transparent); border: 1px solid var(--bd);"><p style="margin:0 0 6px; font-weight:600;">Ti piace Arabic Trainer? ☕</p><p class="sub" style="font-size:0.88rem; margin-bottom:12px;">Se questa app ti sta aiutando a studiare l\'arabo, considera di sostenere il progetto con un piccolo caffè!</p><a href="https://buymeacoffee.com/arabictrainer" target="_blank" rel="noopener" class="btn p" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; border-radius:12px;">☕ Offrimi un caffè</a></div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
 
 
-  /* ===== Sistema Quest Giornaliere e Shop Casse ===== */
-const Quests
+/* ===== Sistema Quest Giornaliere e Shop Casse ===== */
+const Quests = {
+  getTodayQuests() {
+    const t = today();
+    if (!St.d.quests) St.d.quests = { lastDate: "", list: [] };
+    
+    if (St.d.quests.lastDate !== t) {
+      St.d.quests.lastDate = t;
+      St.d.quests.list = [
+        { id: "q1", desc: "Completa l'obiettivo di studio oggi", target: St.d.goal, type: "daily_q", reward: 60, done: false, claimed: false },
+        { id: "q2", desc: "Rispondi correttamente a 10 domande", target: 10, type: "ok_ans", reward: 80, done: false, claimed: false },
+        { id: "q3", desc: "Esercitati con la scrittura a mano 1 volta", target: 1, type: "hand_ex", reward: 100, done: false, claimed: false }
+      ];
+      St.save();
+    }
+    
+    const y = St.d.days[t] || { q: 0 };
+    St.d.quests.list.forEach(q => {
+      if (q.id === "q1" && y.q >= q.target) q.done = true;
+      if (q.id === "q2" && St.d.ok >= q.target) q.done = true;
+      if (q.id === "q3" && (St.d.mode["hand"] || [0,0])[0] >= 1) q.done = true;
+    });
+    
+    return St.d.quests.list;
+  },
+
+  claim(id) {
+    const q = St.d.quests.list.find(x => x.id === id);
+    if (q && q.done && !q.claimed) {
+      q.claimed = true;
+      St.d.coins = (St.d.coins || 0) + q.reward;
+      St.save();
+      if (window.saveCloudProgress) window.saveCloudProgress();
+      toast("🎉 + " + q.reward + " Monete riscattate!");
+      render();
+    }
+  },
+
+  buyChest(type, price) {
+    if ((St.d.coins || 0) < price) {
+      toast("⚠️ Monete insufficienti!");
+      return;
+    }
+    St.d.coins -= price;
+    if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+    St.d.chests[type] = (St.d.chests[type] || 0) + 1;
+    St.save();
+    if (window.saveCloudProgress) window.saveCloudProgress();
+    toast("📦 Cassa acquistata con successo!");
+    render();
+  }
+};
+
+function shopView() {
+  const quests = Quests.getTodayQuests();
+  if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+  const chests = St.d.chests;
+
+  const totalChests = (chests.common || 0) + (chests.rare || 0) + (chests.legendary || 0);
+
+  return `
+    <h2>🎁 Quest & Shop</h2>
+    
+    <h3>📋 Quest Giornaliere</h3>
+    <div class="panel" style="text-align:left; margin-bottom:20px;">
+      ${quests.map(q => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--bd);">
+          <div>
+            <b>${q.desc}</b>
+            <div class="sub" style="font-size:0.85rem; margin:2px 0 0;">Ricompensa: 🪙 ${q.reward} monete</div>
+          </div>
+          <div>
+            ${q.claimed ? '<span class="sub">✅ Riscattato</span>' : 
+              q.done ? `<button class="btn p" onclick="Quests.claim('${q.id}')">Riscatta 🪙 ${q.reward}</button>` : 
+              '<span class="sub" style="opacity:0.7;">In corso...</span>'}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <h3>📦 Acquista Casse</h3>
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+      
+      <div class="panel" style="text-align:center;">
+        <div style="font-size:3rem;">📦</div>
+        <b>Cassa Comune</b>
+        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.common || 0}</p>
+        <button class="btn p" onclick="Quests.buyChest('common', 100)">🪙 100 Monete</button>
+      </div>
+
+      <div class="panel" style="text-align:center; border-color:#8c9bff;">
+        <div style="font-size:3rem;">🔷</div>
+        <b>Cassa Rara</b>
+        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.rare || 0}</p>
+        <button class="btn p" onclick="Quests.buyChest('rare', 250)">🪙 250 Monete</button>
+      </div>
+
+      <div class="panel" style="text-align:center; border-color:#f1c40f;">
+        <div style="font-size:3rem;">👑</div>
+        <b>Cassa Leggendaria</b>
+        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.legendary || 0}</p>
+        <button class="btn p" onclick="Quests.buyChest('legendary', 500)">🪙 500 Monete</button>
+      </div>
+
+    </div>
+
+    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
+    <div class="panel" style="text-align:center;">
+      <div class="chips" style="justify-content:center; gap:10px;">
+        ${(chests.common || 0) > 0 ? '<button class="btn p" onclick="startChestOpening(\'common\')">✨ Apri Cassa Comune (' + chests.common + ')</button>' : ''}
+        ${(chests.rare || 0) > 0 ? '<button class="btn p" style="background:#3498db; border-color:#3498db;" onclick="startChestOpening(\'rare\')">✨ Apri Cassa Rara (' + chests.rare + ')</button>' : ''}
+        ${(chests.legendary || 0) > 0 ? '<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening(\'legendary\')">✨ Apri Cassa Leggendaria (' + chests.legendary + ')</button>' : ''}
+      </div>
+      ${totalChests === 0 ? '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>' : ''}
+    </div>
+  `;
+}
+
+/* ===== Sistema Apertura Casse e Loot Table ===== */
+const LOOT_ITEMS = [
+  { name: "+50 Monete", icon: "🪙", rarity: "common", class: "rarity-common", type: "coins", val: 50 },
+  { name: "+100 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 100 },
+  { name: "+250 Monete", icon: "💎", rarity: "rare", class: "rarity-rare", type: "coins", val: 250 },
+  { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
+  { name: "Titolo: Calligrafo Provetto", icon: "✍️", rarity: "rare", class: "rarity-rare", type: "title", val: "Calligrafo Provetto" },
+  { name: "Titolo: Maestro delle Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle Lettere" },
+  { name: "Stile: Inchiostro Smeraldo", icon: "🖌️", rarity: "epic", class: "rarity-epic", type: "brush", val: "#2ecc71" }
+];
+
+let chestOpeningState = { spinning: false, wonItem: null };
+
+function startChestOpening(type) {
+  if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+  
+  let chestType = type;
+  if (!chestType) {
+    if (St.d.chests.legendary > 0) chestType = "legendary";
+    else if (St.d.chests.rare > 0) chestType = "rare";
+    else if (St.d.chests.common > 0) chestType = "common";
+  }
+
+  if (!chestType || (St.d.chests[chestType] || 0) <= 0) {
+    toast("⚠️ Non possiedi questa cassa!");
+    return;
+  }
+
+  St.d.chests[chestType]--;
+  St.save();
+  if (window.saveCloudProgress) window.saveCloudProgress();
+
+  let trackItems = [];
+  for (let i = 0; i < 35; i++) {
+    trackItems.push(pick(LOOT_ITEMS));
+  }
+
+  const rand = Math.random() * 100;
+  let won;
+  if (chestType === "legendary") {
+    won = rand < 40 ? LOOT_ITEMS.find(x => x.rarity === "legendary") : pick(LOOT_ITEMS.filter(x => x.rarity === "epic" || x.rarity === "rare"));
+  } else if (chestType === "rare") {
+    won = rand < 25 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare" || x.rarity === "epic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon" || x.rarity === "common"));
+  } else {
+    won = rand < 15 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common" || x.rarity === "uncommon"));
+  }
+  if (!won) won = LOOT_ITEMS[0];
+  trackItems[28] = won;
+
+  chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems };
+  S.view = "chest_open";
+  render();
+
+  setTimeout(() => {
+    const track = $("roulette_track");
+    if (!track) return;
+    
+    const itemWidth = 90;
+    const containerWidth = Math.min(window.innerWidth - 60, 380);
+    const targetOffset = (28 * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
+
+    track.style.transform = `translateX(-${targetOffset}px)`;
+
+    setTimeout(() => {
+      chestOpeningState.spinning = false;
+      applyReward(won);
+      render();
+    }, 4600);
+  }, 100);
+}
+
+function applyReward(item) {
+  if (item.type === "coins") {
+    St.d.coins = (St.d.coins || 0) + item.val;
+  } else {
+    if (!St.d.inventory) St.d.inventory = [];
+    if (!St.d.inventory.includes(item.name)) St.d.inventory.push(item.name);
+  }
+  St.save();
+  if (window.saveCloudProgress) window.saveCloudProgress();
+  if (typeof say === "function") say("Mabrouk! Hai sbloccato " + item.name);
+}
+
+function chestOpenView() {
+  const s = chestOpeningState;
+  if (!s.trackItems) return shopView();
+
+  return `
+    <h2>✨ Apertura Cassa</h2>
+    <div class="panel" style="text-align:center; padding:30px 16px;">
+      <p class="sub">${s.spinning ? "Apertura in corso... Buona fortuna!" : "🎉 Complimenti! Ecco il tuo premio:"}</p>
+
+      <div class="roulette-container">
+        <div class="roulette-marker"></div>
+        <div id="roulette_track" class="roulette-track">
+          ${s.trackItems.map(it => `
+            <div class="roulette-item ${it.class}">
+              <span>${it.icon}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      ${!s.spinning ? `
+        <div style="margin-top:20px;">
+          <div style="font-size:3.5rem;">${s.wonItem.icon}</div>
+          <h3 style="font-size:1.4rem; margin:8px 0; color:var(--ac);">${s.wonItem.name}</h3>
+          <p class="sub">Rarità: <b style="text-transform:capitalize;">${s.wonItem.rarity}</b></p>
+          <button class="btn p" style="margin-top:12px; padding:12px 24px;" onclick="go('shop')">Torna allo Shop</button>
+        </div>
+      ` : `<p style="font-size:1.1rem; color:var(--mu); margin-top:20px;">I rulli stanno girando...</p>`}
+    </div>
+  `;
+}
+
+/* ===== Funzione di Render Principale ===== */
+function render(){
+  if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
+  const v = S.view;
+  const t = ["quiz","ex","hand","hand_smart"].includes(v) ? "cfg" : v;
+  const navEl = $("nav");
+
+  if (navEl) {
+    navEl.innerHTML = NAV.map(n => '<button class="' + (n[0] === t ? "on" : "") + '"' + (n[0] === t ? ' aria-current="page"' : "") + ' onclick="go(\'' + n[0] + '\')">' + n[1] + '</button>').join("");
+  }
+
+  if ($("cnt")) $("cnt").textContent = "Lettere selezionate: " + S.sel.size;
+  if ($("bar")) $("bar").style.display = (v === "alf" || v === "cfg") ? "" : "none";
+
+  const app = $("app");
+  if (!app) return;
+
+  if (v === "home") app.innerHTML = homeView();
+  else if (v === "shop") app.innerHTML = shopView();
+  else if (v === "chest_open") app.innerHTML = chestOpenView();
+  else if (v === "alf") app.innerHTML = '<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>' + grid() + detail();
+  else if (v === "account") app.innerHTML = accountView();
+  else if (v === "cfg") app.innerHTML = cfgView();
+  else if (v === "quiz") app.innerHTML = quizView();
+  else if (v === "ex") app.innerHTML = exView();
+}
 
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
