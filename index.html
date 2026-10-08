@@ -81,45 +81,43 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh)}
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
-/* Layout espanso e Sidebar a comparsa */
+/* Layout Unificato e Overlay */
 body { padding-left: 0 !important; }
 main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .bar { left: 0 !important; }
 
-/* Menu Navigazione a comparsa (Drawer) */
-/* Menu Navigazione a comparsa (Drawer) */
-header nav {
-  position: fixed;
-  top: 0;
-  left: -280px;
-  width: 260px;
-  height: 100vh;
-  background: var(--card);
-  border-right: 1px solid var(--bd);
-  flex-direction: column;
-  padding: 60px 16px 20px;
-  gap: 8px;
-  z-index: 1000; /* Valore alto per stare SOPRA lo sfondo grigio */
-  transition: left 0.3s ease;
-  box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-  overflow-y: auto;
-}
-
-header nav.open { left: 0; }
-
-/* Overlay per chiudere il menu toccando lo sfondo */
+/* Overlay grigio di sfondo */
 #nav_overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 999; /* Valore inferiore a header nav per stare SOTTO il menu */
+  position: fixed !important;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5) !important;
+  z-index: 9998 !important;
   display: none;
 }
-#nav_overlay.open { display: block; }
+#nav_overlay.open { display: block !important; }
 
-header nav.open { left: 0; }
+/* Menu Navigazione a comparsa */
+#nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: -280px !important;
+  width: 260px !important;
+  height: 100vh !important;
+  background: var(--card) !important;
+  border-right: 1px solid var(--bd) !important;
+  flex-direction: column !important;
+  padding: 60px 16px 20px !important;
+  gap: 8px !important;
+  z-index: 9999 !important; /* Sovrapposto all'overlay */
+  transition: left 0.3s ease !important;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
+  overflow-y: auto !important;
+}
 
-/* Pulsante Toggle Menu Hamburger */
+#nav.open {
+  left: 0 !important;
+}
+
 .menu-toggle {
   background: none;
   border: none;
@@ -130,7 +128,7 @@ header nav.open { left: 0; }
   color: var(--tx);
   display: inline-flex;
   align-items: center;
-  margin-right: 8px;
+  margin-right: 12px;
 }
 .menu-toggle:hover { background: var(--sel); }
 
@@ -884,11 +882,25 @@ function toggleSidebar(force) {
 }
  
 const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
-function render(){const v=S.view,t=["quiz","ex","hand"].includes(v)?"cfg":v;
- $("nav").innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
- $("cnt").textContent="Lettere selezionate: "+S.sel.size;$("bar").style.display=v==="alf"||v==="cfg"?"":"none";
-$("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="vocab"?vocabView():v==="learn"?learnView():v==="prog"?progView():setView();
- if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus()}
+function render(){
+  const v=S.view, t=["quiz","ex","hand"].includes(v)?"cfg":v;
+  const navEl = $("nav");
+  const wasOpen = navEl ? navEl.classList.contains("open") : false;
+
+  navEl.innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
+  
+  if (wasOpen) {
+    navEl.classList.add("open");
+    const ov = $("nav_overlay");
+    if (ov) ov.classList.add("open");
+  }
+
+  $("cnt").textContent="Lettere selezionate: "+S.sel.size;
+  $("bar").style.display=v==="alf"||v==="cfg"?"":"none";
+  $("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="vocab"?vocabView():v==="learn"?learnView():v==="prog"?progView():setView();
+  
+  if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus();
+}
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
 
