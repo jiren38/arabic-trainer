@@ -973,27 +973,32 @@ const LOOT_ITEMS = [
 let chestOpeningState = { spinning: false, wonItem: null };
 
 function startChestOpening(type) {
-  const chests = St.d.chests || {};
+  if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+  const chests = St.d.chests;
   
-  // Se non viene specificato il tipo, prende la prima cassa disponibile
-  let chestType = type || (chests.legendary > 0 ? "legendary" : chests.rare > 0 ? "rare" : chests.common > 0 ? "common" : null);
+  // Trova il tipo di cassa disponibile
+  let chestType = type;
+  if (!chestType) {
+    if (chests.legendary > 0) chestType = "legendary";
+    else if (chests.rare > 0) chestType = "rare";
+    else if (chests.common > 0) chestType = "common";
+  }
   
   if (!chestType || (chests[chestType] || 0) <= 0) {
     toast("⚠️ Non possiedi questa cassa!");
     return;
   }
 
-  // Consuma 1 cassa dall'inventario
+  // Scala la cassa e salva subito sia in locale che su Firebase
   St.d.chests[chestType]--;
   St.save();
+  if (window.saveCloudProgress) window.saveCloudProgress();
 
-  // Prepara il nastro di 35 elementi casuali per il rullo
   let trackItems = [];
   for (let i = 0; i < 35; i++) {
     trackItems.push(pick(LOOT_ITEMS));
   }
 
-  // Algoritmo di estrazione casuale del premio finale (posizionato all'indice 28)
   const rand = Math.random() * 100;
   let won;
   if (chestType === "legendary") {
@@ -1010,12 +1015,11 @@ function startChestOpening(type) {
   S.view = "chest_open";
   render();
 
-  // Avvia l'animazione del rullo
   setTimeout(() => {
     const track = $("roulette_track");
     if (!track) return;
     
-    const itemWidth = 90; // 80px larghezza + 10px margini
+    const itemWidth = 90;
     const containerWidth = Math.min(window.innerWidth - 60, 380);
     const targetOffset = (28 * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
 
@@ -1217,8 +1221,20 @@ async function loadCloudProgress(uid) {
         const mergedVocabMap = new Map();
         [...cloudVocab, ...localVocab].forEach(w => { if(w && w.ar) mergedVocabMap.set(w.ar, w); });
         
+       // Preserva i dati di casse e monete unendoli
+        const mergedCoins = Math.max(St.d.coins || 0, cloudData.coins || 0);
+        const mergedChests = {
+          common: Math.max((St.d.chests || {}).common || 0, (cloudData.chests || {}).common || 0),
+          rare: Math.max((St.d.chests || {}).rare || 0, (cloudData.chests || {}).rare || 0),
+          legendary: Math.max((St.d.chests || {}).legendary || 0, (cloudData.chests || {}).legendary || 0)
+        };
+        const mergedInventory = Array.from(new Set([...(St.d.inventory || []), ...(cloudData.inventory || [])]));
+
         St.d = Object.assign({}, St.d, cloudData, {
           vocab: Array.from(mergedVocabMap.values()),
+          coins: mergedCoins,
+          chests: mergedChests,
+          inventory: mergedInventory,
           ok: Math.max(St.d.ok || 0, cloudData.ok || 0),
           n: Math.max(St.d.n || 0, cloudData.n || 0),
           done: Math.max(St.d.done || 0, cloudData.done || 0),
