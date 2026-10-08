@@ -81,7 +81,54 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh)}
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
-@media(min-width:900px){header{position:fixed;top:0;left:0;bottom:0;width:230px;border-right:1px solid var(--bd);border-bottom:0}header div{padding:22px 14px}nav{flex-direction:column;overflow:visible;margin-top:14px}nav button{flex:none;text-align:left;padding:11px 12px}body{padding-left:230px}.bar{left:230px}}
+/* Layout espanso e Sidebar a comparsa */
+body { padding-left: 0 !important; }
+main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
+.bar { left: 0 !important; }
+
+/* Menu Navigazione a comparsa (Drawer) */
+header nav {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100vh;
+  background: var(--card);
+  border-right: 1px solid var(--bd);
+  flex-direction: column;
+  padding: 60px 16px 20px;
+  gap: 8px;
+  z-index: 100;
+  transition: left 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+}
+
+header nav.open { left: 0; }
+
+/* Pulsante Toggle Menu Hamburger */
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: var(--tx);
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.menu-toggle:hover { background: var(--sel); }
+
+/* Overlay per chiudere il menu toccando lo sfondo */
+#nav_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99;
+  display: none;
+}
+#nav_overlay.open { display: block; }
 
 /* Stili per il tracciamento dinamico e la scrittura guidata */
 .hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
@@ -104,8 +151,14 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 
 </head>
 <body>
-<header><div><b>Arabic Trainer</b>
-<nav id="nav"><button class="btn" onclick="S.view='vocab';render()">📚 Vocaboli</button></nav>
+<div id="nav_overlay" onclick="toggleSidebar(false)"></div>
+<header>
+  <div style="display:flex; align-items:center;">
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <b>Arabic Trainer</b>
+    <nav id="nav"></nav>
+  </div>
+</header>
 <main>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="aud" class="score" style="display:none" aria-live="polite"></div>
@@ -221,7 +274,7 @@ const Q={cur:null,checked:false,buf:"",ua:"",res:"",fb:"",n:0,ok:0,diff:1,up:0,d
 /* ===== UI ===== */
 const fm=(c,j)=>[c,j?c+J:c,j?J+c+J:J+c,J+c];
 const FN=["Isolata","Iniziale","Mediale","Finale"];
-function go(v,keep){S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
+function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
 function sav(){St.d.sel=[...S.sel];St.save()}
 function toggle(i){say(AN[i]);S.sel.has(i)?S.sel.delete(i):S.sel.add(i);S.last=i;sav();render()}
 function selAll(){L.forEach((_,i)=>S.sel.add(i));sav();render()}
@@ -699,57 +752,69 @@ function vocabView() {
     ${listHtml}
   `;
 }
-function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
- const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
- if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
- return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di arabo</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi</p><button class="btn hb" onclick="cont()">Continua allenamento →</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div>'}
-/* NUOVO CODICE */
-// Genera la vista della pagina Account
-function accountView() {
-  const user = window.currentUser;
+function homeView(){
+  const d = St.d, y = d.days[today()] || {q:0, ms:0}, g = d.goal;
+  const gp = Math.min(100, Math.round(100 * y.q / g));
+  const h = new Date().getHours();
+  const o = overall();
+  const s = (a, b) => `<div class="stat"><small>${a}</small><b>${b}</b></div>`;
 
-  // Se l'utente è già connesso
-  if (user) {
+  if (!d.n) {
     return `
-      <h2>Profilo Utente</h2>
-      <div class="panel" style="text-align:left">
-        <p><b>Accesso effettuato come:</b><br>${esc(user.email)}</p>
-        <p class="sub">I tuoi progressi sono sincronizzati nel cloud.</p>
-        <button class="btn p" onclick="handleLogout()">Disconnetti (Logout)</button>
+      <div class="hero" style="min-height:220px;">
+        <div>
+          <h2>Il tuo percorso inizia qui</h2>
+          <p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p>
+          <div class="row" style="justify-content:flex-start; margin-top:16px;">
+            <button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button>
+            <button class="btn hb2" onclick="go('learn')">Vai al percorso</button>
+          </div>
+        </div>
+        <div class="wm ar" aria-hidden="true">ع</div>
       </div>
     `;
   }
 
-  // Se l'utente non è ancora connesso (Modulo di Login e Registrazione)
   return `
-    <h2>Account e Sincronizzazione</h2>
-    <div class="panel" style="text-align:left; max-width:420px; margin:0 auto;">
-      <p class="sub">Accedi o crea un account per sincronizzare i tuoi progressi su più dispositivi.</p>
-      
-      <div style="margin-bottom:12px;">
-        <label><b>Email</b></label>
-        <input type="text" id="acc_email" placeholder="nome@esempio.com" style="width:100%; text-align:left;">
+    <div class="hero">
+      <div>
+        <h2>${h < 12 ? "Buongiorno" : h < 18 ? "Buon pomeriggio" : "Buonasera"} 👋</h2>
+        <p>Continua il tuo percorso di apprendimento della lingua araba.</p>
+        <p>🔥 <b>${dstreak()}</b> giorni consecutivi di studio</p>
+        <div class="row" style="justify-content:flex-start; margin-top:12px;">
+          <button class="btn hb" onclick="cont()">Continua allenamento →</button>
+          <button class="btn hb2" onclick="go('vocab')">📚 Apri Vocaboli</button>
+        </div>
       </div>
+      ${ring(o, "Progresso generale")}
+      <div class="wm ar" aria-hidden="true">ع</div>
+    </div>
 
-      <div style="margin-bottom:16px;">
-        <label><b>Password</b></label>
-        <input type="password" id="acc_pass" placeholder="••••••••" style="width:100%; padding:12px; font-size:1.2rem; border:2px solid var(--bd); border-radius:10px; background:var(--bg); color:var(--tx);">
-      </div>
+    <div class="panel" style="text-align:left; margin-top:16px;">
+      <b>Obiettivo di oggi</b>
+      ${bar(gp, "Obiettivo di oggi")}
+      <div class="sub">${y.q} / ${g} domande · ${Math.round(y.ms / 6e4)} min ${y.q >= g ? " · 🎉 Obiettivo completato!" : ""}</div>
+    </div>
 
-      <div class="row">
-        <button class="btn p" onclick="handleLogin()">Accedi</button>
-        <button class="btn" onclick="handleRegister()">Registrati</button>
-      </div>
-      <div style="margin-top: 12px;">
-        <button class="btn" onclick="handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
-          🌐 Accedi con Google
-        </button>
-      </div>
-      <div id="acc_msg" class="fb" style="margin-top:10px;"></div>
+    <h3 style="margin-top:24px;">Panoramica Attività</h3>
+    <div class="stats">
+      ${s("Lettere padroneggiate", L.filter((_, i) => Ms.st(i)[1] === "Padroneggiata").length + " su 28")}
+      ${s("Lettere da ripassare", Ms.weak().length)}
+      ${s("Precisione media", Math.round(100 * d.ok / d.n) + "%")}
+      ${s("Quiz completati", d.done)}
+      ${s("Lezioni completate", LES.filter((_, i) => (d.les[i] || 0) >= 70).length + " su 10")}
+    </div>
+
+    <h3 style="margin-top:24px;">Accesso Rapido</h3>
+    <div class="chips">
+      <button class="btn" onclick="go('alf')">🔤 Alfabeto</button>
+      <button class="btn" onclick="go('cfg')">🧠 Allenamento</button>
+      <button class="btn" onclick="go('vocab')">📚 Vocaboli</button>
+      <button class="btn" onclick="hs()">✍️ Scrivi a mano</button>
+      <button class="btn" onclick="go('prog')">📊 Progressi</button>
     </div>
   `;
 }
-
 // Gestione del pulsante ACCEDI
 async function handleLogin() {
   const email = $("acc_email").value.trim();
@@ -792,6 +857,16 @@ async function handleGoogleLogin() {
 async function handleLogout() {
   await window.fbLogout();
   toast("Disconnessione effettuata.");
+}
+
+/* Controllo Sidebar a comparsa */
+function toggleSidebar(force) {
+  const nav = $("nav");
+  const ov = $("nav_overlay");
+  if (!nav || !ov) return;
+  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
+  nav.classList.toggle("open", isOpen);
+  ov.classList.toggle("open", isOpen);
 }
  
 const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
