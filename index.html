@@ -87,6 +87,7 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .bar { left: 0 !important; }
 
 /* Menu Navigazione a comparsa (Drawer) */
+/* Menu Navigazione a comparsa (Drawer) */
 header nav {
   position: fixed;
   top: 0;
@@ -98,10 +99,23 @@ header nav {
   flex-direction: column;
   padding: 60px 16px 20px;
   gap: 8px;
-  z-index: 100;
+  z-index: 1000; /* Valore alto per stare SOPRA lo sfondo grigio */
   transition: left 0.3s ease;
   box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  overflow-y: auto;
 }
+
+header nav.open { left: 0; }
+
+/* Overlay per chiudere il menu toccando lo sfondo */
+#nav_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999; /* Valore inferiore a header nav per stare SOTTO il menu */
+  display: none;
+}
+#nav_overlay.open { display: block; }
 
 header nav.open { left: 0; }
 
