@@ -18,9 +18,6 @@ body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-appl
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
 header div{max-width:860px;margin:0 auto;padding:8px 16px}
 header b{font-size:1.15rem}
-nav{display:flex;gap:4px;margin-top:6px;overflow-x:auto}
-nav button{flex:1;min-width:max-content;padding:8px 10px;border:0;background:none;color:var(--mu);border-radius:8px;font:inherit;cursor:pointer;transition:background .15s}
-nav button:hover{background:var(--sel)}nav button.on{background:var(--ac);color:var(--bg);font-weight:600}
 main{max-width:860px;margin:0 auto;padding:16px 16px 120px}
 h2{font-size:1.25rem;margin:18px 0 6px}h3{font-size:1rem;margin:18px 0 8px}
 p.sub,.sub{color:var(--mu);margin:0 0 12px}
@@ -75,18 +72,21 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .hb{background:#fff;color:#1f2a80;border-color:#fff;font-weight:700}.hb2{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
 .ring{width:96px;height:96px;flex:none}
 #app>*{animation:fin .3s both}@keyframes fin{from{opacity:0;transform:translateY(8px)}}
-.hw{position:relative;width:min(100%,380px);aspect-ratio:1;margin:12px auto;border:2px dashed var(--bd);border-radius:16px;background:var(--bg)}
-.hw canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
-#gh{position:absolute;inset:0;display:grid;place-items:center;font-size:min(55vw,230px);opacity:0;pointer-events:none;color:var(--ac);transition:opacity .2s}
 .les{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh)}
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
-/* Layout con Sidebar a comparsa */
+
+.hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
+.hw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
+.hw-guide { position: absolute; inset: 0; display: grid; place-items: center; font-size: min(50vw, 200px); color: var(--ac); opacity: 0.25; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+.hw-guide.fade-out { opacity: 0 !important; }
+.accuracy-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
+
+/* Stili Menu Laterale a comparsa */
 body { padding-left: 0 !important; }
 main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .bar { left: 0 !important; }
 
-/* Overlay per lo sfondo grigio */
 #nav_overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -96,7 +96,6 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 }
 #nav_overlay.open { display: block !important; }
 
-/* Menu Navigazione a comparsa isolato */
 #nav {
   position: fixed !important;
   top: 0 !important;
@@ -125,7 +124,12 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   font-size: 0.95rem !important;
   border-radius: 10px !important;
   white-space: nowrap !important;
+  border: 0;
+  background: none;
+  color: var(--tx);
 }
+#nav button:hover { background: var(--sel); }
+#nav button.on { background: var(--ac); color: var(--bg); font-weight: 600; }
 
 .menu-toggle {
   background: none; border: none; font-size: 1.4rem;
@@ -133,17 +137,8 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   color: var(--tx); margin-right: 12px; display: inline-flex; align-items: center;
 }
 .menu-toggle:hover { background: var(--sel); }
-
-/* Stili per il tracciamento dinamico e la scrittura guidata */
-.hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
-.hw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
-.hw-guide { position: absolute; inset: 0; display: grid; place-items: center; font-size: min(50vw, 200px); color: var(--ac); opacity: 0.25; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
-.hw-guide.fade-out { opacity: 0 !important; }
-.accuracy-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
- 
 </style>
 
- 
 <meta name="theme-color" content="#2f3fb0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -152,8 +147,8 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-
 </head>
+
 <body>
 <div id="nav_overlay" onclick="toggleSidebar(false)"></div>
 <nav id="nav"></nav>
@@ -164,6 +159,7 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
     <b>Arabic Trainer</b>
   </div>
 </header>
+
 <main>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="aud" class="score" style="display:none" aria-live="polite"></div>
@@ -180,6 +176,7 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 <button class="btn p" onclick="quick('read')">Leggi</button>
 <button class="btn p" onclick="quick('write')">Scrivi</button>
 </div></div>
+
 <script>
 /* ===== Dati ===== */
 const J="\u200D",HK=["\u064E","\u0650","\u064F"],HV={"\u064E":"a","\u0650":"i","\u064F":"u"},HN={"\u064E":"fatha","\u0650":"kasra","\u064F":"damma"};
@@ -191,10 +188,12 @@ dir:[["read","Arabo → Latino"],["write","Latino → Arabo"],["audio","Audio �
 method:[["custom","Personalizzato","Scegli tutto tu."],["prog","Progressivo","La difficoltà sale dopo 3 risposte corrette di fila e scende dopo 2 errori."],["rev","Ripasso errori","Riproposti soprattutto gli esercizi sbagliati."],["free","Allenamento libero","Domande illimitate, finisci quando vuoi."],["test","Test","Nessun aiuto né suggerimento né pronuncia automatica; niente tastiera virtuale; risultato finale con gli errori."]]};
 const SIM=[[1,2,3,24],[4,5,6],[7,8],[9,10],[11,12],[13,14],[15,16],[17,18],[19,20]];
 const DOT=["nessun punto","1 punto sotto","2 punti sopra","3 punti sopra","1 punto sotto","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","3 punti sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","nessun punto","1 punto sopra","1 punto sopra","2 punti sopra","nessun punto","nessun punto","nessun punto","1 punto sopra","nessun punto","nessun punto","2 punti sotto"];
+
 /* ===== Utilità ===== */
 const $=id=>document.getElementById(id),esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const pick=a=>a[Math.floor(Math.random()*a.length)],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const idx=c=>L.findIndex(l=>l[0]===c);
+
 /* ===== Traslitterazione ===== */
 const Tr={
  read(ar){let o="",lp=0,lc="";for(const c of ar){const i=idx(c);if(i>=0){lp=o.length;lc=L[i][2];o+=lc}else if(c==="\u0651")o=o.slice(0,lp)+lc+o.slice(lp);else o+=HV[c]||""}return o},
@@ -202,6 +201,7 @@ const Tr={
  strip:s=>s.replace(/[\u064B-\u065F]/g,""),
  vc:s=>(s.match(/[aiu]/g)||[]).length
 };
+
 /* ===== Generatore ===== */
 const Gen={
  R:{r:[[2,3],[3,4],[4,5]],v:[[1,2],[2,3],[3,4]]},
@@ -214,23 +214,21 @@ const Gen={
   const r=this.R[kind][diff],n=rnd(r[0],r[1]),ar=kind==="r"?this.letters(pool,n):this.vowels(pool,n);
   return ar&&{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0)}}
 };
+
 /* ===== Progressi (localStorage) ===== */
 const St={d:null,
  load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10},o||{})},
-save(){
-  try{
-    localStorage.setItem("at1",JSON.stringify(this.d));
-  }catch(e){}
-  if(window.saveCloudProgress){
-    window.saveCloudProgress();
-  }
-},
+ save(){
+  try{ localStorage.setItem("at1",JSON.stringify(this.d)); }catch(e){}
+  if(window.saveCloudProgress){ window.saveCloudProgress(); }
+ },
  log(ls,sk,ok,mode,ms){const d=this.d;d.n++;if(ok){d.ok++;d.streak++;d.best=Math.max(d.best,d.streak)}else d.streak=0;
   ls.forEach(i=>{const m=d.M[i]||(d.M[i]={}),x=m[sk]||(m[sk]=[0,0]);x[0]++;if(ok)x[1]++;if(!ok){const e=d.E[i]||(d.E[i]={c:0});e.c++;e.t=Date.now();e.m=mode}});
   const k=d.mode[mode]||(d.mode[mode]=[0,0]);k[0]++;if(ok)k[1]++;const y=d.days[today()]||(d.days[today()]={q:0,ms:0});y.q++;y.ms+=ms;d.ms+=ms;this.save();chk()},
  rec(q,ok,sk,mode,ms){this.log(q.ls,sk,ok,mode,ms);const d=this.d;d.err=d.err.filter(e=>e.ar!==q.ar);if(!ok)d.err.unshift({ar:q.ar,lat:q.lat,kind:q.kind,ls:q.ls});d.err=d.err.slice(0,30);this.save()},
  reset(){const s=this.d.sel;this.d=null;try{localStorage.removeItem("at1")}catch(e){}this.load();this.d.sel=s}
 };
+
 /* ===== Audio ===== */
 const Au={vs:[],
  init(){try{this.vs=speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{this.vs=speechSynthesis.getVoices()}}catch(e){}},
@@ -245,7 +243,8 @@ const Au={vs:[],
   if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),120)}else speechSynthesis.speak(u)}
 };
 const say=t=>Au.say(t);
-/* ===== Quiz ===== */
+
+/* ===== Quiz e Navigazione ===== */
 const S={view:"home",sel:new Set(),last:null,ml:null,cfg:{kind:"v",dir:"read",src:"fake",diff:1,count:10,method:"custom"},reset:false};
 const Q={cur:null,checked:false,buf:"",ua:"",res:"",fb:"",n:0,ok:0,diff:1,up:0,dn:0,cfg:null,
  start(over){this.cfg=Object.assign({},S.cfg,over||{});this.n=this.ok=this.up=this.dn=0;if(this.cfg.method==="test"&&!this.cfg.count)this.cfg.count=20;this.t0s=Date.now();this.errs=[];this.diff=this.cfg.diff;go("quiz",1);this.next()},
@@ -276,10 +275,24 @@ const Q={cur:null,checked:false,buf:"",ua:"",res:"",fb:"",n:0,ok:0,diff:1,up:0,d
   else t="Controlla le lettere: la sequenza è formata da "+[...Tr.strip(q.ar)].join(" ")+".";
   return t}
 };
-/* ===== UI ===== */
+
+/* ===== Gestione Sidebar e Navigazione ===== */
+function toggleSidebar(force) {
+  const nav = $("nav");
+  const ov = $("nav_overlay");
+  if (!nav || !ov) return;
+  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
+  nav.classList.toggle("open", isOpen);
+  ov.classList.toggle("open", isOpen);
+}
+
+const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
+
+function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
+
+/* ===== UI e Viste ===== */
 const fm=(c,j)=>[c,j?c+J:c,j?J+c+J:J+c,J+c];
 const FN=["Isolata","Iniziale","Mediale","Finale"];
-function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
 function sav(){St.d.sel=[...S.sel];St.save()}
 function toggle(i){say(AN[i]);S.sel.has(i)?S.sel.delete(i):S.sel.add(i);S.last=i;sav();render()}
 function selAll(){L.forEach((_,i)=>S.sel.add(i));sav();render()}
@@ -306,7 +319,8 @@ function quizView(){const q=Q.cur,c=Q.cfg;
  if(c.dir==="read")return head+'<div class="panel '+Q.res+(c.method==="test"?" tst":"")+'"><div class="word ar">'+q.ar+'</div><button class="btn nt" onclick="say(Q.cur.ar)">🔊 Ascolta pronuncia</button><p>Scrivi come si pronuncia, con caratteri latini</p><input type="text" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="es. bata" value="'+esc(Q.ua)+'"'+dis+' onkeydown="if(event.key===\'Enter\')Q.checked?Q.next():Q.check()"><div class="fb">'+Q.fb+'</div>'+go+'</div>'+end;
  return head+'<div class="panel '+Q.res+(c.method==="test"?" tst":"")+'"><p>Scrivi in arabo la parola che '+(c.dir==="audio"?"senti":"si legge")+'</p>'+(c.dir==="audio"?'<button class="btn p" onclick="say(Q.cur.ar)">🔊 Riascolta</button>':'<div class="latin">'+q.lat+'</div>')+'<div class="word ar" id="out">'+(esc(Q.buf)||"&nbsp;")+'</div><input type="text" id="kb" class="ar" dir="rtl" lang="ar" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="⌨️ Puoi anche digitare con la tastiera araba" value="'+esc(Q.buf)+'" '+dis+' oninput="Q.buf=this.value;$(\'out\').textContent=Q.buf||\'\\u00a0\'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();Q.checked?Q.next():Q.check()}"><div class="row ar keys">'+[...S.sel].map(i=>'<button class="key"'+dis+' onclick="add(\''+L[i][0]+'\')">'+L[i][0]+'</button>').join("")+'</div><div class="row ar keys">'+HK.map(v=>'<button class="key"'+dis+' onclick="add(\''+v+'\')">ـ'+v+'</button>').join("")+'</div><div class="row"><button class="btn"'+dis+' onclick="Q.buf=Array.from(Q.buf).slice(0,-1).join(\'\');render()">Cancella ultimo</button><button class="btn"'+dis+' onclick="Q.buf=\'\';render()">Svuota</button></div><div class="fb">'+Q.fb+'</div>'+go+'</div>'+end}
 function add(c){Q.buf+=c;render()}
-/* ===== Mastery, giorni, obiettivi ===== */
+
+/* ===== Mastery e Statistiche ===== */
 const today=()=>{const x=new Date();return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 const fmt=ms=>{const s=Math.round(ms/1e3);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
 const MN={read:"Arabo → Latino",write:"Latino → Arabo",audio:"Audio → Arabo",find:"Trova la lettera",hear:"Ascolta e riconosci",form:"Quattro forme"};
@@ -322,7 +336,8 @@ const overall=()=>Math.round(L.reduce((s,_,i)=>s+Ms.sc(i).p,0)/28);
 const ACH=()=>{const d=St.d;return[["Prima sessione",d.done>0],["50 risposte corrette",d.ok>=50],["100 risposte corrette",d.ok>=100],["Prima settimana",dstreak()>=7],["90% di precisione",d.n>=20&&d.ok/d.n>=.9],["Tutte le lettere sopra il 70%",L.every((_,i)=>Ms.sc(i).n&&Ms.sc(i).p>=70)]]};
 const bar=(p,l)=>'<div class="pb" role="progressbar" aria-label="'+l+'" aria-valuenow="'+p+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+p+'%"></i></div>';
 const lt=i=>'<span class="ar lt">'+L[i][0]+'</span>';
-/* ===== Esercizi speciali: trova, ascolta, forme ===== */
+
+/* ===== Esercizi Speciali ===== */
 const Ex={t:null,n:0,ok:0,q:null,fb:"",t0:0,ts:0,ms:0,
  start(t){this.t=t;this.n=this.ok=0;this.ts=Date.now();S.view="ex";this.next()},
  make(){const p=[...S.sel],t=this.t,df=S.cfg.diff,w=pick(p.flatMap(i=>{const a=Ms.acc(i);return a!==null&&a<.7?[i,i,i]:[i]}));
@@ -354,14 +369,16 @@ function exView(){const q=Ex.q,e=Ex;
  else if(e.t==="inword")b='<p>In che posizione compare <b>'+L[q.tg][1]+'</b> ('+lt(q.tg)+') in questa parola?</p><div class="word ar">'+q.word+'</div><div class="row">'+[1,2,3].map(k=>'<button class="btn"'+dis+' onclick="Ex.ans('+k+')">'+FN[k]+'</button>').join("")+'</div><p class="sub">Si legge da destra a sinistra: la prima lettera è la più a destra.</p>';
  else b='<p>Trova tutte le lettere:</p><div class="word ar" style="min-height:0">'+L[q.tg][0]+'</div><div class="row ar">'+q.seq.map((i,k)=>'<button class="key'+(q.cl.includes(k)?" on":"")+'" aria-pressed="'+q.cl.includes(k)+'" style="'+(q.cl.includes(k)?"background:var(--sel);border-color:var(--ac);":"")+(e.done&&q.pos.includes(k)?"outline:3px solid var(--ok);":"")+'" onclick="Ex.tog('+k+')">'+L[i][0]+'</button>').join("")+'</div>'+(e.done?"":'<button class="btn p" onclick="Ex.ans()">Controlla</button>');
  return head+'<div class="panel">'+b+'<div class="fb">'+e.fb+'</div>'+(e.done?'<button class="btn p" onclick="Ex.next()">Avanti</button>':"")+'</div><div class="row"><button class="btn" onclick="Ex.n=10;Ex.next()">Termina</button></div>'}
-/* ===== Risultato e scorciatoie ===== */
+
+/* ===== Risultati ===== */
 function resView(ok,n,ms,again,extra){const w=Ms.weak().slice(0,5),p=Math.round(100*ok/Math.max(n,1));
  return'<div class="panel good"><h2>🎉 Quiz completato</h2><p class="latin">'+ok+' / '+n+'</p><p class="latin">'+p+'%</p><p class="sub">Tempo: '+fmt(ms)+'</p>'+extra+(w.length?'<p>Lettere da ripassare:</p><div>'+w.map(lt).join(" ")+'</div>':"")+'<div class="row"><button class="btn p" onclick="'+again+'">Ripeti quiz</button><button class="btn" onclick="reviewW()">Ripassa errori</button><button class="btn" onclick="go(\'home\')">Torna alla Home</button></div></div>'}
 function reviewW(){const w=Ms.weak(),s=w.length?w:[...new Set(St.d.err.flatMap(e=>e.ls))];if(!s.length){Au.note("Nessun errore da ripassare.");return go("prog")}S.sel=new Set(s);sav();Q.start({method:"rev",kind:"m",dir:"read",count:10})}
 function cont(){if(!S.sel.size)S.sel=new Set(PRESET.Principiante);sav();Q.start({method:"prog",kind:"m",dir:"read",count:10})}
 function trainL(i){S.sel=new Set([i]);sav();Q.start({method:"prog",kind:"m",dir:"read",count:10})}
 function trainG(g,t){S.sel=new Set(g);sav();S.cfg.diff=2;Ex.lesson=null;Ex.start(t)}
-/* ===== Viste ===== */
+
+/* ===== Viste Schermate ===== */
 function progView(){const d=St.d;if(!d.n)return'<h2>Progressi</h2>'+homeView();
  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>',wk=Ms.weak(),days=[...Array(7)].map((_,k)=>{const x=new Date();x.setDate(x.getDate()-6+k);return[x.getDate(),(d.days[new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)]||{q:0}).q]}),mx=Math.max(1,...days.map(x=>x[1])),mi=S.ml;
  const sk=i=>{const m=d.M[i]||{};return SK.map(([k,n])=>{const v=m[k],p=v?Math.round(100*v[1]/v[0]):0;return'<div>'+n+': <b>'+(v?p+"%":"non ancora allenata")+'</b>'+bar(p,n)+'</div>'}).join("")};
@@ -373,12 +390,15 @@ function progView(){const d=St.d;if(!d.n)return'<h2>Progressi</h2>'+homeView();
  +'<h3>Da ripassare</h3>'+(wk.length?'<div class="stats">'+wk.slice(0,6).map(i=>s(lt(i),Math.round(100*Ms.acc(i))+"% corrette")).join("")+'</div><button class="btn p" onclick="reviewW()">Ripassa queste lettere →</button>':'<p class="sub">Nessuna lettera da ripassare per ora.</p>')
  +'<h3>Errori recenti</h3>'+(Object.keys(d.E).length?'<div class="stats">'+Object.entries(d.E).sort((a,b)=>b[1].t-a[1].t).slice(0,8).map(([i,e])=>'<button class="stat" style="text-align:left;color:var(--tx);cursor:pointer" onclick="trainL('+i+')" aria-label="Ripassa '+L[i][1]+'">'+lt(i)+'<b> '+e.c+' errori</b><small>'+Math.round(100*Ms.acc(i))+'% corrette · '+MN[e.m]+' · ultimo: '+new Date(e.t).toLocaleDateString("it")+'</small></button>').join("")+'</div><p class="sub">Tocca una voce per ripassare subito.</p>':'<p class="sub">Nessun errore registrato.</p>')
  +'<h3>Traguardi</h3><div class="chips">'+ACH().map(a=>'<span class="btn'+(a[1]?" on":"")+'">'+(a[1]?"🏆 ":"🔒 ")+a[0]+'</span>').join("")+'</div>'}
+
 function learnView(){const HX=[["بَ","ba","fatha: vocale a"],["بِ","bi","kasra: vocale i"],["بُ","bu","damma: vocale u"],["بْ","b","sukūn: nessuna vocale"],["بّ","bb","shadda: raddoppia la consonante"],["بً","ban","tanwin fatha: finale -an"],["بٍ","bin","tanwin kasra: finale -in"],["بٌ","bun","tanwin damma: finale -un"]];
  const nx=LES.findIndex((_,i)=>(St.d.les[i]||0)<70),dn=LES.filter((_,i)=>(St.d.les[i]||0)>=70).length;
  return'<h2>Impara</h2><h3>Percorso</h3><p class="sub">Dieci lezioni progressive. Puoi sempre usare anche l\'allenamento personalizzato.</p>'+bar(dn*10,"Lezioni completate")+LES.map((l,i)=>{const b=St.d.les[i]||0;return'<div class="les'+(i===nx?" next":"")+'"><div><b>Lezione '+(i+1)+' · '+l[0]+'</b><small>'+l[1]+'</small>'+(b?'<small>Miglior risultato: '+b+'%'+(b>=70?" ✅ completata":"")+'</small>':i===nx?'<small>Consigliata</small>':'')+'</div><button class="btn'+(i===nx?" p":"")+'" onclick="lesson('+i+')">'+(b?"Ripeti":"Inizia")+'</button></div>'}).join("")+'<h3>Le harakāt</h3><p class="sub">Senza segni si leggono solo le consonanti (بت = bt). I segni sopra o sotto la lettera aggiungono la vocale.</p><div class="stats">'+HX.map(h=>'<div class="stat"><span class="ar lt" style="font-size:2.4rem">'+h[0]+'</span> <b>'+h[1]+'</b><small>'+h[2]+'</small></div>').join("")+'</div>'
  +'<h3>Non confonderle</h3><p class="sub">Molte lettere hanno lo stesso scheletro: cambiano solo numero e posizione dei punti.</p>'+SIM.map(g=>'<div class="detail" style="margin-top:8px"><div class="fm ar">'+g.map(i=>'<span>'+L[i][0]+'<small>'+L[i][1]+': '+DOT[i]+'</small></span>').join("")+'</div><button class="btn" onclick="trainG(['+g+'],\'find\')">Allenati: trova la lettera</button></div>').join("")}
+
 function setView(){const gs=[5,10,20,30];return'<h2>Impostazioni</h2><div class="panel" style="text-align:left"><p><b>Audio</b><br><span class="sub">Pronuncia di lettere e parole.</span></p><button class="btn" onclick="St.d.au=!St.d.au;St.save();render()">'+(St.d.au?"🔊 Audio attivo":"🔇 Audio disattivato")+'</button><p style="margin-top:18px"><b>Obiettivo giornaliero</b><br><span class="sub">Numero di domande al giorno.</span></p><div class="chips">'+gs.map(g=>'<button class="btn'+(St.d.goal===g?" on":"")+'" onclick="St.d.goal='+g+';St.save();render()">'+g+' domande</button>').join("")+'</div><p style="margin-top:18px"><b>Tema</b></p><div class="chips">'+[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]].map(t=>'<button class="btn'+((St.d.theme||"auto")===t[0]?" on":"")+'" onclick="setTheme(\''+t[0]+'\')">'+t[1]+'</button>').join("")+'</div><p style="margin-top:18px"><b>Backup</b><br><span class="sub">Copia il codice per spostare i progressi su un altro dispositivo, poi incollalo qui e ripristina.</span></p><textarea id="bk" rows="3" aria-label="Codice di backup" style="width:100%;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px"></textarea><div class="chips" style="margin-top:6px"><button class="btn" onclick="$(\'bk\').value=JSON.stringify(St.d)">Mostra codice</button><button class="btn" onclick="restore()">Ripristina</button></div><p style="margin-top:18px"><b>Progressi</b><br><span class="sub">Statistiche ed errori sono salvati su questo dispositivo.</span></p><button class="btn" onclick="if(S.reset){St.reset();S.reset=false}else S.reset=true;render()">'+(S.reset?"Conferma: azzera tutto":"Azzera progressi")+'</button></div>'}
-/* ===== Parole reali, percorso, scrivi a mano, extra ===== */
+
+/* ===== Parole reali e percorso ===== */
 const WORDS=[["بَاب","porta"],["كِتَاب","libro"],["قَلَم","penna"],["بَيْت","casa"],["شَمْس","sole"],["قَمَر","luna"],["وَلَد","bambino"],["بِنْت","ragazza"],["نَهْر","fiume"],["لَبَن","latte"],["سَمَك","pesce"],["جَمَل","cammello"],["دَار","dimora"],["رَجُل","uomo"],["بَحْر","mare"],["كَلْب","cane"],["مَلِك","re"],["فَم","bocca"],["كَتَبَ","ha scritto"],["مَكْتَب","ufficio"],["نَبَات","pianta"],["كَمْ","quanto"],["مِنْ","da"],["لَوْن","colore"],["يَوْم","giorno"],["قَلْب","cuore"],["دَرْس","lezione"],["عَيْن","occhio"],["تَمْر","datteri"],["نَار","fuoco"],["جَدّ","nonno"],["سِتّ","sei"],["كُلّ","tutto"],["حَقّ","diritto"],["مُدَرِّس","insegnante"]];
 const LES=[["Prime lettere","Ba, Ta, Tha, Alif, Nun: riconoscile senza vocali.",[0,1,2,3,24],{kind:"r",dir:"read",diff:0,count:10}],
 ["Nuove lettere","Aggiungi Mim, Lam, Kaf, Fa.",[0,1,2,3,24,23,22,21,19],{kind:"r",dir:"read",diff:1,count:10}],
@@ -402,284 +422,85 @@ function applyTheme(){const r=document.documentElement,t=St.d.theme||"auto";t===
 function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
 function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
-/* ===== Sistema di Scrittura Guidata Avanzato con Tolleranza e Animazione ===== */
-/* ===== SISTEMA SCRITTURA HANDTRAINER COMPLETO E TESTATO ===== */
-/* ===== SISTEMA DI RICONOSCIMENTO VETTORIALE $P / GEOMETRICO DENSE ===== */
-/* ===== SISTEMA SCRITTURA RIGIDO ANTI-SCARABOCCHIO CON DEMO ANIMATA ===== */
-/* ===== SISTEMA SCRITTURA AVANZATO VETTORIALE + DEMO ANIMATA + VOCABOLI ===== */
-const SmartHand = {
-  curIdx: 0,
-  guided: true,
-  ctx: null,
-  guideCtx: null,
-  drawing: false,
-  strokes: [],
-  currentStroke: [],
-  animTimer: null,
 
+/* ===== Sistema Scrittura Smart Hand ===== */
+const SmartHand = {
+  curIdx: 0, guided: true, ctx: null, guideCtx: null, drawing: false, strokes: [], currentStroke: [], animTimer: null,
   start(guidedMode = true) {
-    if (!S.sel || !S.sel.size) {
-      if (typeof Au !== "undefined" && Au.note) Au.note("Seleziona almeno una lettera per iniziare.");
-      return;
-    }
-    this.stopAnim();
-    this.guided = guidedMode;
-    this.curIdx = pick([...S.sel]);
-    S.view = "hand_smart";
-    render();
+    if (!S.sel || !S.sel.size) { if (typeof Au !== "undefined" && Au.note) Au.note("Seleziona almeno una lettera per iniziare."); return; }
+    this.stopAnim(); this.guided = guidedMode; this.curIdx = pick([...S.sel]); S.view = "hand_smart"; render();
     setTimeout(() => this.initCanvas(), 60);
   },
-
   initCanvas() {
-    const canvas = $("hw_cv");
-    const guideCanvas = $("hw_guide_cv");
-    if (!canvas || !guideCanvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    this.ctx = canvas.getContext("2d");
-    this.ctx.scale(dpr, dpr);
-    this.ctx.lineWidth = 12;
-    this.ctx.lineCap = this.ctx.lineJoin = "round";
+    const canvas = $("hw_cv"), guideCanvas = $("hw_guide_cv"); if (!canvas || !guideCanvas) return;
+    const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+    this.ctx = canvas.getContext("2d"); this.ctx.scale(dpr, dpr); this.ctx.lineWidth = 12; this.ctx.lineCap = this.ctx.lineJoin = "round";
     this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
-
-    guideCanvas.width = rect.width * dpr;
-    guideCanvas.height = rect.height * dpr;
-    this.guideCtx = guideCanvas.getContext("2d");
-    this.guideCtx.scale(dpr, dpr);
-
-    this.drawGuideText(rect.width, rect.height);
-    this.bindEvents(canvas);
+    guideCanvas.width = rect.width * dpr; guideCanvas.height = rect.height * dpr;
+    this.guideCtx = guideCanvas.getContext("2d"); this.guideCtx.scale(dpr, dpr);
+    this.drawGuideText(rect.width, rect.height); this.bindEvents(canvas);
   },
-
   drawGuideText(w, h) {
-    const l = L[this.curIdx];
-    this.guideCtx.clearRect(0, 0, w, h);
-    this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-    this.guideCtx.textAlign = "center";
-    this.guideCtx.textBaseline = "middle";
-    this.guideCtx.fillStyle = "#000";
-    this.guideCtx.fillText(l[0], w / 2, h / 2);
+    const l = L[this.curIdx]; this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
   },
-
   bindEvents(c) {
-    let pt = e => {
-      const b = c.getBoundingClientRect();
-      return { x: e.clientX - b.left, y: e.clientY - b.top };
-    };
-
+    let pt = e => { const b = c.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
     c.onpointerdown = e => {
-      this.stopAnim();
-      this.drawing = true;
-      c.setPointerCapture(e.pointerId);
-      const p = pt(e);
-      this.currentStroke = [p];
-      this.ctx.beginPath();
-      this.ctx.moveTo(p.x, p.y);
+      this.stopAnim(); this.drawing = true; c.setPointerCapture(e.pointerId); const p = pt(e);
+      this.currentStroke = [p]; this.ctx.beginPath(); this.ctx.moveTo(p.x, p.y);
     };
-
     c.onpointermove = e => {
-      if (!this.drawing) return;
-      const p = pt(e);
-      this.currentStroke.push(p);
-      this.ctx.lineTo(p.x, p.y);
-      this.ctx.stroke();
-
-      if (this.guided && this.getTotalPointsCount() > 15) {
-        const g = $("hw_ghost");
-        if (g) g.classList.add("fade-out");
-      }
+      if (!this.drawing) return; const p = pt(e); this.currentStroke.push(p); this.ctx.lineTo(p.x, p.y); this.ctx.stroke();
+      if (this.guided && this.getTotalPointsCount() > 15) { const g = $("hw_ghost"); if (g) g.classList.add("fade-out"); }
     };
-
-    c.onpointerup = c.onpointercancel = () => {
-      if (this.drawing && this.currentStroke.length > 0) {
-        this.strokes.push(this.currentStroke);
-        this.currentStroke = [];
-      }
-      this.drawing = false;
-    };
+    c.onpointerup = c.onpointercancel = () => { if (this.drawing && this.currentStroke.length > 0) { this.strokes.push(this.currentStroke); this.currentStroke = []; } this.drawing = false; };
   },
-
-  getTotalPointsCount() {
-    return this.strokes.reduce((acc, s) => acc + s.length, 0) + this.currentStroke.length;
-  },
-
+  getTotalPointsCount() { return this.strokes.reduce((acc, s) => acc + s.length, 0) + this.currentStroke.length; },
   clear() {
-    this.stopAnim();
-    const c = $("hw_cv");
-    if (c && this.ctx) this.ctx.clearRect(0, 0, c.width, c.height);
-    this.strokes = [];
-    this.currentStroke = [];
-    const g = $("hw_ghost");
-    if (this.guided && g) g.classList.remove("fade-out");
-    const res = $("hw_result");
-    if (res) res.innerHTML = "";
+    this.stopAnim(); const c = $("hw_cv"); if (c && this.ctx) this.ctx.clearRect(0, 0, c.width, c.height);
+    this.strokes = []; this.currentStroke = []; const g = $("hw_ghost"); if (this.guided && g) g.classList.remove("fade-out");
+    const res = $("hw_result"); if (res) res.innerHTML = "";
   },
-
-  stopAnim() {
-    if (this.animTimer) cancelAnimationFrame(this.animTimer);
-  },
-
+  stopAnim() { if (this.animTimer) cancelAnimationFrame(this.animTimer); },
   playDemo() {
-    this.clear();
-    const l = L[this.curIdx];
-    const c = $("hw_cv");
-    if (!c) return;
-    const rect = c.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-
-    const fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
-
-    this.guideCtx.clearRect(0, 0, w, h);
-    this.guideCtx.font = fontStr;
-    this.guideCtx.textAlign = "center";
-    this.guideCtx.textBaseline = "middle";
-    this.guideCtx.fillStyle = "#000";
-    this.guideCtx.fillText(l[0], w / 2, h / 2);
-
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = w;
-    tempCanvas.height = h;
-    const tCtx = tempCanvas.getContext("2d");
-    tCtx.font = fontStr;
-    tCtx.textAlign = "center";
-    tCtx.textBaseline = "middle";
-    tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
-    tCtx.fillText(l[0], w / 2, h / 2);
-
+    this.clear(); const l = L[this.curIdx], c = $("hw_cv"); if (!c) return;
+    const rect = c.getBoundingClientRect(), w = rect.width, h = rect.height, fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = fontStr; this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
+    const tempCanvas = document.createElement("canvas"); tempCanvas.width = w; tempCanvas.height = h;
+    const tCtx = tempCanvas.getContext("2d"); tCtx.font = fontStr; tCtx.textAlign = "center"; tCtx.textBaseline = "middle"; tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0"; tCtx.fillText(l[0], w / 2, h / 2);
     let progress = 0;
-
     const step = () => {
-      progress += 0.03;
-      this.ctx.clearRect(0, 0, w, h);
-
-      this.ctx.save();
-      this.ctx.beginPath();
-      const currentX = w - w * progress;
-      this.ctx.rect(currentX, 0, w, h);
-      this.ctx.clip();
-      this.ctx.drawImage(tempCanvas, 0, 0);
-      this.ctx.restore();
-
-      if (progress < 1) {
-        this.animTimer = requestAnimationFrame(step);
-      } else {
-        if (typeof say === "function") say(AN[this.curIdx]);
-      }
+      progress += 0.03; this.ctx.clearRect(0, 0, w, h); this.ctx.save(); this.ctx.beginPath();
+      const currentX = w - w * progress; this.ctx.rect(currentX, 0, w, h); this.ctx.clip(); this.ctx.drawImage(tempCanvas, 0, 0); this.ctx.restore();
+      if (progress < 1) { this.animTimer = requestAnimationFrame(step); } else { if (typeof say === "function") say(AN[this.curIdx]); }
     };
-
     step();
   },
-
   evaluate() {
-    const resEl = $("hw_result");
-
-    if (this.strokes.length === 0) {
-      if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!");
-      return;
-    }
-
-    const targetChar = L[this.curIdx][0];
-
-    const numStrokes = this.strokes.length;
-    let maxAllowedStrokes = 2; 
-    if (["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar)) maxAllowedStrokes = 4;
-
-    if (numStrokes > maxAllowedStrokes) {
-      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti! Cerca di essere più preciso.</div>`;
-      if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000);
-      return;
-    }
-
-    let allPoints = [];
-    this.strokes.forEach(s => allPoints.push(...s));
-
-    if (allPoints.length < 8) {
-      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`;
-      return;
-    }
-
+    const resEl = $("hw_result"); if (this.strokes.length === 0) { if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!"); return; }
+    const targetChar = L[this.curIdx][0]; let maxAllowedStrokes = ["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar) ? 4 : 2;
+    if (this.strokes.length > maxAllowedStrokes) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti! Cerca di essere più preciso.</div>`; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000); return; }
+    let allPoints = []; this.strokes.forEach(s => allPoints.push(...s));
+    if (allPoints.length < 8) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`; return; }
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    allPoints.forEach(p => {
-      if (p.x < minX) minX = p.x;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.y > maxY) maxY = p.y;
-    });
-
-    const userW = maxX - minX;
-    const userH = maxY - minY;
-    const aspectRatio = userW / (userH || 1);
-
-    let score = 100;
-    let errorMsg = "";
-
-    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") {
-      if (aspectRatio > 0.55 || userH < 35) {
-        score = 0;
-        errorMsg = "La Alif deve essere un tratto verticale piatto!";
-      }
-    } 
-    else if (["ب", "ت", "ث"].includes(targetChar)) {
-      if (aspectRatio < 0.75) {
-        score = 0;
-        errorMsg = "Questa lettera deve essere sviluppata in orizzontale!";
-      }
-    }
-
+    allPoints.forEach(p => { if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; });
+    const userW = maxX - minX, userH = maxY - minY, aspectRatio = userW / (userH || 1); let score = 100, errorMsg = "";
+    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") { if (aspectRatio > 0.55 || userH < 35) { score = 0; errorMsg = "La Alif deve essere un tratto verticale piatto!"; } }
+    else if (["ب", "ت", "ث"].includes(targetChar)) { if (aspectRatio < 0.75) { score = 0; errorMsg = "Questa lettera deve essere sviluppata in orizzontale!"; } }
     if (score > 0) {
-      const cv = $("hw_cv");
-      const w = cv.width;
-      const h = cv.height;
-
-      const userImg = this.ctx.getImageData(0, 0, w, h).data;
-      const guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
-
-      let guidePixels = 0;
-      let hitPixels = 0;
-      let outPixels = 0;
-
-      for (let y = 0; y < h; y += 4) {
-        for (let x = 0; x < w; x += 4) {
-          const idx = (y * w + x) * 4;
-          const uA = userImg[idx + 3];
-          const gA = guideImg[idx + 3];
-
-          if (gA > 50) guidePixels++;
-
-          if (uA > 50) {
-            if (gA > 50) {
-              hitPixels++;
-            } else {
-              outPixels++;
-            }
-          }
-        }
-      }
-
-      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
-      const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 45 : 0; 
-
-      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty));
-      score = Math.min(100, score);
+      const cv = $("hw_cv"), w = cv.width, h = cv.height, userImg = this.ctx.getImageData(0, 0, w, h).data, guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
+      let guidePixels = 0, hitPixels = 0, outPixels = 0;
+      for (let y = 0; y < h; y += 4) { for (let x = 0; x < w; x += 4) { const idx = (y * w + x) * 4; if (guideImg[idx + 3] > 50) guidePixels++; if (userImg[idx + 3] > 50) { if (guideImg[idx + 3] > 50) hitPixels++; else outPixels++; } } }
+      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0, penalty = hitPixels > 0 ? (outPixels / hitPixels) * 45 : 0;
+      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty)); score = Math.min(100, score);
     }
-
-    const isGood = score >= 60;
-    if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
-
+    const isGood = score >= 60; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
     if (resEl) {
-      if (score >= 60) {
-        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`;
-        if (typeof say === "function") say(AN[this.curIdx]);
-      } else if (score >= 40) {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${errorMsg || "Cerca di seguire meglio la traccia."}</div>`;
-      } else {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma o orientamento non validi."}</div>`;
-      }
+      if (score >= 60) { resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`; if (typeof say === "function") say(AN[this.curIdx]); }
+      else if (score >= 40) { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${errorMsg || "Cerca di seguire meglio la traccia."}</div>`; }
+      else { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma o orientamento non validi."}</div>`; }
     }
   }
 };
@@ -692,21 +513,17 @@ function smartHandView() {
     <h2>Scrittura a Mano Interattiva</h2>
     <div class="panel">
       <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
-      
       <div class="chips" style="justify-content:center; margin-bottom:10px;">
         <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
         <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
         <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
       </div>
-
       <div class="hw-container">
         <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
         <canvas id="hw_cv" class="hw-canvas"></canvas>
         <canvas id="hw_guide_cv" style="display:none;"></canvas>
       </div>
-
       <div id="hw_result"></div>
-
       <div class="row" style="margin-top:12px;">
         <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
         <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
@@ -716,180 +533,51 @@ function smartHandView() {
   `;
 }
 
-/* ===== SEZIONE VOCABOLI ===== */
-function getLearnedVocab() {
-  if (!St.d || !St.d.logs) return [];
-  const wordSet = new Map();
-  
-  St.d.logs.forEach(log => {
-    if (log.w && Array.isArray(log.w)) {
-      log.w.forEach(wIdx => {
-        if (typeof W !== "undefined" && W[wIdx]) {
-          wordSet.set(wIdx, W[wIdx]);
-        }
-      });
-    }
-  });
-  return Array.from(wordSet.values());
-}
-
+/* ===== Sezione Vocaboli ===== */
 function vocabView() {
-  const words = getLearnedVocab();
-  
-  let listHtml = "";
-  if (words.length === 0) {
-    listHtml = `<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>`;
-  } else {
-    listHtml = `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">` + 
-      words.map(w => `
-        <div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')">
-          <div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div>
-          <div style="font-weight:bold; margin-top:4px;">${w[1]}</div>
-          <div class="sub" style="font-size:0.85rem;">${w[2] || ''}</div>
-          <div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div>
-        </div>
-      `).join('') + `</div>`;
-  }
-
-  return `
-    <h2>📚 Dizionario Vocaboli</h2>
-    <p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>
-    ${listHtml}
-  `;
+  const words = St.d.vocab || [];
+  let listHtml = words.length === 0 ? `<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>` :
+    `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">` + 
+      words.map(w => `<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div><div style="font-weight:bold; margin-top:4px;">${w[1]}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('') + `</div>`;
+  return `<h2>📚 Dizionario Vocaboli</h2><p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>${listHtml}`;
 }
-function homeView(){
-  const d = St.d, y = d.days[today()] || {q:0, ms:0}, g = d.goal;
-  const gp = Math.min(100, Math.round(100 * y.q / g));
-  const h = new Date().getHours();
-  const o = overall();
-  const s = (a, b) => `<div class="stat"><small>${a}</small><b>${b}</b></div>`;
 
-  if (!d.n) {
-    return `
-      <div class="hero" style="min-height:220px;">
-        <div>
-          <h2>Il tuo percorso inizia qui</h2>
-          <p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p>
-          <div class="row" style="justify-content:flex-start; margin-top:16px;">
-            <button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button>
-            <button class="btn hb2" onclick="go('learn')">Vai al percorso</button>
-          </div>
-        </div>
-        <div class="wm ar" aria-hidden="true">ع</div>
-      </div>
-    `;
+function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
+ const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
+ if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
+ return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
+
+function accountView() {
+  const user = window.currentUser;
+  if (user) {
+    return `<h2>Profilo Utente</h2><div class="panel" style="text-align:left"><p><b>Accesso effettuato come:</b><br>${esc(user.email)}</p><p class="sub">I tuoi progressi sono sincronizzati nel cloud.</p><button class="btn p" onclick="handleLogout()">Disconnetti (Logout)</button></div>`;
   }
-
-  return `
-    <div class="hero">
-      <div>
-        <h2>${h < 12 ? "Buongiorno" : h < 18 ? "Buon pomeriggio" : "Buonasera"} 👋</h2>
-        <p>Continua il tuo percorso di apprendimento della lingua araba.</p>
-        <p>🔥 <b>${dstreak()}</b> giorni consecutivi di studio</p>
-        <div class="row" style="justify-content:flex-start; margin-top:12px;">
-          <button class="btn hb" onclick="cont()">Continua allenamento →</button>
-          <button class="btn hb2" onclick="go('vocab')">📚 Apri Vocaboli</button>
-        </div>
-      </div>
-      ${ring(o, "Progresso generale")}
-      <div class="wm ar" aria-hidden="true">ع</div>
-    </div>
-
-    <div class="panel" style="text-align:left; margin-top:16px;">
-      <b>Obiettivo di oggi</b>
-      ${bar(gp, "Obiettivo di oggi")}
-      <div class="sub">${y.q} / ${g} domande · ${Math.round(y.ms / 6e4)} min ${y.q >= g ? " · 🎉 Obiettivo completato!" : ""}</div>
-    </div>
-
-    <h3 style="margin-top:24px;">Panoramica Attività</h3>
-    <div class="stats">
-      ${s("Lettere padroneggiate", L.filter((_, i) => Ms.st(i)[1] === "Padroneggiata").length + " su 28")}
-      ${s("Lettere da ripassare", Ms.weak().length)}
-      ${s("Precisione media", Math.round(100 * d.ok / d.n) + "%")}
-      ${s("Quiz completati", d.done)}
-      ${s("Lezioni completate", LES.filter((_, i) => (d.les[i] || 0) >= 70).length + " su 10")}
-    </div>
-
-    <h3 style="margin-top:24px;">Accesso Rapido</h3>
-    <div class="chips">
-      <button class="btn" onclick="go('alf')">🔤 Alfabeto</button>
-      <button class="btn" onclick="go('cfg')">🧠 Allenamento</button>
-      <button class="btn" onclick="go('vocab')">📚 Vocaboli</button>
-      <button class="btn" onclick="hs()">✍️ Scrivi a mano</button>
-      <button class="btn" onclick="go('prog')">📊 Progressi</button>
-    </div>
-  `;
+  return `<h2>Account e Sincronizzazione</h2><div class="panel" style="text-align:left; max-width:420px; margin:0 auto;"><p class="sub">Accedi o crea un account per sincronizzare i tuoi progressi su più dispositivi.</p><div style="margin-bottom:12px;"><label><b>Email</b></label><input type="text" id="acc_email" placeholder="nome@esempio.com" style="width:100%; text-align:left;"></div><div style="margin-bottom:16px;"><label><b>Password</b></label><input type="password" id="acc_pass" placeholder="••••••••" style="width:100%; padding:12px; font-size:1.2rem; border:2px solid var(--bd); border-radius:10px; background:var(--bg); color:var(--tx);"></div><div class="row"><button class="btn p" onclick="handleLogin()">Accedi</button><button class="btn" onclick="handleRegister()">Registrati</button></div><div style="margin-top: 12px;"><button class="btn" onclick="handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">🌐 Accedi con Google</button></div><div id="acc_msg" class="fb" style="margin-top:10px;"></div></div>`;
 }
-// Gestione del pulsante ACCEDI
+
 async function handleLogin() {
-  const email = $("acc_email").value.trim();
-  const pass = $("acc_pass").value.trim();
-  const msg = $("acc_msg");
+  const email = $("acc_email").value.trim(), pass = $("acc_pass").value.trim(), msg = $("acc_msg");
   if (!email || !pass) { msg.innerHTML = '<span class="ko">Inserisci email e password.</span>'; return; }
-  try {
-    await window.fbLogin(email, pass);
-    toast("Accesso effettuato!");
-  } catch (e) {
-    msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>';
-  }
+  try { await window.fbLogin(email, pass); toast("Accesso effettuato!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>'; }
 }
 
-// Gestione del pulsante REGISTRATI
 async function handleRegister() {
-  const email = $("acc_email").value.trim();
-  const pass = $("acc_pass").value.trim();
-  const msg = $("acc_msg");
+  const email = $("acc_email").value.trim(), pass = $("acc_pass").value.trim(), msg = $("acc_msg");
   if (!email || !pass) { msg.innerHTML = '<span class="ko">Inserisci email e password.</span>'; return; }
-  try {
-    await window.fbRegister(email, pass);
-    toast("Account creato con successo!");
-  } catch (e) {
-    msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>';
-  }
+  try { await window.fbRegister(email, pass); toast("Account creato con successo!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>'; }
 }
 
- // Gestione del pulsante ACCEDI CON GOOGLE
 async function handleGoogleLogin() {
   const msg = $("acc_msg");
-  try {
-    await window.fbLoginGoogle();
-    toast("Accesso con Google effettuato!");
-  } catch (e) {
-    msg.innerHTML = '<span class="ko">Errore Google: ' + esc(e.message) + '</span>';
-  }
-}
-// Gestione del LOGOUT
-async function handleLogout() {
-  await window.fbLogout();
-  toast("Disconnessione effettuata.");
+  try { await window.fbLoginGoogle(); toast("Accesso con Google effettuato!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore Google: ' + esc(e.message) + '</span>'; }
 }
 
-/* Controllo Sidebar a comparsa */
-function toggleSidebar(force) {
-  const nav = $("nav");
-  const ov = $("nav_overlay");
-  if (!nav || !ov) return;
-  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
-  nav.classList.toggle("open", isOpen);
-  ov.classList.toggle("open", isOpen);
-}
- 
-/* Controllo Sidebar */
-function toggleSidebar(force) {
-  const nav = $("nav");
-  const ov = $("nav_overlay");
-  if (!nav || !ov) return;
-  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
-  nav.classList.toggle("open", isOpen);
-  ov.classList.toggle("open", isOpen);
-}
+async function handleLogout() { await window.fbLogout(); toast("Disconnessione effettuata."); }
 
-const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
-
-function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
-
+/* ===== Funzione di Render Principale ===== */
 function render(){
-  const v=S.view, t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
+  const v=S.view;
+  const t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
   const navEl = $("nav");
   
   if (navEl) {
@@ -914,7 +602,7 @@ function render(){
 
   if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus();
 }
-}
+
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
 
@@ -925,10 +613,11 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
-<!-- Firebase SDK (Modulo JavaScript) -->
+
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
- import { 
+  import { 
     getAuth, 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -944,23 +633,20 @@ if ("serviceWorker" in navigator) {
     getDoc 
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Incolla le tue chiavi ottenute al Passo 1
   const firebaseConfig = {
-  apiKey: "AIzaSyBtL8l3RA-YWvc-IW_DbtC95GOSNBjxUZo",
-  authDomain: "arabic-trainer-375ba.firebaseapp.com",
-  projectId: "arabic-trainer-375ba",
-  storageBucket: "arabic-trainer-375ba.firebasestorage.app",
-  messagingSenderId: "613388029498",
-  appId: "1:613388029498:web:3a1a34315977c0b8b42f03",
-  measurementId: "G-4MLXM6RSK7"
+    apiKey: "AIzaSyBtL8l3RA-YWvc-IW_DbtC95GOSNBjxUZo",
+    authDomain: "arabic-trainer-375ba.firebaseapp.com",
+    projectId: "arabic-trainer-375ba",
+    storageBucket: "arabic-trainer-375ba.firebasestorage.app",
+    messagingSenderId: "613388029498",
+    appId: "1:613388029498:web:3a1a34315977c0b8b42f03",
+    measurementId: "G-4MLXM6RSK7"
   };
 
-  // Inizializzazione di Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Rendiamo le funzioni Firebase accessibili nel resto dello script
   window.fbAuth = auth;
   window.fbDb = db;
   window.fbRegister = (email, pass) => createUserWithEmailAndPassword(auth, email, pass);
@@ -969,20 +655,16 @@ if ("serviceWorker" in navigator) {
   const googleProvider = new GoogleAuthProvider();
   window.fbLoginGoogle = () => signInWithPopup(auth, googleProvider);
 
-  // Ascolta quando un utente entra o esce (Login / Logout)
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       window.currentUser = user;
-      // Se l'utente è loggato, carica i suoi dati dal Cloud
       await loadCloudProgress(user.uid);
     } else {
       window.currentUser = null;
     }
-    // Ridisegna l'interfaccia dell'app per aggiornare la vista
     if (typeof render === "function") render();
   });
 
-  // Salva lo stato dei progressi nel database Firestore
   window.saveCloudProgress = async function() {
     if (!window.currentUser) return;
     try {
@@ -993,7 +675,6 @@ if ("serviceWorker" in navigator) {
     }
   };
 
-  // Carica i progressi salvati da Firestore
   async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
@@ -1001,13 +682,10 @@ if ("serviceWorker" in navigator) {
       if (snap.exists()) {
         const cloudData = snap.data().data;
         if (cloudData) {
-          // Unisce i dati del cloud con lo stato locale
           St.d = Object.assign(St.d, cloudData);
-          // Salva anche nel localStorage locale
           try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
         }
       } else {
-        // Primo accesso: crea il documento dell'utente salvando lo stato attuale
         window.saveCloudProgress();
       }
     } catch (e) {
