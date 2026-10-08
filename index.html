@@ -894,23 +894,34 @@ function toggleSidebar(force) {
  
 const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
 function render(){
-  const v=S.view, t=["quiz","ex","hand"].includes(v)?"cfg":v;
+  const v=S.view;
+  const t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
   const navEl = $("nav");
   const wasOpen = navEl ? navEl.classList.contains("open") : false;
 
-  navEl.innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
-  
-  if (wasOpen) {
-    navEl.classList.add("open");
-    const ov = $("nav_overlay");
-    if (ov) ov.classList.add("open");
+  if (navEl) {
+    navEl.innerHTML=NAV.map(n=>'<button class="btn '+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
+    if (wasOpen) navEl.classList.add("open");
   }
 
   $("cnt").textContent="Lettere selezionate: "+S.sel.size;
   $("bar").style.display=v==="alf"||v==="cfg"?"":"none";
-  $("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="vocab"?vocabView():v==="learn"?learnView():v==="prog"?progView():setView();
   
+  const app = $("app");
+  if (v==="home") app.innerHTML=homeView();
+  else if (v==="alf") app.innerHTML='<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail();
+  else if (v==="account") app.innerHTML=accountView();
+  else if (v==="cfg") app.innerHTML=cfgView();
+  else if (v==="quiz") app.innerHTML=quizView();
+  else if (v==="ex") app.innerHTML=exView();
+  else if (v==="hand_smart") app.innerHTML=smartHandView();
+  else if (v==="vocab") app.innerHTML=vocabView();
+  else if (v==="learn") app.innerHTML=learnView();
+  else if (v==="prog") app.innerHTML=progView();
+  else if (v==="set") app.innerHTML=setView();
+
   if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus();
+}
 }
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
