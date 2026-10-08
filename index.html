@@ -76,11 +76,59 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
 
-.hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
-.hw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
-.hw-guide { position: absolute; inset: 0; display: grid; place-items: center; font-size: min(50vw, 200px); color: var(--ac); opacity: 0.25; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+.hw-container { 
+  position: relative; 
+  width: min(100%, 300px); 
+  aspect-ratio: 1; 
+  margin: 16px auto; 
+  background: #ffffff;
+  border: 3px solid var(--bd); 
+  border-radius: 16px; 
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.hw-grid-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.25;
+  z-index: 1;
+}
+.hw-canvas { 
+  position: absolute; 
+  inset: 0; 
+  width: 100%; 
+  height: 100%; 
+  touch-action: none; 
+  cursor: crosshair; 
+  z-index: 3; 
+}
+.hw-guide { 
+  position: absolute; 
+  inset: 0; 
+  display: grid; 
+  place-items: center; 
+  font-size: min(40vw, 170px); 
+  color: var(--ac); 
+  opacity: 0.2; 
+  transition: opacity 0.4s ease; 
+  z-index: 2; 
+  pointer-events: none; 
+}
 .hw-guide.fade-out { opacity: 0 !important; }
-.accuracy-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
+.accuracy-badge { 
+  font-weight: bold; 
+  font-size: 1.1rem;
+  padding: 10px 16px; 
+  border-radius: 12px; 
+  margin-top: 12px; 
+  display: inline-block; 
+}
+.accuracy-badge.ok-green { background: rgba(39, 174, 96, 0.15); color: #27ae60; border: 1px solid #27ae60; }
+.accuracy-badge.warn-yellow { background: rgba(243, 156, 18, 0.15); color: #d35400; border: 1px solid #f39c12; }
+.accuracy-badge.err-red { background: rgba(231, 76, 60, 0.15); color: #c0392b; border: 1px solid #e74c3c; }
 
 /* Stili Menu Laterale a comparsa */
 body { padding-left: 0 !important; }
@@ -499,29 +547,81 @@ const SmartHand = {
     };
     step();
   },
-  evaluate() {
-    const resEl = $("hw_result"); if (this.strokes.length === 0) { if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!"); return; }
-    const targetChar = L[this.curIdx][0]; let maxAllowedStrokes = ["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar) ? 4 : 2;
-    if (this.strokes.length > maxAllowedStrokes) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti! Cerca di essere più preciso.</div>`; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000); return; }
-    let allPoints = []; this.strokes.forEach(s => allPoints.push(...s));
-    if (allPoints.length < 8) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`; return; }
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    allPoints.forEach(p => { if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; });
-    const userW = maxX - minX, userH = maxY - minY, aspectRatio = userW / (userH || 1); let score = 100, errorMsg = "";
-    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") { if (aspectRatio > 0.55 || userH < 35) { score = 0; errorMsg = "La Alif deve essere un tratto verticale piatto!"; } }
-    else if (["ب", "ت", "ث"].includes(targetChar)) { if (aspectRatio < 0.75) { score = 0; errorMsg = "Questa lettera deve essere sviluppata in orizzontale!"; } }
-    if (score > 0) {
-      const cv = $("hw_cv"), w = cv.width, h = cv.height, userImg = this.ctx.getImageData(0, 0, w, h).data, guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
-      let guidePixels = 0, hitPixels = 0, outPixels = 0;
-      for (let y = 0; y < h; y += 4) { for (let x = 0; x < w; x += 4) { const idx = (y * w + x) * 4; if (guideImg[idx + 3] > 50) guidePixels++; if (userImg[idx + 3] > 50) { if (guideImg[idx + 3] > 50) hitPixels++; else outPixels++; } } }
-      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0, penalty = hitPixels > 0 ? (outPixels / hitPixels) * 45 : 0;
-      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty)); score = Math.min(100, score);
+ evaluate() {
+    const resEl = $("hw_result"); 
+    if (this.strokes.length === 0) { 
+      if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!"); 
+      return; 
     }
-    const isGood = score >= 60; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
+
+    const targetChar = L[this.curIdx][0]; 
+    let maxAllowedStrokes = ["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar) ? 4 : 2;
+    
+    if (this.strokes.length > maxAllowedStrokes) { 
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge err-red">🔴 Sbagliata (Troppi tratti isolati)</div>`; 
+      if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000); 
+      return; 
+    }
+
+    let allPoints = []; 
+    this.strokes.forEach(s => allPoints.push(...s));
+    if (allPoints.length < 8) { 
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge err-red">🔴 Tratto troppo breve o incompleto</div>`; 
+      return; 
+    }
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    allPoints.forEach(p => { 
+      if (p.x < minX) minX = p.x; 
+      if (p.x > maxX) maxX = p.x; 
+      if (p.y < minY) minY = p.y; 
+      if (p.y > maxY) maxY = p.y; 
+    });
+
+    const userW = maxX - minX, userH = maxY - minY, aspectRatio = userW / (userH || 1); 
+    let score = 100, errorMsg = "";
+
+    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") { 
+      if (aspectRatio > 0.55 || userH < 35) { score = 0; errorMsg = "Sviluppo errato: la Alif deve essere un tratto verticale!"; } 
+    } else if (["ب", "ت", "ث"].includes(targetChar)) { 
+      if (aspectRatio < 0.75) { score = 0; errorMsg = "Sviluppo errato: questa lettera va scritta in orizzontale!"; } 
+    }
+
+    if (score > 0) {
+      const cv = $("hw_cv"), w = cv.width, h = cv.height;
+      const userImg = this.ctx.getImageData(0, 0, w, h).data;
+      const guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
+      
+      let guidePixels = 0, hitPixels = 0, outPixels = 0;
+      for (let y = 0; y < h; y += 4) { 
+        for (let x = 0; x < w; x += 4) { 
+          const idx = (y * w + x) * 4; 
+          if (guideImg[idx + 3] > 50) guidePixels++; 
+          if (userImg[idx + 3] > 50) { 
+            if (guideImg[idx + 3] > 50) hitPixels++; 
+            else outPixels++; 
+          } 
+        } 
+      }
+      
+      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
+      const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 40 : 0;
+      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty)); 
+      score = Math.min(100, score);
+    }
+
+    const isGood = score >= 60; 
+    if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
+
     if (resEl) {
-      if (score >= 60) { resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`; if (typeof say === "function") say(AN[this.curIdx]); }
-      else if (score >= 40) { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${errorMsg || "Cerca di seguire meglio la traccia."}</div>`; }
-      else { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma o orientamento non validi."}</div>`; }
+      if (score >= 70) { 
+        resEl.innerHTML = `<div class="accuracy-badge ok-green">🟢 Corretta! (${score}%)</div>`; 
+        if (typeof say === "function") say(AN[this.curIdx]); 
+      } else if (score >= 40) { 
+        resEl.innerHTML = `<div class="accuracy-badge warn-yellow">🟡 Inaccurata (${score}%). ${errorMsg || "Segui meglio la traccia guida."}</div>`; 
+      } else { 
+        resEl.innerHTML = `<div class="accuracy-badge err-red">🔴 Errata (${score}%). ${errorMsg || "Forma o proporzioni non valide."}</div>`; 
+      }
     }
   }
 };
@@ -531,22 +631,35 @@ function hs() { SmartHand.start(true); }
 function smartHandView() {
   const l = L[SmartHand.curIdx];
   return `
-    <h2>Scrittura a Mano Interattiva</h2>
-    <div class="panel">
-      <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
-      <div class="chips" style="justify-content:center; margin-bottom:10px;">
+    <h2>✍️ Scuola di Calligrafia</h2>
+    <div class="panel" style="max-width:440px; margin:0 auto;">
+      <p style="margin-bottom:8px;">Esercitati a scrivere la lettera <b style="font-size:1.8rem; color:var(--ac);" class="ar">${l[0]}</b> <span>(${l[1]} - ${l[4]})</span></p>
+      
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
         <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
-        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
+        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra Tratto</button>
       </div>
+
+      <!-- Quadrato con Griglia Tratteggiata -->
       <div class="hw-container">
+        <svg class="hw-grid-svg" viewBox="0 0 100 100">
+          <line x1="33.3" y1="0" x2="33.3" y2="100" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
+          <line x1="66.6" y1="0" x2="66.6" y2="100" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
+          <line x1="0" y1="33.3" x2="100" y2="33.3" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
+          <line x1="0" y1="66.6" x2="100" y2="66.6" stroke="#000" stroke-dasharray="3" stroke-width="0.8"/>
+          <line x1="0" y1="0" x2="100" y2="100" stroke="#000" stroke-dasharray="2" stroke-width="0.5"/>
+          <line x1="100" y1="0" x2="0" y2="100" stroke="#000" stroke-dasharray="2" stroke-width="0.5"/>
+        </svg>
         <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
         <canvas id="hw_cv" class="hw-canvas"></canvas>
         <canvas id="hw_guide_cv" style="display:none;"></canvas>
       </div>
-      <div id="hw_result"></div>
+
+      <div id="hw_result" style="min-height:48px;"></div>
+
       <div class="row" style="margin-top:12px;">
-        <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
+        <button class="btn" onclick="SmartHand.clear()">🗑️ Cancella</button>
         <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
         <button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button>
       </div>
