@@ -448,6 +448,7 @@ const SmartHand = {
   },
 
   // Mostra l'animazione dimostrativa
+ // Animazione precisa tratto per tratto (Da destra verso sinistra + puntini)
   playDemo() {
     this.clear();
     const l = L[this.curIdx];
@@ -456,27 +457,64 @@ const SmartHand = {
     const w = rect.width;
     const h = rect.height;
 
+    // Maschera e font identici al sottofondo per sovrapposizione al 100%
+    const fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+
+    // Disegniamo la lettera guida esatta nel canvas nascosto per estrarre la sagoma
+    this.guideCtx.clearRect(0, 0, w, h);
+    this.guideCtx.font = fontStr;
+    this.guideCtx.textAlign = "center";
+    this.guideCtx.textBaseline = "middle";
+    this.guideCtx.fillStyle = "#000";
+    this.guideCtx.fillText(l[0], w / 2, h / 2);
+
+    const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
+
+    // Troviamo i confini effettivi (Bounding Box) della lettera
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    for (let y = 0; y < h; y += 2) {
+      for (let x = 0; x < w; x += 2) {
+        if (guideImgData[(y * w + x) * 4 + 3] > 50) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    // Canvas temporaneo per la scrittura animata
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = w;
     tempCanvas.height = h;
     const tCtx = tempCanvas.getContext("2d");
-    tCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    tCtx.font = fontStr;
     tCtx.textAlign = "center";
     tCtx.textBaseline = "middle";
-    tCtx.fillStyle = "#000";
+    tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
     tCtx.fillText(l[0], w / 2, h / 2);
 
+    // Animazione da Destra verso Sinistra (RTL Araba) in 2 Fasi:
+    // Fase 1: Corpo principale della lettera (da maxX a minX)
+    // Fase 2: Punti e segni diacritici finali
     let progress = 0;
-    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
-    this.ctx.lineWidth = 10;
 
     const step = () => {
-      progress += 0.04;
+      progress += 0.025; // Velocità dell'animazione
       this.ctx.clearRect(0, 0, w, h);
-      
+
       this.ctx.save();
       this.ctx.beginPath();
-      this.ctx.rect(0, 0, w, h * progress);
+
+      if (progress <= 0.75) {
+        // FASE 1: Scrittura corpo principale da DESTRA verso SINISTRA
+        const currentX = maxX - (maxX - minX) * (progress / 0.75);
+        this.ctx.rect(currentX, minY - 10, maxX - currentX + 20, maxY - minY + 20);
+      } else {
+        // FASE 2: Rivelazione completa dei puntini / tratti superiori e inferiori
+        this.ctx.rect(minX - 10, 0, maxX - minX + 20, h);
+      }
+
       this.ctx.clip();
       this.ctx.drawImage(tempCanvas, 0, 0);
       this.ctx.restore();
@@ -487,14 +525,11 @@ const SmartHand = {
         say(AN[this.curIdx]);
       }
     };
+
     step();
   },
 
-  stopAnim() {
-    if (this.animTimer) cancelAnimationFrame(this.animTimer);
-  },
-
-  // Algoritmo tollerante per la verifica
+  // Algoritmo di verifica severo sull'orientamento e tollerante sui dettagli
   evaluate() {
     if (this.userPoints.length < 5) {
       Au.note("Disegna la lettera prima di verificare!");
@@ -505,30 +540,75 @@ const SmartHand = {
     const w = cv.width;
     const h = cv.height;
 
+    // 1. Bounding Box del disegno dell'utente
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    this.userPoints.forEach(([x, y]) => {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    });
+
+    const userW = maxX - minX;
+    const userH = maxY - minY;
+
+    if (userW < 8 && userH < 8) {
+      Au.note("Tratto troppo corto. Disegna la lettera!");
+      return;
+    }
+
+    // 2. Orientamento dell'utente
+    const userIsVertical = userH > userW * 1.25;
+    const userIsHorizontal = userW > userH * 1.25;
+
+    // 3. Estrazione dati guida
     const userImgData = this.ctx.getImageData(0, 0, w, h).data;
     const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
 
+    let gMinX = w, gMaxX = 0, gMinY = h, gMaxY = 0;
     let guidePixels = 0;
-    let hitPixels = 0;
-
-    const radius = Math.round(w * 0.04); // Raggio di tolleranza al 4%
 
     for (let y = 0; y < h; y += 2) {
       for (let x = 0; x < w; x += 2) {
         const idx = (y * w + x) * 4;
-        const guideAlpha = guideImgData[idx + 3];
+        if (guideImgData[idx + 3] > 50) {
+          guidePixels++;
+          if (x < gMinX) gMinX = x;
+          if (x > gMaxX) gMaxX = x;
+          if (y < gMinY) gMinY = y;
+          if (y > gMaxY) gMaxY = y;
+        }
+      }
+    }
 
-        if (guideAlpha > 50) guidePixels++;
+    const guideW = gMaxX - gMinX;
+    const guideH = gMaxY - gMinY;
+    const guideIsVertical = guideH > guideW * 1.25;
+    const guideIsHorizontal = guideW > guideH * 1.25;
 
+    // 4. CONTROLLO RIGIDO ORIENTAMENTO: Blocca se la direzione è invertita
+    if ((guideIsVertical && userIsHorizontal) || (guideIsHorizontal && userIsVertical)) {
+      const resEl = $("hw_result");
+      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Orientamento errato! La lettera va tracciata in verticale/orizzontale.</div>`;
+      St.log([this.curIdx], "write", false, "hand", 10000);
+      return;
+    }
+
+    // 5. Sovrapposizione con tolleranza di raggio
+    let hitPixels = 0;
+    let missPixels = 0;
+    const radius = Math.round(w * 0.035);
+
+    for (let y = 0; y < h; y += 3) {
+      for (let x = 0; x < w; x += 3) {
+        const idx = (y * w + x) * 4;
         if (userImgData[idx + 3] > 50) {
           let foundInRadius = false;
           for (let dy = -radius; dy <= radius; dy += 3) {
             for (let dx = -radius; dx <= radius; dx += 3) {
-              const nx = x + dx;
-              const ny = y + dy;
+              const nx = x + dx, ny = y + dy;
               if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                const nIdx = (ny * w + nx) * 4;
-                if (guideImgData[nIdx + 3] > 50) {
+                if (guideImgData[(ny * w + nx) * 4 + 3] > 50) {
                   foundInRadius = true;
                   break;
                 }
@@ -537,24 +617,30 @@ const SmartHand = {
             if (foundInRadius) break;
           }
 
-          if (foundInRadius) hitPixels++;
+          if (foundInRadius) {
+            hitPixels++;
+          } else {
+            missPixels++;
+          }
         }
       }
     }
 
-    let coverage = guidePixels > 0 ? (hitPixels / (guidePixels * 0.45)) * 100 : 0;
-    let score = Math.min(100, Math.round(coverage));
+    const coverage = guidePixels > 0 ? (hitPixels / (guidePixels * 0.35)) * 100 : 0;
+    const penalty = hitPixels > 0 ? (missPixels / hitPixels) * 20 : 0;
+    let score = Math.max(0, Math.round(coverage - penalty));
+    score = Math.min(100, score);
 
-    const isGood = score >= 35;
+    const isGood = score >= 45;
 
     St.log([this.curIdx], "write", isGood, "hand", 10000);
 
     const resEl = $("hw_result");
     if (isGood) {
-      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ben fatta! Riconosco la lettera (${Math.min(100, score + 15)}%)</div>`;
+      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Lettera riconosciuta (${score}%)</div>`;
       say(AN[this.curIdx]);
     } else {
-      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Ancora un po' imprecisa. Prova a ricalcare la traccia!</div>`;
+      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto non corretto (${score}%). Segui la forma e la direzione della lettera!</div>`;
     }
   }
 };
