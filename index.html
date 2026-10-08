@@ -949,13 +949,13 @@ function shopView() {
 
    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
     <div class="panel" style="text-align:center;">
-      <div class="chips" style="justify-content:center; gap:10px;">
-        ${(chests.common || 0) > 0 ? `<button class="btn p" onclick="startChestOpening('common')">✨ Apri Cassa Comune (${chests.common})</button>` : ''}
-        ${(chests.rare || 0) > 0 ? `<button class="btn p" style="background:#3498db; border-color:#3498db;" onclick="startChestOpening('rare')">✨ Apri Cassa Rara (${chests.rare})</button>` : ''}
-        ${(chests.legendary || 0) > 0 ? `<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening('legendary')">✨ Apri Cassa Leggendaria (${chests.legendary})</button>` : ''}
+     <div class="chips" style="justify-content:center; gap:10px;">
+        ${(chests.common || 0) > 0 ? '<button class="btn p" onclick="startChestOpening(\'common\')">✨ Apri Cassa Comune (' + chests.common + ')</button>' : ''}
+        ${(chests.rare || 0) > 0 ? '<button class="btn p" style="background:#3498db; border-color:#3498db;" onclick="startChestOpening(\'rare\')">✨ Apri Cassa Rara (' + chests.rare + ')</button>' : ''}
+        ${(chests.legendary || 0) > 0 ? '<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening(\'legendary\')">✨ Apri Cassa Leggendaria (' + chests.legendary + ')</button>' : ''}
       </div>
       ${!(chests.common || chests.rare || chests.legendary) ? 
-        `<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>` : ''}
+        '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>' : ''}
     </div>
   `;
 }
@@ -974,31 +974,33 @@ let chestOpeningState = { spinning: false, wonItem: null };
 
 function startChestOpening(type) {
   if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
-  const chests = St.d.chests;
   
-  // Trova il tipo di cassa disponibile
+  // Se non viene passato un tipo specifico, individua la prima cassa disponibile
   let chestType = type;
   if (!chestType) {
-    if (chests.legendary > 0) chestType = "legendary";
-    else if (chests.rare > 0) chestType = "rare";
-    else if (chests.common > 0) chestType = "common";
+    if (St.d.chests.legendary > 0) chestType = "legendary";
+    else if (St.d.chests.rare > 0) chestType = "rare";
+    else if (St.d.chests.common > 0) chestType = "common";
   }
-  
-  if (!chestType || (chests[chestType] || 0) <= 0) {
-    toast("⚠️ Non possiedi questa cassa!");
+
+  // Verifica che il tipo esista e che ce ne sia almeno una
+  if (!chestType || (St.d.chests[chestType] || 0) <= 0) {
+    toast("⚠️ Nessuna cassa " + (chestType || "") + " da aprire!");
     return;
   }
 
-  // Scala la cassa e salva subito sia in locale che su Firebase
+  // Sscala la cassa e salva subito
   St.d.chests[chestType]--;
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
 
+  // Genera i 35 elementi del nastro
   let trackItems = [];
   for (let i = 0; i < 35; i++) {
     trackItems.push(pick(LOOT_ITEMS));
   }
 
+  // Calcola il premio vincente (indice 28)
   const rand = Math.random() * 100;
   let won;
   if (chestType === "legendary") {
@@ -1011,10 +1013,12 @@ function startChestOpening(type) {
   if (!won) won = LOOT_ITEMS[0];
   trackItems[28] = won;
 
-  chestOpeningState = { spinning: true, wonItem: won, trackItems };
+  // Imposta lo stato dell'animazione e passa alla vista
+  chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems };
   S.view = "chest_open";
   render();
 
+  // Avvia lo scorrimento
   setTimeout(() => {
     const track = $("roulette_track");
     if (!track) return;
