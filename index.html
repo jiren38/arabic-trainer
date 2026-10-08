@@ -344,6 +344,7 @@ function applyTheme(){const r=document.documentElement,t=St.d.theme||"auto";t===
 function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
 function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
+/* ===== Sistema di Scrittura Guidata Avanzato con Tolleranza e Animazione ===== */
 const SmartHand = {
   curIdx: 0,
   guided: true,
@@ -351,12 +352,14 @@ const SmartHand = {
   guideCtx: null,
   drawing: false,
   userPoints: [],
+  animTimer: null,
   
   start(guidedMode = true) {
     if (!S.sel.size) {
       Au.note("Seleziona almeno una lettera per iniziare.");
       return;
     }
+    this.stopAnim();
     this.guided = guidedMode;
     this.curIdx = pick([...S.sel]);
     S.view = "hand_smart";
@@ -372,16 +375,14 @@ const SmartHand = {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
 
-    // Configura Canvas Utente
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     this.ctx = canvas.getContext("2d");
     this.ctx.scale(dpr, dpr);
-    this.ctx.lineWidth = 12;
+    this.ctx.lineWidth = 14;
     this.ctx.lineCap = this.ctx.lineJoin = "round";
     this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
 
-    // Configura Canvas Guida
     guideCanvas.width = rect.width * dpr;
     guideCanvas.height = rect.height * dpr;
     this.guideCtx = guideCanvas.getContext("2d");
@@ -408,6 +409,7 @@ const SmartHand = {
     };
 
     c.onpointerdown = e => {
+      this.stopAnim();
       this.drawing = true;
       c.setPointerCapture(e.pointerId);
       this.ctx.beginPath();
@@ -423,7 +425,7 @@ const SmartHand = {
       this.ctx.stroke();
       this.userPoints.push(p);
 
-      if (this.guided && this.userPoints.length > 20) {
+      if (this.guided && this.userPoints.length > 15) {
         const g = $("hw_ghost");
         if (g) g.classList.add("fade-out");
       }
@@ -435,6 +437,7 @@ const SmartHand = {
   },
 
   clear() {
+    this.stopAnim();
     if (!this.ctx) return;
     const c = $("hw_cv");
     this.ctx.clearRect(0, 0, c.width, c.height);
@@ -444,8 +447,56 @@ const SmartHand = {
     $("hw_result").innerHTML = "";
   },
 
+  // Mostra l'animazione dimostrativa
+  playDemo() {
+    this.clear();
+    const l = L[this.curIdx];
+    const c = $("hw_cv");
+    const rect = c.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tCtx = tempCanvas.getContext("2d");
+    tCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    tCtx.textAlign = "center";
+    tCtx.textBaseline = "middle";
+    tCtx.fillStyle = "#000";
+    tCtx.fillText(l[0], w / 2, h / 2);
+
+    let progress = 0;
+    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
+    this.ctx.lineWidth = 10;
+
+    const step = () => {
+      progress += 0.04;
+      this.ctx.clearRect(0, 0, w, h);
+      
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.rect(0, 0, w, h * progress);
+      this.ctx.clip();
+      this.ctx.drawImage(tempCanvas, 0, 0);
+      this.ctx.restore();
+
+      if (progress < 1) {
+        this.animTimer = requestAnimationFrame(step);
+      } else {
+        say(AN[this.curIdx]);
+      }
+    };
+    step();
+  },
+
+  stopAnim() {
+    if (this.animTimer) cancelAnimationFrame(this.animTimer);
+  },
+
+  // Algoritmo tollerante per la verifica
   evaluate() {
-    if (this.userPoints.length < 10) {
+    if (this.userPoints.length < 5) {
       Au.note("Disegna la lettera prima di verificare!");
       return;
     }
@@ -459,38 +510,51 @@ const SmartHand = {
 
     let guidePixels = 0;
     let hitPixels = 0;
-    let missPixels = 0;
 
-    for (let i = 3; i < userImgData.length; i += 4) {
-      const userAlpha = userImgData[i];
-      const guideAlpha = guideImgData[i];
+    const radius = Math.round(w * 0.04); // Raggio di tolleranza al 4%
 
-      if (guideAlpha > 50) guidePixels++;
+    for (let y = 0; y < h; y += 2) {
+      for (let x = 0; x < w; x += 2) {
+        const idx = (y * w + x) * 4;
+        const guideAlpha = guideImgData[idx + 3];
 
-      if (userAlpha > 50) {
-        if (guideAlpha > 50) {
-          hitPixels++;
-        } else {
-          missPixels++;
+        if (guideAlpha > 50) guidePixels++;
+
+        if (userImgData[idx + 3] > 50) {
+          let foundInRadius = false;
+          for (let dy = -radius; dy <= radius; dy += 3) {
+            for (let dx = -radius; dx <= radius; dx += 3) {
+              const nx = x + dx;
+              const ny = y + dy;
+              if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                const nIdx = (ny * w + nx) * 4;
+                if (guideImgData[nIdx + 3] > 50) {
+                  foundInRadius = true;
+                  break;
+                }
+              }
+            }
+            if (foundInRadius) break;
+          }
+
+          if (foundInRadius) hitPixels++;
         }
       }
     }
 
-    const coverage = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
-    const penalty = hitPixels > 0 ? (missPixels / hitPixels) * 15 : 0;
-    let score = Math.max(0, Math.round(coverage - penalty));
-    score = Math.min(100, Math.round(score * 1.3));
+    let coverage = guidePixels > 0 ? (hitPixels / (guidePixels * 0.45)) * 100 : 0;
+    let score = Math.min(100, Math.round(coverage));
 
-    const isGood = score >= 50;
+    const isGood = score >= 35;
 
     St.log([this.curIdx], "write", isGood, "hand", 10000);
 
     const resEl = $("hw_result");
     if (isGood) {
-      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Precisione: ${score}%</div>`;
+      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ben fatta! Riconosco la lettera (${Math.min(100, score + 15)}%)</div>`;
       say(AN[this.curIdx]);
     } else {
-      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Da rifare. Precisione: ${score}%</div>`;
+      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Ancora un po' imprecisa. Prova a ricalcare la traccia!</div>`;
     }
   }
 };
@@ -507,6 +571,7 @@ function smartHandView() {
       <div class="chips" style="justify-content:center; margin-bottom:10px;">
         <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
         <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
+        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
       </div>
 
       <div class="hw-container">
