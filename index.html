@@ -112,24 +112,33 @@ header {
   position: fixed !important;
   top: 0 !important;
   left: -280px !important;
-  width: 260px !important;
+  width: 270px !important;
   height: 100vh !important;
   background: var(--card) !important;
   border-right: 1px solid var(--bd) !important;
+  display: flex !important;
   flex-direction: column !important;
-  padding: 60px 16px 20px !important;
+  padding: 50px 14px 100px !important; /* Aumentato il padding in fondo */
   gap: 8px !important;
-  z-index: 99999 !important; /* Forza il menu in primo piano assoluto */
+  z-index: 9999 !important;
   transition: left 0.3s ease !important;
   box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
   overflow-y: auto !important;
-  pointer-events: auto !important; /* Garantisce la cliccabilità dei pulsanti */
+  -webkit-overflow-scrolling: touch;
 }
-
 #nav.open {
   left: 0 !important;
 }
-
+#nav button {
+  flex: none !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+}
+  
 .menu-toggle {
   background: none;
   border: none;
@@ -883,7 +892,7 @@ function toggleSidebar(force) {
   ov.classList.toggle("open", isOpen);
 }
  
-const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
+const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
 function render(){
   const v=S.view, t=["quiz","ex","hand"].includes(v)?"cfg":v;
   const navEl = $("nav");
