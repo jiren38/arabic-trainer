@@ -81,33 +81,22 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--sh)}
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
-/* Layout Unificato e Overlay */
+/* Layout con Sidebar a comparsa */
 body { padding-left: 0 !important; }
 main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .bar { left: 0 !important; }
 
-/* Overlay grigio di sfondo */
-/* Layout Unificato e Overlay */
-body { padding-left: 0 !important; }
-main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
-.bar { left: 0 !important; }
-
-/* Invia l'header in alto mantenendolo sopra la pagina */
-header {
-  z-index: 10000 !important;
-}
-
-/* Overlay grigio di sfondo che copre tutto TRANNE il menu */
+/* Overlay per lo sfondo grigio */
 #nav_overlay {
   position: fixed !important;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0 !important;
   background: rgba(0, 0, 0, 0.5) !important;
-  z-index: 9998 !important;
+  z-index: 9000 !important;
   display: none;
 }
 #nav_overlay.open { display: block !important; }
 
-/* Menu Navigazione a comparsa isolato sopra l'overlay */
+/* Menu Navigazione a comparsa isolato */
 #nav {
   position: fixed !important;
   top: 0 !important;
@@ -118,17 +107,16 @@ header {
   border-right: 1px solid var(--bd) !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 50px 14px 100px !important; /* Aumentato il padding in fondo */
-  gap: 8px !important;
+  padding: 50px 14px 100px !important;
+  gap: 6px !important;
   z-index: 9999 !important;
   transition: left 0.3s ease !important;
   box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
 }
-#nav.open {
-  left: 0 !important;
-}
+#nav.open { left: 0 !important; }
+
 #nav button {
   flex: none !important;
   width: 100% !important;
@@ -138,18 +126,11 @@ header {
   border-radius: 10px !important;
   white-space: nowrap !important;
 }
-  
+
 .menu-toggle {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  color: var(--tx);
-  display: inline-flex;
-  align-items: center;
-  margin-right: 12px;
+  background: none; border: none; font-size: 1.4rem;
+  cursor: pointer; padding: 4px 8px; border-radius: 8px;
+  color: var(--tx); margin-right: 12px; display: inline-flex; align-items: center;
 }
 .menu-toggle:hover { background: var(--sel); }
 
@@ -175,11 +156,12 @@ header {
 </head>
 <body>
 <div id="nav_overlay" onclick="toggleSidebar(false)"></div>
+<nav id="nav"></nav>
+
 <header>
   <div style="display:flex; align-items:center;">
     <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     <b>Arabic Trainer</b>
-    <nav id="nav"></nav>
   </div>
 </header>
 <main>
@@ -892,16 +874,26 @@ function toggleSidebar(force) {
   ov.classList.toggle("open", isOpen);
 }
  
-const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
-function render(){
-  const v=S.view;
-  const t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
-  const navEl = $("nav");
-  const wasOpen = navEl ? navEl.classList.contains("open") : false;
+/* Controllo Sidebar */
+function toggleSidebar(force) {
+  const nav = $("nav");
+  const ov = $("nav_overlay");
+  if (!nav || !ov) return;
+  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
+  nav.classList.toggle("open", isOpen);
+  ov.classList.toggle("open", isOpen);
+}
 
+const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
+
+function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
+
+function render(){
+  const v=S.view, t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
+  const navEl = $("nav");
+  
   if (navEl) {
-    navEl.innerHTML=NAV.map(n=>'<button class="btn '+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
-    if (wasOpen) navEl.classList.add("open");
+    navEl.innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
   }
 
   $("cnt").textContent="Lettere selezionate: "+S.sel.size;
