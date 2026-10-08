@@ -627,6 +627,7 @@ if ("serviceWorker" in navigator) {
 </script>
 
 <!-- Firebase SDK -->
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { 
@@ -667,18 +668,21 @@ if ("serviceWorker" in navigator) {
   const googleProvider = new GoogleAuthProvider();
   window.fbLoginGoogle = () => signInWithPopup(auth, googleProvider);
 
+  window.isCloudLoaded = false;
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       window.currentUser = user;
       await loadCloudProgress(user.uid);
     } else {
       window.currentUser = null;
+      window.isCloudLoaded = true; // Permette il salvataggio locale anche senza login
     }
     if (typeof render === "function") render();
   });
 
   window.saveCloudProgress = async function() {
-    if (!window.currentUser) return;
+    if (!window.currentUser || !window.isCloudLoaded) return;
     try {
       const ref = doc(db, "users", window.currentUser.uid);
       await setDoc(ref, { data: St.d, updatedAt: Date.now() }, { merge: true });
@@ -687,7 +691,7 @@ if ("serviceWorker" in navigator) {
     }
   };
 
-async function loadCloudProgress(uid) {
+  async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
@@ -696,10 +700,11 @@ async function loadCloudProgress(uid) {
         const localVocab = St.d.vocab || [];
         const cloudVocab = cloudData.vocab || [];
         
+        // Mappa unica per evitare duplicati nei vocaboli
         const mergedVocabMap = new Map();
         [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) mergedVocabMap.set(w[0], w); });
         
-        // Fonde i dati prendendo i valori più alti tra PC e iPhone
+        // Fonde prendendo SEMPRE il valore massimo tra PC e iPhone
         St.d = Object.assign({}, St.d, cloudData, {
           vocab: Array.from(mergedVocabMap.values()),
           ok: Math.max(St.d.ok || 0, cloudData.ok || 0),
@@ -708,15 +713,17 @@ async function loadCloudProgress(uid) {
           streak: Math.max(St.d.streak || 0, cloudData.streak || 0)
         });
 
+        // Salva subito i dati fusi sia su localStorage sia sul cloud
         try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
         try { localStorage.setItem("at_vocab", JSON.stringify(St.d.vocab)); } catch(e){}
-        await window.saveCloudProgress();
-      } else {
-        await window.saveCloudProgress();
       }
+      window.isCloudLoaded = true;
+      await window.saveCloudProgress();
     } catch (e) {
       console.error("Errore nel caricamento dal Cloud:", e);
+      window.isCloudLoaded = true;
     }
+    if (typeof render === "function") render();
   }
 </script>
 </body>
