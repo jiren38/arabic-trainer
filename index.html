@@ -219,10 +219,17 @@ const Gen={
 const St={d:null,
  load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10,vocab:[]},o||{});if(!this.d.vocab)this.d.vocab=[];},
 save(){
+  if(!this.d) return;
   if(!this.d.vocab) this.d.vocab = [];
+  // Salvataggio locale FORZATO e INDIPENDENTE
+  try{ localStorage.setItem("at1", JSON.stringify(this.d)); }catch(e){}
   try{ localStorage.setItem("at_vocab", JSON.stringify(this.d.vocab)); }catch(e){}
-  try{ localStorage.setItem("at1",JSON.stringify(this.d)); }catch(e){}
-  if(window.saveCloudProgress){ window.saveCloudProgress(); }
+  // Salvataggio cloud solo se Firebase è pronto
+  try{
+    if(window.saveCloudProgress && window.isCloudLoaded){ 
+      window.saveCloudProgress(); 
+    }
+  }catch(e){}
  },
  log(ls,sk,ok,mode,ms){const d=this.d;d.n++;if(ok){d.ok++;d.streak++;d.best=Math.max(d.best,d.streak)}else d.streak=0;
   ls.forEach(i=>{const m=d.M[i]||(d.M[i]={}),x=m[sk]||(m[sk]=[0,0]);x[0]++;if(ok)x[1]++;if(!ok){const e=d.E[i]||(d.E[i]={c:0});e.c++;e.t=Date.now();e.m=mode}});
