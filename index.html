@@ -948,7 +948,7 @@ function shopView() {
 
     </div>
 
-    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
+   <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
     <div class="panel" style="text-align:center;">
       <div class="chips" style="justify-content:center; gap:10px;">
         ${(chests.common || 0) > 0 ? '<button class="btn p" onclick="startChestOpening(\'common\')">✨ Apri Cassa Comune (' + chests.common + ')</button>' : ''}
@@ -956,6 +956,16 @@ function shopView() {
         ${(chests.legendary || 0) > 0 ? '<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening(\'legendary\')">✨ Apri Cassa Leggendaria (' + chests.legendary + ')</button>' : ''}
       </div>
       ${totalChests === 0 ? '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>' : ''}
+    </div>
+
+    <h3 style="margin-top:24px;">🎒 La tua Collezione</h3>
+    <div class="panel">
+      ${(!St.d.inventory || St.d.inventory.length === 0) ? 
+        '<p class="sub" style="text-align:center; margin:0;">Non hai ancora sbloccato oggetti dalle casse! Apri la tua prima cassa per trovare titoli e stili unici.</p>' : 
+        '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
+          St.d.inventory.map(item => '<div style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ' + item + '</div>').join('') + 
+        '</div>'
+      }
     </div>
   `;
 }
