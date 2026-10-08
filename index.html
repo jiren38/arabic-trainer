@@ -345,6 +345,7 @@ function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
 function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
 /* ===== Sistema di Scrittura Guidata Avanzato con Tolleranza e Animazione ===== */
+/* ===== SISTEMA SCRITTURA HANDTRAINER COMPLETO E TESTATO ===== */
 const SmartHand = {
   curIdx: 0,
   guided: true,
@@ -353,10 +354,10 @@ const SmartHand = {
   drawing: false,
   userPoints: [],
   animTimer: null,
-  
+
   start(guidedMode = true) {
-    if (!S.sel.size) {
-      Au.note("Seleziona almeno una lettera per iniziare.");
+    if (!S.sel || !S.sel.size) {
+      if (typeof Au !== "undefined" && Au.note) Au.note("Seleziona almeno una lettera per iniziare.");
       return;
     }
     this.stopAnim();
@@ -364,7 +365,7 @@ const SmartHand = {
     this.curIdx = pick([...S.sel]);
     S.view = "hand_smart";
     render();
-    setTimeout(() => this.initCanvas(), 50);
+    setTimeout(() => this.initCanvas(), 60);
   },
 
   initCanvas() {
@@ -387,7 +388,7 @@ const SmartHand = {
     guideCanvas.height = rect.height * dpr;
     this.guideCtx = guideCanvas.getContext("2d");
     this.guideCtx.scale(dpr, dpr);
-    
+
     this.drawGuideText(rect.width, rect.height);
     this.bindEvents(canvas);
   },
@@ -440,27 +441,25 @@ const SmartHand = {
     this.stopAnim();
     if (!this.ctx) return;
     const c = $("hw_cv");
-    this.ctx.clearRect(0, 0, c.width, c.height);
+    if (c) this.ctx.clearRect(0, 0, c.width, c.height);
     this.userPoints = [];
     const g = $("hw_ghost");
     if (this.guided && g) g.classList.remove("fade-out");
-    $("hw_result").innerHTML = "";
+    const res = $("hw_result");
+    if (res) res.innerHTML = "";
   },
 
-  // Mostra l'animazione dimostrativa
- // Animazione precisa tratto per tratto (Da destra verso sinistra + puntini)
   playDemo() {
     this.clear();
     const l = L[this.curIdx];
     const c = $("hw_cv");
+    if (!c) return;
     const rect = c.getBoundingClientRect();
     const w = rect.width;
     const h = rect.height;
 
-    // Maschera e font identici al sottofondo per sovrapposizione al 100%
     const fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
 
-    // Disegniamo la lettera guida esatta nel canvas nascosto per estrarre la sagoma
     this.guideCtx.clearRect(0, 0, w, h);
     this.guideCtx.font = fontStr;
     this.guideCtx.textAlign = "center";
@@ -470,7 +469,6 @@ const SmartHand = {
 
     const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
 
-    // Troviamo i confini effettivi (Bounding Box) della lettera
     let minX = w, maxX = 0, minY = h, maxY = 0;
     for (let y = 0; y < h; y += 2) {
       for (let x = 0; x < w; x += 2) {
@@ -483,7 +481,6 @@ const SmartHand = {
       }
     }
 
-    // Canvas temporaneo per la scrittura animata
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = w;
     tempCanvas.height = h;
@@ -494,24 +491,19 @@ const SmartHand = {
     tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0";
     tCtx.fillText(l[0], w / 2, h / 2);
 
-    // Animazione da Destra verso Sinistra (RTL Araba) in 2 Fasi:
-    // Fase 1: Corpo principale della lettera (da maxX a minX)
-    // Fase 2: Punti e segni diacritici finali
     let progress = 0;
 
     const step = () => {
-      progress += 0.025; // Velocità dell'animazione
+      progress += 0.025;
       this.ctx.clearRect(0, 0, w, h);
 
       this.ctx.save();
       this.ctx.beginPath();
 
       if (progress <= 0.75) {
-        // FASE 1: Scrittura corpo principale da DESTRA verso SINISTRA
         const currentX = maxX - (maxX - minX) * (progress / 0.75);
         this.ctx.rect(currentX, minY - 10, maxX - currentX + 20, maxY - minY + 20);
       } else {
-        // FASE 2: Rivelazione completa dei puntini / tratti superiori e inferiori
         this.ctx.rect(minX - 10, 0, maxX - minX + 20, h);
       }
 
@@ -522,25 +514,28 @@ const SmartHand = {
       if (progress < 1) {
         this.animTimer = requestAnimationFrame(step);
       } else {
-        say(AN[this.curIdx]);
+        if (typeof say === "function") say(AN[this.curIdx]);
       }
     };
 
     step();
   },
 
-  // Algoritmo di verifica severo sull'orientamento e tollerante sui dettagli
+  stopAnim() {
+    if (this.animTimer) cancelAnimationFrame(this.animTimer);
+  },
+
   evaluate() {
     if (this.userPoints.length < 5) {
-      Au.note("Disegna la lettera prima di verificare!");
+      if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!");
       return;
     }
 
     const cv = $("hw_cv");
+    if (!cv) return;
     const w = cv.width;
     const h = cv.height;
 
-    // 1. Bounding Box del disegno dell'utente
     let minX = w, maxX = 0, minY = h, maxY = 0;
     this.userPoints.forEach(([x, y]) => {
       if (x < minX) minX = x;
@@ -553,15 +548,13 @@ const SmartHand = {
     const userH = maxY - minY;
 
     if (userW < 8 && userH < 8) {
-      Au.note("Tratto troppo corto. Disegna la lettera!");
+      if (typeof Au !== "undefined" && Au.note) Au.note("Tratto troppo corto. Disegna la lettera!");
       return;
     }
 
-    // 2. Orientamento dell'utente
     const userIsVertical = userH > userW * 1.25;
     const userIsHorizontal = userW > userH * 1.25;
 
-    // 3. Estrazione dati guida
     const userImgData = this.ctx.getImageData(0, 0, w, h).data;
     const guideImgData = this.guideCtx.getImageData(0, 0, w, h).data;
 
@@ -586,15 +579,14 @@ const SmartHand = {
     const guideIsVertical = guideH > guideW * 1.25;
     const guideIsHorizontal = guideW > guideH * 1.25;
 
-    // 4. CONTROLLO RIGIDO ORIENTAMENTO: Blocca se la direzione è invertita
+    const resEl = $("hw_result");
+
     if ((guideIsVertical && userIsHorizontal) || (guideIsHorizontal && userIsVertical)) {
-      const resEl = $("hw_result");
-      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Orientamento errato! La lettera va tracciata in verticale/orizzontale.</div>`;
-      St.log([this.curIdx], "write", false, "hand", 10000);
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Orientamento errato! La lettera va tracciata in direzione diversa.</div>`;
+      if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000);
       return;
     }
 
-    // 5. Sovrapposizione con tolleranza di raggio
     let hitPixels = 0;
     let missPixels = 0;
     const radius = Math.round(w * 0.035);
@@ -633,14 +625,15 @@ const SmartHand = {
 
     const isGood = score >= 45;
 
-    St.log([this.curIdx], "write", isGood, "hand", 10000);
+    if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
 
-    const resEl = $("hw_result");
-    if (isGood) {
-      resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Lettera riconosciuta (${score}%)</div>`;
-      say(AN[this.curIdx]);
-    } else {
-      resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto non corretto (${score}%). Segui la forma e la direzione della lettera!</div>`;
+    if (resEl) {
+      if (isGood) {
+        resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Ottimo! Lettera riconosciuta (${score}%)</div>`;
+        if (typeof say === "function") say(AN[this.curIdx]);
+      } else {
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Tratto non corretto (${score}%). Segui la forma e la direzione della lettera!</div>`;
+      }
     }
   }
 };
