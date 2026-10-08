@@ -105,7 +105,7 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 </head>
 <body>
 <header><div><b>Arabic Trainer</b>
-<nav id="nav"></nav></div></header>
+<nav id="nav"><button class="btn" onclick="S.view='vocab';render()">📚 Vocaboli</button></nav>
 <main>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="aud" class="score" style="display:none" aria-live="polite"></div>
@@ -348,6 +348,7 @@ const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="
 /* ===== SISTEMA SCRITTURA HANDTRAINER COMPLETO E TESTATO ===== */
 /* ===== SISTEMA DI RICONOSCIMENTO VETTORIALE $P / GEOMETRICO DENSE ===== */
 /* ===== SISTEMA SCRITTURA RIGIDO ANTI-SCARABOCCHIO CON DEMO ANIMATA ===== */
+/* ===== SISTEMA SCRITTURA AVANZATO VETTORIALE + DEMO ANIMATA + VOCABOLI ===== */
 const SmartHand = {
   curIdx: 0,
   guided: true,
@@ -460,7 +461,10 @@ const SmartHand = {
     if (res) res.innerHTML = "";
   },
 
-  // FUNZIONE DEMO RIPRISTINATA E PERFETTAMENTE SINCRONIZZATA
+  stopAnim() {
+    if (this.animTimer) cancelAnimationFrame(this.animTimer);
+  },
+
   playDemo() {
     this.clear();
     const l = L[this.curIdx];
@@ -513,11 +517,6 @@ const SmartHand = {
     step();
   },
 
-  stopAnim() {
-    if (this.animTimer) cancelAnimationFrame(this.animTimer);
-  },
-
-  /* VALUTAZIONE SEVERA ANTI-SCARABOCCHIO */
   evaluate() {
     const resEl = $("hw_result");
 
@@ -528,19 +527,16 @@ const SmartHand = {
 
     const targetChar = L[this.curIdx][0];
 
-    // 1. REGOLA SEVERA: CONTEGGIO TRATTI
-    // Se l'utente fa più di 3-4 tratti per lettere semplici, è uno scarabocchio!
     const numStrokes = this.strokes.length;
-    let maxAllowedStrokes = 2; // Default per Alif, Dal, Raa...
-    if (["ب", "ت", "ث", "ك", "ي", "ط", "ظ"].includes(targetChar)) maxAllowedStrokes = 4;
+    let maxAllowedStrokes = 2; 
+    if (["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar)) maxAllowedStrokes = 4;
 
     if (numStrokes > maxAllowedStrokes) {
-      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti casuali! Hai fatto ${numStrokes} tratti.</div>`;
+      if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti! Cerca di essere più preciso.</div>`;
       if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000);
       return;
     }
 
-    // 2. RACCOLTA PUNTI E CALCOLO BOUNDING BOX
     let allPoints = [];
     this.strokes.forEach(s => allPoints.push(...s));
 
@@ -561,26 +557,22 @@ const SmartHand = {
     const userH = maxY - minY;
     const aspectRatio = userW / (userH || 1);
 
-    // 3. VERIFICA GEOMETRICA PER SPECIFICA LETTERA
     let score = 100;
     let errorMsg = "";
 
-    // SE È ALIF (ا) -> DEVE ESSERE RIGIDAMENTE VERTICALE
     if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") {
       if (aspectRatio > 0.55 || userH < 35) {
         score = 0;
-        errorMsg = "La Alif deve essere una linea verticale ben definita!";
+        errorMsg = "La Alif deve essere un tratto verticale piatto!";
       }
     } 
-    // SE È BA / TA / THA -> DEVE ESSERE ORIZZONTALE
     else if (["ب", "ت", "ث"].includes(targetChar)) {
-      if (aspectRatio < 0.8) {
+      if (aspectRatio < 0.75) {
         score = 0;
-        errorMsg = "Questa lettera deve svilupparsi in orizzontale!";
+        errorMsg = "Questa lettera deve essere sviluppata in orizzontale!";
       }
     }
 
-    // 4. VERIFICA SOVRAPPOSIZIONE E PENALITÀ PER TRATTI FUORI POSTO
     if (score > 0) {
       const cv = $("hw_cv");
       const w = cv.width;
@@ -605,33 +597,108 @@ const SmartHand = {
             if (gA > 50) {
               hitPixels++;
             } else {
-              outPixels++; // Tratto disegnato fuori dalla lettera!
+              outPixels++;
             }
           }
         }
       }
 
       const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0;
-      const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 40 : 0; // Penalità severa per chi scarabocchia fuori
+      const penalty = hitPixels > 0 ? (outPixels / hitPixels) * 45 : 0; 
 
       score = Math.max(0, Math.round(matchPercent * 2.2 - penalty));
       score = Math.min(100, score);
     }
 
-    // 5. GIUDIZIO E SCORE SOGLIA MINIMA 50%
-    const isGood = score >= 50;
+    const isGood = score >= 60;
     if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
 
     if (resEl) {
-      if (score >= 50) {
+      if (score >= 60) {
         resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`;
         if (typeof say === "function") say(AN[this.curIdx]);
+      } else if (score >= 40) {
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${errorMsg || "Cerca di seguire meglio la traccia."}</div>`;
       } else {
-        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma non valida o troppe sbavature."}</div>`;
+        resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma o orientamento non validi."}</div>`;
       }
     }
   }
 };
+
+function hs() { SmartHand.start(true); }
+
+function smartHandView() {
+  const l = L[SmartHand.curIdx];
+  return `
+    <h2>Scrittura a Mano Interattiva</h2>
+    <div class="panel">
+      <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
+      
+      <div class="chips" style="justify-content:center; margin-bottom:10px;">
+        <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
+        <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
+        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
+      </div>
+
+      <div class="hw-container">
+        <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
+        <canvas id="hw_cv" class="hw-canvas"></canvas>
+        <canvas id="hw_guide_cv" style="display:none;"></canvas>
+      </div>
+
+      <div id="hw_result"></div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
+        <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
+        <button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ===== SEZIONE VOCABOLI ===== */
+function getLearnedVocab() {
+  if (!St.d || !St.d.logs) return [];
+  const wordSet = new Map();
+  
+  St.d.logs.forEach(log => {
+    if (log.w && Array.isArray(log.w)) {
+      log.w.forEach(wIdx => {
+        if (typeof W !== "undefined" && W[wIdx]) {
+          wordSet.set(wIdx, W[wIdx]);
+        }
+      });
+    }
+  });
+  return Array.from(wordSet.values());
+}
+
+function vocabView() {
+  const words = getLearnedVocab();
+  
+  let listHtml = "";
+  if (words.length === 0) {
+    listHtml = `<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>`;
+  } else {
+    listHtml = `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">` + 
+      words.map(w => `
+        <div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')">
+          <div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div>
+          <div style="font-weight:bold; margin-top:4px;">${w[1]}</div>
+          <div class="sub" style="font-size:0.85rem;">${w[2] || ''}</div>
+          <div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div>
+        </div>
+      `).join('') + `</div>`;
+  }
+
+  return `
+    <h2>📚 Dizionario Vocaboli</h2>
+    <p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>
+    ${listHtml}
+  `;
+}
 function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
  if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
@@ -731,7 +798,7 @@ const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento
 function render(){const v=S.view,t=["quiz","ex","hand"].includes(v)?"cfg":v;
  $("nav").innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
  $("cnt").textContent="Lettere selezionate: "+S.sel.size;$("bar").style.display=v==="alf"||v==="cfg"?"":"none";
-$("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="learn"?learnView():v==="prog"?progView():setView();
+$("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="vocab"?vocabView():v==="learn"?learnView():v==="prog"?progView():setView();
  if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus()}
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
