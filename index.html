@@ -321,7 +321,29 @@ const Gen={
 
 /* ===== Progressi (localStorage) ===== */
 const St={d:null,
-load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10,vocab:[],coins:100,chests:{common:0,rare:0,legendary:0},inventory:[],quests:{lastDate:"",list:[]}},o||{});if(!this.d.vocab)this.d.vocab=[];},
+load(){
+  let o = null;
+  try { o = JSON.parse(localStorage.getItem("at1")); } catch(e){}
+  
+  // Impostazioni di default
+  const defaults = {
+    done:0, ok:0, n:0, streak:0, best:0, err:[], sel:[], au:true, les:{}, ach:[], theme:"auto",
+    M:{}, E:{}, days:{}, ms:0, mode:{}, goal:10, vocab:[],
+    coins: 100,
+    chests: { common: 0, rare: 0, legendary: 0 },
+    inventory: [],
+    quests: { lastDate: "", list: [] }
+  };
+
+  // Unisce i dati mantenendo oggetti e inventari già esistenti
+  this.d = Object.assign({}, defaults, o || {});
+  if (o) {
+    if (o.chests) this.d.chests = Object.assign({ common: 0, rare: 0, legendary: 0 }, o.chests);
+    if (o.inventory) this.d.inventory = o.inventory;
+    if (o.quests) this.d.quests = o.quests;
+  }
+  if (!this.d.vocab) this.d.vocab = [];
+},
 save(){
   if(!this.d) return;
   if(!this.d.vocab) this.d.vocab = [];
@@ -857,7 +879,7 @@ const Quests = {
     }
   },
 
-  buyChest(type, price) {
+ buyChest(type, price) {
     if ((St.d.coins || 0) < price) {
       toast("⚠️ Monete insufficienti!");
       return;
@@ -865,7 +887,11 @@ const Quests = {
     St.d.coins -= price;
     if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
     St.d.chests[type] = (St.d.chests[type] || 0) + 1;
+    
+    // Salvataggio sia su localStorage sia su Cloud Firebase
     St.save();
+    if (window.saveCloudProgress) window.saveCloudProgress();
+    
     toast("📦 Cassa acquistata con successo!");
     render();
   }
@@ -921,12 +947,15 @@ function shopView() {
 
     </div>
 
-    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
+   <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
     <div class="panel" style="text-align:center;">
-      <p class="sub">Hai in inventario: 📦 ${chests.common || 0} Comuni · 🔷 ${chests.rare || 0} Rare · 👑 ${chests.legendary || 0} Leggendarie</p>
-      ${(chests.common || chests.rare || chests.legendary) ? 
-        `<button class="btn p" style="font-size:1.1rem; padding:12px 24px;" onclick="startChestOpening()">✨ Apri una Cassa!</button>` : 
-        `<p style="font-size:0.9rem; color:var(--mu);">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>`}
+      <div class="chips" style="justify-content:center; gap:10px;">
+        ${(chests.common || 0) > 0 ? `<button class="btn p" onclick="startChestOpening('common')">✨ Apri Cassa Comune (${chests.common})</button>` : ''}
+        ${(chests.rare || 0) > 0 ? `<button class="btn p" style="background:#3498db; border-color:#3498db;" onclick="startChestOpening('rare')">✨ Apri Cassa Rara (${chests.rare})</button>` : ''}
+        ${(chests.legendary || 0) > 0 ? `<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening('legendary')">✨ Apri Cassa Leggendaria (${chests.legendary})</button>` : ''}
+      </div>
+      ${!(chests.common || chests.rare || chests.legendary) ? 
+        `<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>` : ''}
     </div>
   `;
 }
@@ -943,30 +972,36 @@ const LOOT_ITEMS = [
 
 let chestOpeningState = { spinning: false, wonItem: null };
 
-function startChestOpening() {
+function startChestOpening(type) {
   const chests = St.d.chests || {};
-  let chestType = "common";
-  if (chests.legendary > 0) chestType = "legendary";
-  else if (chests.rare > 0) chestType = "rare";
-  else if (chests.common > 0) chestType = "common";
-  else return;
+  
+  // Se non viene specificato il tipo, prende la prima cassa disponibile
+  let chestType = type || (chests.legendary > 0 ? "legendary" : chests.rare > 0 ? "rare" : chests.common > 0 ? "common" : null);
+  
+  if (!chestType || (chests[chestType] || 0) <= 0) {
+    toast("⚠️ Non possiedi questa cassa!");
+    return;
+  }
 
+  // Consuma 1 cassa dall'inventario
   St.d.chests[chestType]--;
   St.save();
 
+  // Prepara il nastro di 35 elementi casuali per il rullo
   let trackItems = [];
   for (let i = 0; i < 35; i++) {
     trackItems.push(pick(LOOT_ITEMS));
   }
 
+  // Algoritmo di estrazione casuale del premio finale (posizionato all'indice 28)
   const rand = Math.random() * 100;
   let won;
   if (chestType === "legendary") {
-    won = rand < 40 ? LOOT_ITEMS.find(x=>x.rarity==="legendary") : pick(LOOT_ITEMS.filter(x=>x.rarity==="epic"||x.rarity==="rare"));
+    won = rand < 40 ? LOOT_ITEMS.find(x => x.rarity === "legendary") : pick(LOOT_ITEMS.filter(x => x.rarity === "epic" || x.rarity === "rare"));
   } else if (chestType === "rare") {
-    won = rand < 25 ? pick(LOOT_ITEMS.filter(x=>x.rarity==="rare"||x.rarity==="epic")) : pick(LOOT_ITEMS.filter(x=>x.rarity==="uncommon"||x.rarity==="common"));
+    won = rand < 25 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare" || x.rarity === "epic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon" || x.rarity === "common"));
   } else {
-    won = rand < 15 ? pick(LOOT_ITEMS.filter(x=>x.rarity==="rare")) : pick(LOOT_ITEMS.filter(x=>x.rarity==="common"||x.rarity==="uncommon"));
+    won = rand < 15 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common" || x.rarity === "uncommon"));
   }
   if (!won) won = LOOT_ITEMS[0];
   trackItems[28] = won;
@@ -975,12 +1010,13 @@ function startChestOpening() {
   S.view = "chest_open";
   render();
 
+  // Avvia l'animazione del rullo
   setTimeout(() => {
     const track = $("roulette_track");
     if (!track) return;
     
-    const itemWidth = 90;
-    const containerWidth = 380;
+    const itemWidth = 90; // 80px larghezza + 10px margini
+    const containerWidth = Math.min(window.innerWidth - 60, 380);
     const targetOffset = (28 * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
 
     track.style.transform = `translateX(-${targetOffset}px)`;
