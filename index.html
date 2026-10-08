@@ -217,7 +217,7 @@ const Gen={
 
 /* ===== Progressi (localStorage) ===== */
 const St={d:null,
- load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10},o||{})},
+ load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10,vocab:[]},o||{});if(!this.d.vocab)this.d.vocab=[];},
  save(){
   try{ localStorage.setItem("at1",JSON.stringify(this.d)); }catch(e){}
   if(window.saveCloudProgress){ window.saveCloudProgress(); }
@@ -685,7 +685,8 @@ if ("serviceWorker" in navigator) {
       if (snap.exists()) {
         const cloudData = snap.data().data;
         if (cloudData) {
-          St.d = Object.assign(St.d, cloudData);
+         St.d = Object.assign(St.d, cloudData);
+if (!St.d.vocab) St.d.vocab = [];
           try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
         }
       } else {
