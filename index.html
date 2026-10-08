@@ -388,6 +388,11 @@ function accountView() {
         <button class="btn p" onclick="handleLogin()">Accedi</button>
         <button class="btn" onclick="handleRegister()">Registrati</button>
       </div>
+      <div style="margin-top: 12px;">
+        <button class="btn" onclick="handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
+          🌐 Accedi con Google
+        </button>
+      </div>
       <div id="acc_msg" class="fb" style="margin-top:10px;"></div>
     </div>
   `;
@@ -421,6 +426,16 @@ async function handleRegister() {
   }
 }
 
+ // Gestione del pulsante ACCEDI CON GOOGLE
+async function handleGoogleLogin() {
+  const msg = $("acc_msg");
+  try {
+    await window.fbLoginGoogle();
+    toast("Accesso con Google effettuato!");
+  } catch (e) {
+    msg.innerHTML = '<span class="ko">Errore Google: ' + esc(e.message) + '</span>';
+  }
+}
 // Gestione del LOGOUT
 async function handleLogout() {
   await window.fbLogout();
@@ -446,12 +461,14 @@ if ("serviceWorker" in navigator) {
 <!-- Firebase SDK (Modulo JavaScript) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { 
+ import { 
     getAuth, 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
     signOut, 
-    onAuthStateChanged 
+    onAuthStateChanged,
+    GoogleAuthProvider,
+    signInWithPopup
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { 
     getFirestore, 
@@ -482,6 +499,8 @@ if ("serviceWorker" in navigator) {
   window.fbRegister = (email, pass) => createUserWithEmailAndPassword(auth, email, pass);
   window.fbLogin = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
   window.fbLogout = () => signOut(auth);
+  const googleProvider = new GoogleAuthProvider();
+  window.fbLoginGoogle = () => signInWithPopup(auth, googleProvider);
 
   // Ascolta quando un utente entra o esce (Login / Logout)
   onAuthStateChanged(auth, async (user) => {
