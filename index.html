@@ -425,8 +425,8 @@ Q.real=function(c){
   if(!ok.length)return null;
   const w=pick(ok),kind=c.kind==="m"?pick(["r","v"]):c.kind,ar=kind==="r"?Tr.strip(w[0]):w[0];
   if(!St.d.vocab) St.d.vocab = [];
-  if(!St.d.vocab.some(v=>v[0]===w[0])){
-    St.d.vocab.push([w[0],w[1]]);
+  if(!St.d.vocab.some(v=>(Array.isArray(v)?v[0]:v.ar)===w[0])){
+    St.d.vocab.push({ar: w[0], mean: w[1]});
     St.save();
   }
   return{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0),mean:w[1],full:w[0]};
@@ -554,13 +554,13 @@ function smartHandView() {
 
 /* ===== Sezione Vocaboli ===== */
 function vocabView() {
-  const words = St.d.vocab || [];
+  const rawWords = St.d.vocab || [];
+  const words = rawWords.map(w => Array.isArray(w) ? {ar: w[0], mean: w[1]} : w);
   let listHtml = words.length === 0 ? `<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>` :
     `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">` + 
-      words.map(w => `<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div><div style="font-weight:bold; margin-top:4px;">${w[1]}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('') + `</div>`;
+      words.map(w => `<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w.ar}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w.ar}</div><div style="font-weight:bold; margin-top:4px;">${w.mean}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('') + `</div>`;
   return `<h2>📚 Dizionario Vocaboli</h2><p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>${listHtml}`;
 }
-
 function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
  if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
@@ -698,20 +698,18 @@ if ("serviceWorker" in navigator) {
     }
   };
 
-  async function loadCloudProgress(uid) {
+async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const cloudData = snap.data().data || {};
-        const localVocab = St.d.vocab || [];
-        const cloudVocab = cloudData.vocab || [];
+        const localVocab = (St.d.vocab || []).map(w => Array.isArray(w) ? {ar: w[0], mean: w[1]} : w);
+        const cloudVocab = (cloudData.vocab || []).map(w => Array.isArray(w) ? {ar: w[0], mean: w[1]} : w);
         
-        // Mappa unica per evitare duplicati nei vocaboli
         const mergedVocabMap = new Map();
-        [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) mergedVocabMap.set(w[0], w); });
+        [...cloudVocab, ...localVocab].forEach(w => { if(w && w.ar) mergedVocabMap.set(w.ar, w); });
         
-        // Fonde prendendo SEMPRE il valore massimo tra PC e iPhone
         St.d = Object.assign({}, St.d, cloudData, {
           vocab: Array.from(mergedVocabMap.values()),
           ok: Math.max(St.d.ok || 0, cloudData.ok || 0),
@@ -720,7 +718,6 @@ if ("serviceWorker" in navigator) {
           streak: Math.max(St.d.streak || 0, cloudData.streak || 0)
         });
 
-        // Salva subito i dati fusi sia su localStorage sia sul cloud
         try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
         try { localStorage.setItem("at_vocab", JSON.stringify(St.d.vocab)); } catch(e){}
       }
