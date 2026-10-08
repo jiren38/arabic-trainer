@@ -13,10 +13,10 @@
 :root[data-theme="dark"]{--bg:#10131d;--card:#1a1f2e;--tx:#e8ebf5;--mu:#98a1ba;--ac:#8c9bff;--sel:#262d52;--ok:#5fd18a;--ko:#ff8a80;--bd:#2d3450}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*:before,*:after{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding-left:0!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
 .ar{font-family:"Noto Naskh Arabic","Geeza Pro","Traditional Arabic","Arial",serif;direction:rtl;unicode-bidi:isolate}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--bd)}
-header div{max-width:860px;margin:0 auto;padding:8px 16px;display:flex;align-items:center}
+header div{max-width:860px;margin:0 auto;padding:8px 16px}
 header b{font-size:1.15rem}
 main{max-width:860px;margin:0 auto;padding:16px 16px 120px}
 h2{font-size:1.25rem;margin:18px 0 6px}h3{font-size:1rem;margin:18px 0 8px}
@@ -30,7 +30,7 @@ button:focus-visible,.card:focus-visible,input:focus-visible{outline:3px solid v
 .card .big{font-size:3rem;line-height:1.3}.card b{display:block}
 .card small{color:var(--mu);display:block;font-size:.8rem;line-height:1.3}
 .card .forms{font-size:1.25rem;display:flex;justify-content:center;gap:8px;margin-top:4px;direction:ltr}
-.bar{position:fixed;left:0!important;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
 .bar div{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .bar strong{flex:1 1 100%}
 .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);transition:transform .1s,background .15s}
@@ -76,21 +76,67 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 .les.next{border-color:var(--ac)}.les b{display:block}.les small{color:var(--mu)}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none;font-weight:600}
 
-/* Menu Laterale */
-#nav_overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:none}
-#nav_overlay.open{display:block}
-#nav{position:fixed;top:0;left:-280px;width:270px;height:100vh;background:var(--card);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:50px 14px 100px;gap:6px;z-index:9999;transition:left 0.3s ease;box-shadow:4px 0 20px rgba(0,0,0,0.25);overflow-y:auto}
-#nav.open{left:0}
-#nav button{flex:none;width:100%;text-align:left;padding:10px 14px;font-size:0.95rem;border-radius:10px;white-space:nowrap;border:0;background:none;color:var(--tx)}
-#nav button:hover{background:var(--sel)}
-#nav button.on{background:var(--ac);color:var(--bg);font-weight:600}
-.menu-toggle{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:4px 8px;border-radius:8px;color:var(--tx);margin-right:12px}
+.hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
+.hw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
+.hw-guide { position: absolute; inset: 0; display: grid; place-items: center; font-size: min(50vw, 200px); color: var(--ac); opacity: 0.25; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+.hw-guide.fade-out { opacity: 0 !important; }
+.accuracy-badge { font-weight: bold; padding: 6px 12px; border-radius: 8px; margin-top: 8px; display: inline-block; }
 
-.hw-container{position:relative;width:min(100%,360px);aspect-ratio:1;margin:12px auto}
-.hw-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;z-index:2}
-.hw-guide{position:absolute;inset:0;display:grid;place-items:center;font-size:min(50vw,200px);color:var(--ac);opacity:0.25;transition:opacity 0.5s ease;z-index:1;pointer-events:none}
-.hw-guide.fade-out{opacity:0!important}
-.accuracy-badge{font-weight:bold;padding:6px 12px;border-radius:8px;margin-top:8px;display:inline-block}
+/* Stili Menu Laterale a comparsa */
+body { padding-left: 0 !important; }
+main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
+.bar { left: 0 !important; }
+
+#nav_overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 9000 !important;
+  display: none;
+}
+#nav_overlay.open { display: block !important; }
+
+#nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: -280px !important;
+  width: 270px !important;
+  height: 100vh !important;
+  background: var(--card) !important;
+  border-right: 1px solid var(--bd) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 50px 14px 100px !important;
+  gap: 6px !important;
+  z-index: 9999 !important;
+  transition: left 0.3s ease !important;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+#nav.open { left: 0 !important; }
+
+#nav button {
+  flex: none !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+  border-radius: 10px !important;
+  white-space: nowrap !important;
+  border: 0;
+  background: none;
+  color: var(--tx);
+}
+#nav button:hover { background: var(--sel); }
+#nav button.on { background: var(--ac); color: var(--bg); font-weight: 600; }
+
+.menu-toggle {
+  background: none; border: none; font-size: 1.4rem;
+  cursor: pointer; padding: 4px 8px; border-radius: 8px;
+  color: var(--tx); margin-right: 12px; display: inline-flex; align-items: center;
+}
+.menu-toggle:hover { background: var(--sel); }
 </style>
 
 <meta name="theme-color" content="#2f3fb0">
@@ -108,7 +154,7 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 <nav id="nav"></nav>
 
 <header>
-  <div>
+  <div style="display:flex; align-items:center;">
     <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     <b>Arabic Trainer</b>
   </div>
@@ -123,7 +169,6 @@ button.card{color:var(--tx);font:inherit}.key.on{background:var(--sel)}.tst .key
 <p>Senza harakāt si leggono solo le lettere, senza aggiungere vocali: بت = bt (ا = a). Con le harakāt: fatha = a, kasra = i, damma = u (بَت = bat, بِت = bit, بُت = but). Alif dopo una fatha allunga la a. Il controllo ignora maiuscole, spazi e trattini e accetta varianti come dj, x, ch, c, g e vocali doppie.</p>
 </details>
 </main>
-
 <div class="bar" id="bar"><div>
 <strong id="cnt"></strong>
 <button class="btn" onclick="selAll()">Seleziona tutte</button>
@@ -170,10 +215,10 @@ const Gen={
   return ar&&{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0)}}
 };
 
-/* ===== Storage ===== */
+/* ===== Progressi (localStorage) ===== */
 const St={d:null,
  load(){let o=null;try{o=JSON.parse(localStorage.getItem("at1"))}catch(e){}this.d=Object.assign({done:0,ok:0,n:0,streak:0,best:0,err:[],sel:[],au:true,les:{},ach:[],theme:"auto",M:{},E:{},days:{},ms:0,mode:{},goal:10,vocab:[]},o||{});if(!this.d.vocab)this.d.vocab=[];},
- save(){
+save(){
   if(!this.d.vocab) this.d.vocab = [];
   try{ localStorage.setItem("at_vocab", JSON.stringify(this.d.vocab)); }catch(e){}
   try{ localStorage.setItem("at1",JSON.stringify(this.d)); }catch(e){}
@@ -233,20 +278,21 @@ const Q={cur:null,checked:false,buf:"",ua:"",res:"",fb:"",n:0,ok:0,diff:1,up:0,d
   return t}
 };
 
-/* ===== Sidebar ===== */
-function toggleSidebar(force){
-  const nav=$("nav"), ov=$("nav_overlay");
-  if(!nav||!ov)return;
-  const isOpen = force!==undefined ? force : !nav.classList.contains("open");
-  nav.classList.toggle("open",isOpen);
-  ov.classList.toggle("open",isOpen);
+/* ===== Gestione Sidebar e Navigazione ===== */
+function toggleSidebar(force) {
+  const nav = $("nav");
+  const ov = $("nav_overlay");
+  if (!nav || !ov) return;
+  const isOpen = force !== undefined ? force : !nav.classList.contains("open");
+  nav.classList.toggle("open", isOpen);
+  ov.classList.toggle("open", isOpen);
 }
 
 const NAV=[["home","🏠 Home"],["alf","🔤 Alfabeto"],["cfg","🧠 Allenamento"],["vocab","📚 Vocaboli"],["learn","📚 Impara"],["prog","📊 Progressi"],["account","👤 Account"],["set","⚙️ Impostazioni"]];
 
 function go(v,keep){toggleSidebar(false);S.view=v;Au.note("");if(v!=="quiz"&&!keep)Q.cur=null;render();window.scrollTo(0,0)}
 
-/* ===== UI ===== */
+/* ===== UI e Viste ===== */
 const fm=(c,j)=>[c,j?c+J:c,j?J+c+J:J+c,J+c];
 const FN=["Isolata","Iniziale","Mediale","Finale"];
 function sav(){St.d.sel=[...S.sel];St.save()}
@@ -352,10 +398,10 @@ function learnView(){const HX=[["بَ","ba","fatha: vocale a"],["بِ","bi","kas
  return'<h2>Impara</h2><h3>Percorso</h3><p class="sub">Dieci lezioni progressive. Puoi sempre usare anche l\'allenamento personalizzato.</p>'+bar(dn*10,"Lezioni completate")+LES.map((l,i)=>{const b=St.d.les[i]||0;return'<div class="les'+(i===nx?" next":"")+'"><div><b>Lezione '+(i+1)+' · '+l[0]+'</b><small>'+l[1]+'</small>'+(b?'<small>Miglior risultato: '+b+'%'+(b>=70?" ✅ completata":"")+'</small>':i===nx?'<small>Consigliata</small>':'')+'</div><button class="btn'+(i===nx?" p":"")+'" onclick="lesson('+i+')">'+(b?"Ripeti":"Inizia")+'</button></div>'}).join("")+'<h3>Le harakāt</h3><p class="sub">Senza segni si leggono solo le consonanti (بت = bt). I segni sopra o sotto la lettera aggiungono la vocale.</p><div class="stats">'+HX.map(h=>'<div class="stat"><span class="ar lt" style="font-size:2.4rem">'+h[0]+'</span> <b>'+h[1]+'</b><small>'+h[2]+'</small></div>').join("")+'</div>'
  +'<h3>Non confonderle</h3><p class="sub">Molte lettere hanno lo stesso scheletro: cambiano solo numero e posizione dei punti.</p>'+SIM.map(g=>'<div class="detail" style="margin-top:8px"><div class="fm ar">'+g.map(i=>'<span>'+L[i][0]+'<small>'+L[i][1]+': '+DOT[i]+'</small></span>').join("")+'</div><button class="btn" onclick="trainG(['+g+'],\'find\')">Allenati: trova la lettera</button></div>').join("")}
 
-function setView(){const gs=[5,10,20,30];return'<h2>Impostazioni</h2><div class="panel" style="text-align:left"><p><b>Audio</b><br><span class="sub">Pronuncia di lettere e parole.</span></p><button class="btn" onclick="St.d.au=!St.d.au;St.save();render()">'+(St.d.au?"🔊 Audio attivo":"🔇 Audio disattivato")+'</button><p style="margin-top:18px"><b>Obiettivo giornaliero</b><br><span class="sub">Numero di domande al giorno.</span></p><div class="chips">'+gs.map(g=>'<button class="btn'+(St.d.goal===g?" on":"")+'" onclick="St.d.goal='+g+';St.save();render()">'+g+' domande</button></div><p style="margin-top:18px"><b>Tema</b></p><div class="chips">'+[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]].map(t=>'<button class="btn'+((St.d.theme||"auto")===t[0]?" on":"")+'" onclick="setTheme(\''+t[0]+'\')">'+t[1]+'</button>').join("")+'</div><p style="margin-top:18px"><b>Backup</b><br><span class="sub">Copia il codice per spostare i progressi su un altro dispositivo, poi incollalo qui e ripristina.</span></p><textarea id="bk" rows="3" aria-label="Codice di backup" style="width:100%;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px"></textarea><div class="chips" style="margin-top:6px"><button class="btn" onclick="$(\'bk\').value=JSON.stringify(St.d)">Mostra codice</button><button class="btn" onclick="restore()">Ripristina</button></div><p style="margin-top:18px"><b>Progressi</b><br><span class="sub">Statistiche ed errori sono salvati su questo dispositivo.</span></p><button class="btn" onclick="if(S.reset){St.reset();S.reset=false}else S.reset=true;render()">'+(S.reset?"Conferma: azzera tutto":"Azzera progressi")+'</button></div>'}
+function setView(){const gs=[5,10,20,30];return'<h2>Impostazioni</h2><div class="panel" style="text-align:left"><p><b>Audio</b><br><span class="sub">Pronuncia di lettere e parole.</span></p><button class="btn" onclick="St.d.au=!St.d.au;St.save();render()">'+(St.d.au?"🔊 Audio attivo":"🔇 Audio disattivato")+'</button><p style="margin-top:18px"><b>Obiettivo giornaliero</b><br><span class="sub">Numero di domande al giorno.</span></p><div class="chips">'+gs.map(g=>'<button class="btn'+(St.d.goal===g?" on":"")+'" onclick="St.d.goal='+g+';St.save();render()">'+g+' domande</button>').join("")+'</div><p style="margin-top:18px"><b>Tema</b></p><div class="chips">'+[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]].map(t=>'<button class="btn'+((St.d.theme||"auto")===t[0]?" on":"")+'" onclick="setTheme(\''+t[0]+'\')">'+t[1]+'</button>').join("")+'</div><p style="margin-top:18px"><b>Backup</b><br><span class="sub">Copia il codice per spostare i progressi su un altro dispositivo, poi incollalo qui e ripristina.</span></p><textarea id="bk" rows="3" aria-label="Codice di backup" style="width:100%;font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px"></textarea><div class="chips" style="margin-top:6px"><button class="btn" onclick="$(\'bk\').value=JSON.stringify(St.d)">Mostra codice</button><button class="btn" onclick="restore()">Ripristina</button></div><p style="margin-top:18px"><b>Progressi</b><br><span class="sub">Statistiche ed errori sono salvati su questo dispositivo.</span></p><button class="btn" onclick="if(S.reset){St.reset();S.reset=false}else S.reset=true;render()">'+(S.reset?"Conferma: azzera tutto":"Azzera progressi")+'</button></div>'}
 
-/* ===== Parole reali ===== */
-const WORDS=[["بَاب","porta"],["كِتَاب","libro"],["قَلَم","penna"],["بَيْت","casa"],["شَمْس","sole"],["قَمَر","luna"],["وَلَد","bambino"],["بِنْت","ragazza"],["نَهْر","fiume"],["لَبَن","latte"],["سَمَك","pesce"],["جَمَل","cammello"],["دَار","dimora"],["رَجُل","uomo"],["بَحْر","mare"],["كَلْب","cane"],["مَلِك","re"],["فَم","bocca"],["كَتَبَ","ha scritto"],["مَكْتَب","ufficio"],["نَبَات","pianta"],["كَمْ","quanto"],["مِنْ","da"],["لَوْن","colore"],["يَوْم","giorno"],["قَلْب","cuore"],["دَرْس","lezione"],["عَيْن","occhio"],["تَمْر","datteri"],["نَار","fuoco"],["جَدّ","nonno"],["سِتّ","sei"],["كُلّ","tutto"],["حَقّ","diritto"],["مُدَرِّس","insegnante"],["مَاء","acqua"],["شَجَرَة","albero"],["زَهْرَة","fiore"],["سَمَاء","cielo"],["أَرْض","terra"],["مَدِينَة","città"],["سَيَّارَة","automobile"],["طَائِرَة","aereo"],["مَدْرَسَة","scuola"],["طَالِب","studente"],["مُعَلِّم","maestro"],["صَدِيق","amico"],["عَائِلَة","famiglia"],["أُمّ","madre"],["أَب","padre"],["أَخ","fratello"],["أُخْت","sorella"],["ابْن","figlio"],["طَعَام","cibo"],["خُبْز","pane"],["فَاكِهَة","frutta"],["قَهْوَة","caffè"],["شَاي","tè"],["زَيْت","olio"],["سُكَّر","zucchero"],["مَطْعَم","ristorante"],["فُنْدُق","hotel"],["مَطَار","aeroporto"],["سُوق","mercato"],["مَسْجِد","moschea"],["كَنِيسَة","chiesa"],["مُسْتَشْفَى","ospedale"],["طَبِيب","medico"],["امْرَأَة","donna"],["نَجْم","stella"],["سَاعَة","orologio / ora"],["أُسْبُوع","settimana"],["شَهْر","mese"],["سَنَة","anno"],["كَبِير","grande"],["صَغِير","piccolo"],["جَمِيل","bello"],["جَدِيد","nuovo"],["قَدِيم","vecchio"],["قَرِيب","vicino"],["بَعِيد","lontano"],["سَرِيع","veloce"],["سَعِيد","felice"],["طَوِيل","lungo / alto"],["قَصِير","corto / basso"],["شُكْرًا","grazie"],["مَرْحَبًا","ciao / benvenuto"],["نَعَم","sì"],["لا","no"]];
+/* ===== Parole reali e percorso ===== */
+const WORDS=[["بَاب","porta"],["كِتَاب","libro"],["قَلَم","penna"],["بَيْت","casa"],["شَمْس","sole"],["قَمَر","luna"],["وَلَد","bambino"],["بِنْت","ragazza"],["نَهْر","fiume"],["لَبَن","latte"],["سَمَك","pesce"],["جَمَل","cammello"],["دَار","dimora"],["رَجُل","uomo"],["بَحْر","mare"],["كَلْب","cane"],["مَلِك","re"],["فَم","bocca"],["كَتَبَ","ha scritto"],["مَكْتَب","ufficio"],["نَبَات","pianta"],["كَمْ","quanto"],["مِنْ","da"],["لَوْن","colore"],["يَوْم","giorno"],["قَلْب","cuore"],["دَرْس","lezione"],["عَيْن","occhio"],["تَمْر","datteri"],["نَار","fuoco"],["جَدّ","nonno"],["سِتّ","sei"],["كُلّ","tutto"],["حَقّ","diritto"],["مُدَرِّس","insegnante"],["مَاء","acqua"],["شَجَرَة","albero"],["زَهْرَة","fiore"],["سَمَاء","cielo"],["أَرْض","terra"],["مَدِينَة","città"],["سَيَّارَة","automobile"],["طَائِرَة","aereo"],["مَدْرَسَة","scuola"],["طَالِب","studente"],["مُعَلِّم","maestro"],["صَدِيق","amico"],["عَائِلَة","famiglia"],["أُمّ","madre"],["أَب","padre"],["أَخ","fratello"],["أُخْت","sorella"],["ابْن","figlio"],["طَعَام","cibo"],["خُبْز","pane"],["فَاكِهَة","frutta"],["قَهْوَة","caffè"],["شَاي","tè"],["زَيْت","olio"],["سُكَّر","zucchero"],["مَطْعَم","ristorante"],["فُنْدُق","hotel"],["مَطَار","aeroporto"],["سُوق","mercato"],["مَسْجِد","moschea"],["كَنِيسَة","chiesa"],["مُسْتَشْفَى","ospedale"],["طَبِيب","medico"],["رَجُل","uomo"],["امْرَأَة","donna"],["شَمْس","sole"],["نَجْم","stella"],["قَمَر","luna"],["سَاعَة","orologio / ora"],["يَوْم","giorno"],["أُسْبُوع","settimana"],["شَهْر","mese"],["سَنَة","anno"],["كَبِير","grande"],["صَغِير","piccolo"],["جَمِيل","bello"],["جَدِيد","nuovo"],["قَدِيم","vecchio"],["قَرِيب","vicino"],["بَعِيد","lontano"],["سَرِيع","veloce"],["سَعِيد","felice"],["طَوِيل","lungo / alto"],["قَصِير","corto / basso"],["كَبِير","grande"],["شُكْرًا","grazie"],["مَرْحَبًا","ciao / benvenuto"],["نَعَم","sì"],["لا","no"]];
 const LES=[["Prime lettere","Ba, Ta, Tha, Alif, Nun: riconoscile senza vocali.",[0,1,2,3,24],{kind:"r",dir:"read",diff:0,count:10}],
 ["Nuove lettere","Aggiungi Mim, Lam, Kaf, Fa.",[0,1,2,3,24,23,22,21,19],{kind:"r",dir:"read",diff:1,count:10}],
 ["Lettere simili","Distingui ج ح خ e د ذ ر ز dai punti.",[4,5,6,7,8,9,10],{ex:"find",diff:2}],
@@ -367,7 +413,6 @@ const LES=[["Prime lettere","Ba, Ta, Tha, Alif, Nun: riconoscile senza vocali.",
 ["Parole semplici","Leggi vere parole arabe con le prime lettere.",PRESET.Principiante,{kind:"v",dir:"read",src:"real",diff:1,count:10}],
 ["Lettura","Sequenze lunghe con tutte le lettere.",PRESET.Completo,{kind:"m",dir:"read",diff:2,count:10}]];
 Object.assign(MN,{inword:"Lettera nella parola",hand:"Scrivi a mano"});
-
 Q.real=function(c){
   const ok=WORDS.filter(w=>[...w[0]].every(ch=>idx(ch)<0||S.sel.has(idx(ch)))&&(!this.cur||w[0]!==this.cur.full));
   if(!ok.length)return null;
@@ -379,7 +424,6 @@ Q.real=function(c){
   }
   return{ar,lat:Tr.read(ar),kind,ls:[...ar].map(idx).filter(i=>i>=0),mean:w[1],full:w[0]};
 };
-
 function lessonDone(i,ok,n){chk();if(i!=null&&n){const p=Math.round(100*ok/n);St.d.les[i]=Math.max(St.d.les[i]||0,p)}St.save()}
 const lesNote=(ok,n)=>'<p>'+(ok/n>=.7?"✅ <b>Lezione completata</b>":"Raggiungi almeno il 70% per completare la lezione.")+'</p>';
 function lesson(i){const l=LES[i],c=l[3];S.sel=new Set(l[2]);sav();S.cfg.src=c.src||"fake";
@@ -391,66 +435,183 @@ function setTheme(t){St.d.theme=t;St.save();applyTheme();render()}
 function restore(){try{const o=JSON.parse($("bk").value);if(typeof o!=="object"||!("n" in o))throw 0;St.d=Object.assign(St.d,o);St.save();S.sel=new Set(St.d.sel);applyTheme();Au.note("Progressi ripristinati.")}catch(e){Au.note("Codice di backup non valido.")}render()}
 const ring=(p,l)=>'<svg class="ring" viewBox="0 0 80 80" role="img" aria-label="'+l+' '+p+'%"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="'+(213.6*(1-p/100)).toFixed(1)+'" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .8s"/><text x="40" y="46" text-anchor="middle" fill="#fff" font-size="18" font-weight="700">'+p+'%</text></svg>';
 
-/* ===== Smart Hand ===== */
-const SmartHand={
- curIdx:0,guided:true,ctx:null,guideCtx:null,drawing:false,strokes:[],currentStroke:[],animTimer:null,
- start(guidedMode=true){if(!S.sel||!S.sel.size){if(typeof Au!=="undefined"&&Au.note)Au.note("Seleziona almeno una lettera per iniziare.");return}this.stopAnim();this.guided=guidedMode;this.curIdx=pick([...S.sel]);S.view="hand_smart";render();setTimeout(()=>this.initCanvas(),60)},
- initCanvas(){const canvas=$("hw_cv"),guideCanvas=$("hw_guide_cv");if(!canvas||!guideCanvas)return;const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;this.ctx=canvas.getContext("2d");this.ctx.scale(dpr,dpr);this.ctx.lineWidth=12;this.ctx.lineCap=this.ctx.lineJoin="round";this.ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--tx")||"#000";guideCanvas.width=rect.width*dpr;guideCanvas.height=rect.height*dpr;this.guideCtx=guideCanvas.getContext("2d");this.guideCtx.scale(dpr,dpr);this.drawGuideText(rect.width,rect.height);this.bindEvents(canvas)},
- drawGuideText(w,h){const l=L[this.curIdx];this.guideCtx.clearRect(0,0,w,h);this.guideCtx.font=`${h*0.55}px "Noto Naskh Arabic", serif`;this.guideCtx.textAlign="center";this.guideCtx.textBaseline="middle";this.guideCtx.fillStyle="#000";this.guideCtx.fillText(l[0],w/2,h/2)},
- bindEvents(c){let pt=e=>{const b=c.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top}};c.onpointerdown=e=>{this.stopAnim();this.drawing=true;c.setPointerCapture(e.pointerId);const p=pt(e);this.currentStroke=[p];this.ctx.beginPath();this.ctx.moveTo(p.x,p.y)};c.onpointermove=e=>{if(!this.drawing)return;const p=pt(e);this.currentStroke.push(p);this.ctx.lineTo(p.x,p.y);this.ctx.stroke();if(this.guided&&this.getTotalPointsCount()>15){const g=$("hw_ghost");if(g)g.classList.add("fade-out")}};c.onpointerup=c.onpointercancel=()=>{if(this.drawing&&this.currentStroke.length>0){this.strokes.push(this.currentStroke);this.currentStroke=[]}this.drawing=false}},
- getTotalPointsCount(){return this.strokes.reduce((acc,s)=>acc+s.length,0)+this.currentStroke.length},
- clear(){this.stopAnim();const c=$("hw_cv");if(c&&this.ctx)this.ctx.clearRect(0,0,c.width,c.height);this.strokes=[];this.currentStroke=[];const g=$("hw_ghost");if(this.guided&&g)g.classList.remove("fade-out");const res=$("hw_result");if(res)res.innerHTML=""},
- stopAnim(){if(this.animTimer)cancelAnimationFrame(this.animTimer)},
- playDemo(){this.clear();const l=L[this.curIdx],c=$("hw_cv");if(!c)return;const rect=c.getBoundingClientRect(),w=rect.width,h=rect.height,fontStr=`${h*0.55}px "Noto Naskh Arabic", serif`;this.guideCtx.clearRect(0,0,w,h);this.guideCtx.font=fontStr;this.guideCtx.textAlign="center";this.guideCtx.textBaseline="middle";this.guideCtx.fillStyle="#000";this.guideCtx.fillText(l[0],w/2,h/2);const tempCanvas=document.createElement("canvas");tempCanvas.width=w;tempCanvas.height=h;const tCtx=tempCanvas.getContext("2d");tCtx.font=fontStr;tCtx.textAlign="center";tCtx.textBaseline="middle";tCtx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--ac")||"#2f3fb0";tCtx.fillText(l[0],w/2,h/2);let progress=0;const step=()=>{progress+=0.03;this.ctx.clearRect(0,0,w,h);this.ctx.save();this.ctx.beginPath();const currentX=w-w*progress;this.ctx.rect(currentX,0,w,h);this.ctx.clip();this.ctx.drawImage(tempCanvas,0,0);this.ctx.restore();if(progress<1){this.animTimer=requestAnimationFrame(step)}else{if(typeof say==="function")say(AN[this.curIdx])}};step()},
- evaluate(){const resEl=$("hw_result");if(this.strokes.length===0){if(typeof Au!=="undefined"&&Au.note)Au.note("Disegna la lettera prima di verificare!");return}const targetChar=L[this.curIdx][0];let maxAllowedStrokes=["ب","ت","ث","ك","ي","ط","ظ","ن"].includes(targetChar)?4:2;if(this.strokes.length>maxAllowedStrokes){if(resEl)resEl.innerHTML=`<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti!</div>`;if(typeof St!=="undefined"&&St.log)St.log([this.curIdx],"write",false,"hand",10000);return}let allPoints=[];this.strokes.forEach(s=>allPoints.push(...s));if(allPoints.length<8){if(resEl)resEl.innerHTML=`<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`;return}let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;allPoints.forEach(p=>{if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y});const userW=maxX-minX,userH=maxY-minY,aspectRatio=userW/(userH||1);let score=100,errorMsg="";if(targetChar==="ا"||targetChar==="أ"||targetChar==="إ"){if(aspectRatio>0.55||userH<35){score=0;errorMsg="La Alif deve essere un tratto verticale piatto!"}}else if(["ب","ت","ث"].includes(targetChar)){if(aspectRatio<0.75){score=0;errorMsg="Questa lettera deve essere sviluppata in orizzontale!"}}if(score>0){const cv=$("hw_cv"),w=cv.width,h=cv.height,userImg=this.ctx.getImageData(0,0,w,h).data,guideImg=this.guideCtx.getImageData(0,0,w,h).data;let guidePixels=0,hitPixels=0,outPixels=0;for(let y=0;y<h;y+=4){for(let x=0;x<w;x+=4){const idx=(y*w+x)*4;if(guideImg[idx+3]>50)guidePixels++;if(userImg[idx+3]>50){if(guideImg[idx+3]>50)hitPixels++;else outPixels++}}}const matchPercent=guidePixels>0?(hitPixels/guidePixels)*100:0,penalty=hitPixels>0?(outPixels/hitPixels)*45:0;score=Math.max(0,Math.round(matchPercent*2.2-penalty));score=Math.min(100,score)}const isGood=score>=60;if(typeof St!=="undefined"&&St.log)St.log([this.curIdx],"write",isGood,"hand",10000);if(resEl){if(score>=60){resEl.innerHTML=`<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`;if(typeof say==="function")say(AN[this.curIdx])}else if(score>=40){resEl.innerHTML=`<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}\%).${errorMsg||"Cerca di seguire meglio la traccia."}</div>`}else{resEl.innerHTML=`<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}\%).${errorMsg||"Forma o orientamento non validi."}</div>`}}}
+/* ===== Sistema Scrittura Smart Hand ===== */
+const SmartHand = {
+  curIdx: 0, guided: true, ctx: null, guideCtx: null, drawing: false, strokes: [], currentStroke: [], animTimer: null,
+  start(guidedMode = true) {
+    if (!S.sel || !S.sel.size) { if (typeof Au !== "undefined" && Au.note) Au.note("Seleziona almeno una lettera per iniziare."); return; }
+    this.stopAnim(); this.guided = guidedMode; this.curIdx = pick([...S.sel]); S.view = "hand_smart"; render();
+    setTimeout(() => this.initCanvas(), 60);
+  },
+  initCanvas() {
+    const canvas = $("hw_cv"), guideCanvas = $("hw_guide_cv"); if (!canvas || !guideCanvas) return;
+    const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+    this.ctx = canvas.getContext("2d"); this.ctx.scale(dpr, dpr); this.ctx.lineWidth = 12; this.ctx.lineCap = this.ctx.lineJoin = "round";
+    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--tx") || "#000";
+    guideCanvas.width = rect.width * dpr; guideCanvas.height = rect.height * dpr;
+    this.guideCtx = guideCanvas.getContext("2d"); this.guideCtx.scale(dpr, dpr);
+    this.drawGuideText(rect.width, rect.height); this.bindEvents(canvas);
+  },
+  drawGuideText(w, h) {
+    const l = L[this.curIdx]; this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
+  },
+  bindEvents(c) {
+    let pt = e => { const b = c.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+    c.onpointerdown = e => {
+      this.stopAnim(); this.drawing = true; c.setPointerCapture(e.pointerId); const p = pt(e);
+      this.currentStroke = [p]; this.ctx.beginPath(); this.ctx.moveTo(p.x, p.y);
+    };
+    c.onpointermove = e => {
+      if (!this.drawing) return; const p = pt(e); this.currentStroke.push(p); this.ctx.lineTo(p.x, p.y); this.ctx.stroke();
+      if (this.guided && this.getTotalPointsCount() > 15) { const g = $("hw_ghost"); if (g) g.classList.add("fade-out"); }
+    };
+    c.onpointerup = c.onpointercancel = () => { if (this.drawing && this.currentStroke.length > 0) { this.strokes.push(this.currentStroke); this.currentStroke = []; } this.drawing = false; };
+  },
+  getTotalPointsCount() { return this.strokes.reduce((acc, s) => acc + s.length, 0) + this.currentStroke.length; },
+  clear() {
+    this.stopAnim(); const c = $("hw_cv"); if (c && this.ctx) this.ctx.clearRect(0, 0, c.width, c.height);
+    this.strokes = []; this.currentStroke = []; const g = $("hw_ghost"); if (this.guided && g) g.classList.remove("fade-out");
+    const res = $("hw_result"); if (res) res.innerHTML = "";
+  },
+  stopAnim() { if (this.animTimer) cancelAnimationFrame(this.animTimer); },
+  playDemo() {
+    this.clear(); const l = L[this.curIdx], c = $("hw_cv"); if (!c) return;
+    const rect = c.getBoundingClientRect(), w = rect.width, h = rect.height, fontStr = `${h * 0.55}px "Noto Naskh Arabic", serif`;
+    this.guideCtx.clearRect(0, 0, w, h); this.guideCtx.font = fontStr; this.guideCtx.textAlign = "center"; this.guideCtx.textBaseline = "middle"; this.guideCtx.fillStyle = "#000"; this.guideCtx.fillText(l[0], w / 2, h / 2);
+    const tempCanvas = document.createElement("canvas"); tempCanvas.width = w; tempCanvas.height = h;
+    const tCtx = tempCanvas.getContext("2d"); tCtx.font = fontStr; tCtx.textAlign = "center"; tCtx.textBaseline = "middle"; tCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--ac") || "#2f3fb0"; tCtx.fillText(l[0], w / 2, h / 2);
+    let progress = 0;
+    const step = () => {
+      progress += 0.03; this.ctx.clearRect(0, 0, w, h); this.ctx.save(); this.ctx.beginPath();
+      const currentX = w - w * progress; this.ctx.rect(currentX, 0, w, h); this.ctx.clip(); this.ctx.drawImage(tempCanvas, 0, 0); this.ctx.restore();
+      if (progress < 1) { this.animTimer = requestAnimationFrame(step); } else { if (typeof say === "function") say(AN[this.curIdx]); }
+    };
+    step();
+  },
+  evaluate() {
+    const resEl = $("hw_result"); if (this.strokes.length === 0) { if (typeof Au !== "undefined" && Au.note) Au.note("Disegna la lettera prima di verificare!"); return; }
+    const targetChar = L[this.curIdx][0]; let maxAllowedStrokes = ["ب", "ت", "ث", "ك", "ي", "ط", "ظ", "ن"].includes(targetChar) ? 4 : 2;
+    if (this.strokes.length > maxAllowedStrokes) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Troppi tratti! Cerca di essere più preciso.</div>`; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", false, "hand", 10000); return; }
+    let allPoints = []; this.strokes.forEach(s => allPoints.push(...s));
+    if (allPoints.length < 8) { if (resEl) resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (0%). Tratto troppo breve.</div>`; return; }
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    allPoints.forEach(p => { if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; });
+    const userW = maxX - minX, userH = maxY - minY, aspectRatio = userW / (userH || 1); let score = 100, errorMsg = "";
+    if (targetChar === "ا" || targetChar === "أ" || targetChar === "إ") { if (aspectRatio > 0.55 || userH < 35) { score = 0; errorMsg = "La Alif deve essere un tratto verticale piatto!"; } }
+    else if (["ب", "ت", "ث"].includes(targetChar)) { if (aspectRatio < 0.75) { score = 0; errorMsg = "Questa lettera deve essere sviluppata in orizzontale!"; } }
+    if (score > 0) {
+      const cv = $("hw_cv"), w = cv.width, h = cv.height, userImg = this.ctx.getImageData(0, 0, w, h).data, guideImg = this.guideCtx.getImageData(0, 0, w, h).data;
+      let guidePixels = 0, hitPixels = 0, outPixels = 0;
+      for (let y = 0; y < h; y += 4) { for (let x = 0; x < w; x += 4) { const idx = (y * w + x) * 4; if (guideImg[idx + 3] > 50) guidePixels++; if (userImg[idx + 3] > 50) { if (guideImg[idx + 3] > 50) hitPixels++; else outPixels++; } } }
+      const matchPercent = guidePixels > 0 ? (hitPixels / guidePixels) * 100 : 0, penalty = hitPixels > 0 ? (outPixels / hitPixels) * 45 : 0;
+      score = Math.max(0, Math.round(matchPercent * 2.2 - penalty)); score = Math.min(100, score);
+    }
+    const isGood = score >= 60; if (typeof St !== "undefined" && St.log) St.log([this.curIdx], "write", isGood, "hand", 10000);
+    if (resEl) {
+      if (score >= 60) { resEl.innerHTML = `<div class="accuracy-badge ok" style="color:var(--ok);">✅ Corretta! (${score}%)</div>`; if (typeof say === "function") say(AN[this.curIdx]); }
+      else if (score >= 40) { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:orange;">⚠️ Quasi corretta (${score}%). ${errorMsg || "Cerca di seguire meglio la traccia."}</div>`; }
+      else { resEl.innerHTML = `<div class="accuracy-badge ko" style="color:var(--ko);">❌ Sbagliata (${score}%). ${errorMsg || "Forma o orientamento non validi."}</div>`; }
+    }
+  }
 };
-function hs(){SmartHand.start(true)}
-function smartHandView(){const l=L[SmartHand.curIdx];return`<h2>Scrittura a Mano Interattiva</h2><div class="panel"><p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p><div class="chips" style="justify-content:center; margin-bottom:10px;"><button class="btn ${SmartHand.guided?"on":""}" onclick="SmartHand.start(true)">📐 Con Guida</button><button class="btn ${!SmartHand.guided?"on":""}" onclick="SmartHand.start(false)">✍️ A Memoria</button><button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button></div><div class="hw-container"><div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided?"fade-out":""}">${l[0]}</div><canvas id="hw_cv" class="hw-canvas"></canvas><canvas id="hw_guide_cv" style="display:none;"></canvas></div><div id="hw_result"></div><div class="row" style="margin-top:12px;"><button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button><button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button><button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button></div></div>`}
 
-/* ===== Vocaboli ===== */
-function vocabView(){const words=St.d.vocab||[];let listHtml=words.length===0?`<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>`:`<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">`+words.map(w=>`<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div><div style="font-weight:bold; margin-top:4px;">${w[1]}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('')+`</div>`;return`<h2>📚 Dizionario Vocaboli</h2><p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>${listHtml}`}
+function hs() { SmartHand.start(true); }
 
-/* ===== Schermata Home ===== */
-function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
+function smartHandView() {
+  const l = L[SmartHand.curIdx];
+  return `
+    <h2>Scrittura a Mano Interattiva</h2>
+    <div class="panel">
+      <p>Scrivi la lettera <b style="font-size:1.6rem;" class="ar">${l[0]}</b> <span>(${l[1]})</span></p>
+      <div class="chips" style="justify-content:center; margin-bottom:10px;">
+        <button class="btn ${SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(true)">📐 Con Guida</button>
+        <button class="btn ${!SmartHand.guided ? "on" : ""}" onclick="SmartHand.start(false)">✍️ A Memoria</button>
+        <button class="btn" onclick="SmartHand.playDemo()">🎬 Mostra come scrivere</button>
+      </div>
+      <div class="hw-container">
+        <div id="hw_ghost" class="hw-guide ar ${!SmartHand.guided ? "fade-out" : ""}">${l[0]}</div>
+        <canvas id="hw_cv" class="hw-canvas"></canvas>
+        <canvas id="hw_guide_cv" style="display:none;"></canvas>
+      </div>
+      <div id="hw_result"></div>
+      <div class="row" style="margin-top:12px;">
+        <button class="btn" onclick="SmartHand.clear()">🗑 Cancella</button>
+        <button class="btn p" onclick="SmartHand.evaluate()">🔍 Verifica</button>
+        <button class="btn" onclick="SmartHand.start(SmartHand.guided)">Prossima →</button>
+      </div>
+    </div>
+  `;
+}
 
-/* ===== Schermata Account ===== */
-function accountView(){
-  const user=window.currentUser;
-  if(user){
+/* ===== Sezione Vocaboli ===== */
+function vocabView() {
+  const words = St.d.vocab || [];
+  let listHtml = words.length === 0 ? `<div class="panel" style="text-align:center;"><p class="sub">Non hai ancora incontrato parole reali negli esercizi. Completa qualche lezione per sbloccarle!</p></div>` :
+    `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">` + 
+      words.map(w => `<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w[0]}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w[0]}</div><div style="font-weight:bold; margin-top:4px;">${w[1]}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('') + `</div>`;
+  return `<h2>📚 Dizionario Vocaboli</h2><p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>${listHtml}`;
+}
+
+function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
+ const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
+ if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
+ return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
+
+function accountView() {
+  const user = window.currentUser;
+  if (user) {
     return `<h2>Profilo Utente</h2><div class="panel" style="text-align:left"><p><b>Accesso effettuato come:</b><br>${esc(user.email)}</p><p class="sub">I tuoi progressi sono sincronizzati nel cloud.</p><button class="btn p" onclick="handleLogout()">Disconnetti (Logout)</button></div>`;
   }
   return `<h2>Account e Sincronizzazione</h2><div class="panel" style="text-align:left; max-width:420px; margin:0 auto;"><p class="sub">Accedi o crea un account per sincronizzare i tuoi progressi su più dispositivi.</p><div style="margin-bottom:12px;"><label><b>Email</b></label><input type="text" id="acc_email" placeholder="nome@esempio.com" style="width:100%; text-align:left;"></div><div style="margin-bottom:16px;"><label><b>Password</b></label><input type="password" id="acc_pass" placeholder="••••••••" style="width:100%; padding:12px; font-size:1.2rem; border:2px solid var(--bd); border-radius:10px; background:var(--bg); color:var(--tx);"></div><div class="row"><button class="btn p" onclick="handleLogin()">Accedi</button><button class="btn" onclick="handleRegister()">Registrati</button></div><div style="margin-top: 12px;"><button class="btn" onclick="handleGoogleLogin()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">🌐 Accedi con Google</button></div><div id="acc_msg" class="fb" style="margin-top:10px;"></div></div>`;
 }
 
-async function handleLogin(){
-  const email=$("acc_email").value.trim(), pass=$("acc_pass").value.trim(), msg=$("acc_msg");
-  if(!email||!pass){ msg.innerHTML='<span class="ko">Inserisci email e password.</span>'; return; }
-  try{ await window.fbLogin(email,pass); toast("Accesso effettuato!"); }catch(e){ msg.innerHTML='<span class="ko">Errore: '+esc(e.message)+'</span>'; }
+async function handleLogin() {
+  const email = $("acc_email").value.trim(), pass = $("acc_pass").value.trim(), msg = $("acc_msg");
+  if (!email || !pass) { msg.innerHTML = '<span class="ko">Inserisci email e password.</span>'; return; }
+  try { await window.fbLogin(email, pass); toast("Accesso effettuato!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>'; }
 }
 
-async function handleRegister(){
-  const email=$("acc_email").value.trim(), pass=$("acc_pass").value.trim(), msg=$("acc_msg");
-  if(!email||!pass){ msg.innerHTML='<span class="ko">Inserisci email e password.</span>'; return; }
-  try{ await window.fbRegister(email,pass); toast("Account creato con successo!"); }catch(e){ msg.innerHTML='<span class="ko">Errore: '+esc(e.message)+'</span>'; }
+async function handleRegister() {
+  const email = $("acc_email").value.trim(), pass = $("acc_pass").value.trim(), msg = $("acc_msg");
+  if (!email || !pass) { msg.innerHTML = '<span class="ko">Inserisci email e password.</span>'; return; }
+  try { await window.fbRegister(email, pass); toast("Account creato con successo!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore: ' + esc(e.message) + '</span>'; }
 }
 
-async function handleGoogleLogin(){
-  const msg=$("acc_msg");
-  try{ await window.fbLoginGoogle(); toast("Accesso con Google effettuato!"); }catch(e){ msg.innerHTML='<span class="ko">Errore Google: '+esc(e.message)+'</span>'; }
+async function handleGoogleLogin() {
+  const msg = $("acc_msg");
+  try { await window.fbLoginGoogle(); toast("Accesso con Google effettuato!"); } catch (e) { msg.innerHTML = '<span class="ko">Errore Google: ' + esc(e.message) + '</span>'; }
 }
 
-async function handleLogout(){ await window.fbLogout(); toast("Disconnessione effettuata."); }
+async function handleLogout() { await window.fbLogout(); toast("Disconnessione effettuata."); }
 
-/* ===== Render Principale ===== */
+/* ===== Funzione di Render Principale ===== */
 function render(){
-  const v=S.view,t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
-  const navEl=$("nav");
-  if(navEl){
+  const v=S.view;
+  const t=["quiz","ex","hand","hand_smart"].includes(v)?"cfg":v;
+  const navEl = $("nav");
+  
+  if (navEl) {
     navEl.innerHTML=NAV.map(n=>'<button class="'+(n[0]===t?"on":"")+'"'+(n[0]===t?' aria-current="page"':"")+' onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join("");
   }
+
   $("cnt").textContent="Lettere selezionate: "+S.sel.size;
   $("bar").style.display=v==="alf"||v==="cfg"?"":"none";
-  $("app").innerHTML=v==="home"?homeView():v==="alf"?'<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail():v==="account"?accountView():v==="cfg"?cfgView():v==="quiz"?quizView():v==="ex"?exView():v==="hand_smart"?smartHandView():v==="vocab"?vocabView():v==="learn"?learnView():v==="prog"?progView():setView();
+  
+  const app = $("app");
+  if (v==="home") app.innerHTML=homeView();
+  else if (v==="alf") app.innerHTML='<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>'+grid()+detail();
+  else if (v==="account") app.innerHTML=accountView();
+  else if (v==="cfg") app.innerHTML=cfgView();
+  else if (v==="quiz") app.innerHTML=quizView();
+  else if (v==="ex") app.innerHTML=exView();
+  else if (v==="hand_smart") app.innerHTML=smartHandView();
+  else if (v==="vocab") app.innerHTML=vocabView();
+  else if (v==="learn") app.innerHTML=learnView();
+  else if (v==="prog") app.innerHTML=progView();
+  else if (v==="set") app.innerHTML=setView();
+
   if(v==="quiz"&&Q.cur&&!Q.checked&&Q.cfg.dir==="read"&&$("ans"))$("ans").focus();
 }
 
@@ -465,6 +626,7 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { 
@@ -525,36 +687,28 @@ if ("serviceWorker" in navigator) {
     }
   };
 
-  async function loadCloudProgress(uid) {
+ async function loadCloudProgress(uid) {
     try {
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const cloudData = snap.data().data || {};
-        
-        // Unisci i vocaboli di PC e iPhone senza duplicati
         const localVocab = St.d.vocab || [];
         const cloudVocab = cloudData.vocab || [];
-        const vocabMap = new Map();
-        [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) vocabMap.set(w[0], w); });
         
-        St.d = Object.assign({}, St.d, cloudData, {
-          vocab: Array.from(vocabMap.values()),
-          ok: Math.max(St.d.ok || 0, cloudData.ok || 0),
-          n: Math.max(St.d.n || 0, cloudData.n || 0),
-          done: Math.max(St.d.done || 0, cloudData.done || 0),
-          streak: Math.max(St.d.streak || 0, cloudData.streak || 0)
-        });
-
+        // Unisce i vocaboli locali e cloud senza duplicati
+        const mergedVocabMap = new Map();
+        [...cloudVocab, ...localVocab].forEach(w => { if(w && w[0]) mergedVocabMap.set(w[0], w); });
+        
+        St.d = Object.assign({}, cloudData, St.d, { vocab: Array.from(mergedVocabMap.values()) });
         try { localStorage.setItem("at1", JSON.stringify(St.d)); } catch(e){}
         window.saveCloudProgress();
       } else {
         window.saveCloudProgress();
       }
     } catch (e) {
-      console.error("Errore Sincronizzazione Cloud:", e);
+      console.error("Errore nel caricamento dal Cloud:", e);
     }
-    if (typeof render === "function") render();
   }
 </script>
 </body>
