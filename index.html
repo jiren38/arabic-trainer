@@ -87,16 +87,27 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .bar { left: 0 !important; }
 
 /* Overlay grigio di sfondo */
+/* Layout Unificato e Overlay */
+body { padding-left: 0 !important; }
+main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
+.bar { left: 0 !important; }
+
+/* Invia l'header in alto mantenendolo sopra la pagina */
+header {
+  z-index: 10000 !important;
+}
+
+/* Overlay grigio di sfondo che copre tutto TRANNE il menu */
 #nav_overlay {
   position: fixed !important;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
   z-index: 9998 !important;
   display: none;
 }
 #nav_overlay.open { display: block !important; }
 
-/* Menu Navigazione a comparsa */
+/* Menu Navigazione a comparsa isolato sopra l'overlay */
 #nav {
   position: fixed !important;
   top: 0 !important;
@@ -108,10 +119,11 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   flex-direction: column !important;
   padding: 60px 16px 20px !important;
   gap: 8px !important;
-  z-index: 9999 !important; /* Sovrapposto all'overlay */
+  z-index: 99999 !important; /* Forza il menu in primo piano assoluto */
   transition: left 0.3s ease !important;
   box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
   overflow-y: auto !important;
+  pointer-events: auto !important; /* Garantisce la cliccabilità dei pulsanti */
 }
 
 #nav.open {
@@ -131,16 +143,6 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   margin-right: 12px;
 }
 .menu-toggle:hover { background: var(--sel); }
-
-/* Overlay per chiudere il menu toccando lo sfondo */
-#nav_overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 99;
-  display: none;
-}
-#nav_overlay.open { display: block; }
 
 /* Stili per il tracciamento dinamico e la scrittura guidata */
 .hw-container { position: relative; width: min(100%, 360px); aspect-ratio: 1; margin: 12px auto; }
