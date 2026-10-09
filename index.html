@@ -1087,6 +1087,7 @@ function chestOpenView() {
 
 /* ===== Funzione di Render Principale ===== */
 /* ===== Funzione di Render Principale ===== */
+/* ===== Funzione di Render Principale ===== */
 function render(){
   if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
   const v = S.view || S.v || "home";
@@ -1103,7 +1104,7 @@ function render(){
   const app = $("app");
   if (!app) return;
 
-  // Rotte per tutte le sezioni dell'app
+  // Gestione di tutte le rotte senza reindirizzare alla Home
   if (v === "home") app.innerHTML = typeof homeView === "function" ? homeView() : "";
   else if (v === "shop") app.innerHTML = typeof shopView === "function" ? shopView() : "";
   else if (v === "chest_open") app.innerHTML = typeof chestOpenView === "function" ? chestOpenView() : "";
@@ -1116,9 +1117,9 @@ function render(){
   else if (v === "cfg") app.innerHTML = typeof cfgView === "function" ? cfgView() : "";
   else if (v === "quiz") app.innerHTML = typeof quizView === "function" ? quizView() : "";
   else if (v === "ex") app.innerHTML = typeof exView === "function" ? exView() : "";
+  else if (v === "hand" || v === "hand_smart") app.innerHTML = typeof handView === "function" ? handView() : (typeof exView === "function" ? exView() : "");
   else app.innerHTML = typeof homeView === "function" ? homeView() : "";
 }
-
 
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
