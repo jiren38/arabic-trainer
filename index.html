@@ -185,7 +185,77 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   color: var(--tx); margin-right: 12px; display: inline-flex; align-items: center;
 }
 .menu-toggle:hover { background: var(--sel); }
-  /* Stili Rullo Apertura Cassa */
+/* Stili 3D Casse Stile Clash Royale e Rarità */
+.chest-3d-card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+.chest-3d-card:hover { transform: translateY(-4px); }
+
+/* Forma Cassa 3D */
+.chest-3d {
+  width: 90px;
+  height: 80px;
+  margin: 10px auto;
+  position: relative;
+  perspective: 600px;
+}
+.chest-body {
+  width: 100%;
+  height: 55px;
+  position: absolute;
+  bottom: 0;
+  border-radius: 8px 8px 12px 12px;
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.3), inset 0 4px 0 rgba(255,255,255,0.2), 0 8px 15px rgba(0,0,0,0.4);
+  border: 2px solid #222;
+}
+.chest-lid {
+  width: 104%;
+  height: 28px;
+  position: absolute;
+  top: 4px;
+  left: -2%;
+  border-radius: 12px 12px 4px 4px;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.3);
+  border: 2px solid #222;
+  z-index: 2;
+}
+.chest-lock {
+  width: 18px;
+  height: 22px;
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  z-index: 3;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  border: 1px solid #111;
+}
+
+/* Temi Colore 3D per Tipo Cassa */
+.chest-wooden .chest-body, .chest-wooden .chest-lid { background: linear-gradient(135deg, #8d5524, #5c3310); }
+.chest-wooden .chest-lock { background: linear-gradient(135deg, #d4af37, #aa7c11); }
+
+.chest-silver .chest-body, .chest-silver .chest-lid { background: linear-gradient(135deg, #bdc3c7, #7f8c8d); }
+.chest-silver .chest-lock { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+.chest-gold .chest-body, .chest-gold .chest-lid { background: linear-gradient(135deg, #f1c40f, #b7950b); }
+.chest-gold .chest-lock { background: linear-gradient(135deg, #3498db, #2980b9); }
+
+.chest-magical .chest-body, .chest-magical .chest-lid { background: linear-gradient(135deg, #a569bd, #5b2c6f); }
+.chest-magical .chest-lock { background: linear-gradient(135deg, #00f2fe, #4facfe); }
+
+.chest-legendary .chest-body, .chest-legendary .chest-lid { background: linear-gradient(135deg, #ff0844, #ffb199); }
+.chest-legendary .chest-lock { background: linear-gradient(135deg, #f1c40f, #fff); box-shadow: 0 0 10px #f1c40f; }
+
+/* Rullo Apertura Cassa */
 .roulette-container {
   position: relative;
   width: 100%;
@@ -211,8 +281,7 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   display: flex;
   align-items: center;
   position: absolute;
-  top: 10px;
-  left: 0;
+  top: 10px; left: 0;
   height: 90px;
   transition: transform 4.5s cubic-bezier(0.1, 1, 0.1, 1);
 }
@@ -232,11 +301,14 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
   color: #fff;
   user-select: none;
 }
+
+/* Colori Rarità Oggetti */
 .rarity-common { border-color: #b0bec5; background: rgba(176,190,197,0.2); }
 .rarity-uncommon { border-color: #2ecc71; background: rgba(46,204,113,0.2); }
 .rarity-rare { border-color: #3498db; background: rgba(52,152,219,0.2); }
-.rarity-epic { border-color: #9b59b6; background: rgba(155,89,182,0.2); }
-.rarity-legendary { border-color: #f1c40f; background: rgba(241,196,15,0.25); box-shadow: inset 0 0 15px rgba(241,196,15,0.4); }
+.rarity-epic { border-color: #9b59b6; background: rgba(155,89,182,0.25); }
+.rarity-legendary { border-color: #f1c40f; background: rgba(241,196,15,0.3); box-shadow: inset 0 0 15px rgba(241,196,15,0.5); }
+.rarity-mythic { border-color: #ff0844; background: rgba(255,8,68,0.35); box-shadow: inset 0 0 20px rgba(255,8,68,0.6); }
 </style>
 
 <meta name="theme-color" content="#2f3fb0">
@@ -885,6 +957,14 @@ function accountView() {
 }
 
 /* ===== Sistema Quest Giornaliere e Shop Casse ===== */
+const CHEST_TYPES = {
+  common: { name: "Cassa di Legno", price: 80, class: "chest-wooden" },
+  silver: { name: "Cassa d'Argento", price: 150, class: "chest-silver" },
+  rare: { name: "Cassa d'Oro", price: 300, class: "chest-gold" },
+  magical: { name: "Cassa Magica", price: 600, class: "chest-magical" },
+  legendary: { name: "Cassa Leggendaria", price: 1200, class: "chest-legendary" }
+};
+
 const Quests = {
   getTodayQuests() {
     const t = today();
@@ -922,26 +1002,67 @@ const Quests = {
     }
   },
 
-  buyChest(type, price) {
-    if ((St.d.coins || 0) < price) {
+  buyChest(type) {
+    const chestInfo = CHEST_TYPES[type];
+    if (!chestInfo) return;
+    if ((St.d.coins || 0) < chestInfo.price) {
       toast("⚠️ Monete insufficienti!");
       return;
     }
-    St.d.coins -= price;
-    if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+    St.d.coins -= chestInfo.price;
+    if (!St.d.chests) St.d.chests = {};
     St.d.chests[type] = (St.d.chests[type] || 0) + 1;
     St.save();
     if (window.saveCloudProgress) window.saveCloudProgress();
-    toast("📦 Cassa acquistata con successo!");
+    toast("📦 " + chestInfo.name + " acquistata!");
     render();
   }
 };
 
+/* ===== Tabella Oggetti Estesa e Rarità ===== */
+const LOOT_ITEMS = [
+  // Comune
+  { name: "+50 Monete", icon: "🪙", rarity: "common", class: "rarity-common", type: "coins", val: 50 },
+  { name: "Titolo: Novizio d'Arabo", icon: "🌱", rarity: "common", class: "rarity-common", type: "title", val: "Novizio d'Arabo" },
+  { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
+  { name: "Avatar: Cammello Simpatico", icon: "🐪", rarity: "common", class: "rarity-common", type: "avatar", val: "🐪" },
+
+  // Non Comune
+  { name: "+120 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 120 },
+  { name: "Titolo: Lettore Curioso", icon: "📖", rarity: "uncommon", class: "rarity-uncommon", type: "title", val: "Lettore Curioso" },
+  { name: "Stile: Inchiostro Blu Reale", icon: "🖋️", rarity: "uncommon", class: "rarity-uncommon", type: "brush", val: "#2f3fb0" },
+  { name: "Avatar: Dattero Dorato", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "avatar", val: "🌴" },
+
+  // Raro
+  { name: "+300 Monete", icon: "💎", rarity: "rare", class: "rarity-rare", type: "coins", val: 300 },
+  { name: "Titolo: Calligrafo Provetto", icon: "✍️", rarity: "rare", class: "rarity-rare", type: "title", val: "Calligrafo Provetto" },
+  { name: "Titolo: Esploratore delle Dune", icon: "🏜️", rarity: "rare", class: "rarity-rare", type: "title", val: "Esploratore delle Dune" },
+  { name: "Stile: Tratto Rubino", icon: "🎨", rarity: "rare", class: "rarity-rare", type: "brush", val: "#e74c3c" },
+  { name: "Avatar: Falcone del Deserto", icon: "🦅", rarity: "rare", class: "rarity-rare", type: "avatar", val: "🦅" },
+
+  // Epico
+  { name: "+600 Monete", icon: "💎", rarity: "epic", class: "rarity-epic", type: "coins", val: 600 },
+  { name: "Titolo: Erudito di Baghdad", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "title", val: "Erudito di Baghdad" },
+  { name: "Stile: Inchiostro Smeraldo Neon", icon: "🖌️", rarity: "epic", class: "rarity-epic", type: "brush", val: "#2ecc71" },
+  { name: "Tema UI: Oasi Notturna", icon: "🌌", rarity: "epic", class: "rarity-epic", type: "theme", val: "oasi" },
+
+  // Leggendario
+  { name: "+1500 Monete", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "coins", val: 1500 },
+  { name: "Titolo: Maestro delle 28 Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle 28 Lettere" },
+  { name: "Stile: Calamo d'Oro Puro", icon: "✨", rarity: "legendary", class: "rarity-legendary", type: "brush", val: "#f1c40f" },
+  { name: "Avatar: Genio della Lampada", icon: "🧞", rarity: "legendary", class: "rarity-legendary", type: "avatar", val: "🧞" },
+
+  // Mitico
+  { name: "+3000 Monete", icon: "🔥", rarity: "mythic", class: "rarity-mythic", type: "coins", val: 3000 },
+  { name: "Titolo: Leggenda della Calligrafia", icon: "⚡", rarity: "mythic", class: "rarity-mythic", type: "title", val: "Leggenda della Calligrafia" },
+  { name: "Stile: Fuoco della Fenice", icon: "🔥", rarity: "mythic", class: "rarity-mythic", type: "brush", val: "#ff0844" }
+];
+
 function shopView() {
   const quests = Quests.getTodayQuests();
-  if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
+  if (!St.d.chests) St.d.chests = {};
   const chests = St.d.chests;
-  const totalChests = (chests.common || 0) + (chests.rare || 0) + (chests.legendary || 0);
+  const totalChests = Object.values(chests).reduce((a, b) => a + (b || 0), 0);
 
   return `
     <h2>🎁 Quest & Shop</h2>
@@ -963,44 +1084,36 @@ function shopView() {
       `).join('')}
     </div>
 
-    <h3>📦 Acquista Casse</h3>
-    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-      <div class="panel" style="text-align:center;">
-        <div style="font-size:3rem;">📦</div>
-        <b>Cassa Comune</b>
-        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.common || 0}</p>
-        <button class="btn p" onclick="Quests.buyChest('common', 100)">🪙 100 Monete</button>
-      </div>
-
-      <div class="panel" style="text-align:center; border-color:#8c9bff;">
-        <div style="font-size:3rem;">🔷</div>
-        <b>Cassa Rara</b>
-        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.rare || 0}</p>
-        <button class="btn p" onclick="Quests.buyChest('rare', 250)">🪙 250 Monete</button>
-      </div>
-
-      <div class="panel" style="text-align:center; border-color:#f1c40f;">
-        <div style="font-size:3rem;">👑</div>
-        <b>Cassa Leggendaria</b>
-        <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.legendary || 0}</p>
-        <button class="btn p" onclick="Quests.buyChest('legendary', 500)">🪙 500 Monete</button>
-      </div>
+    <h3>📦 Acquista Casse 3D</h3>
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px;">
+      ${Object.entries(CHEST_TYPES).map(([type, c]) => `
+        <div class="chest-3d-card">
+          <div class="chest-3d ${c.class}">
+            <div class="chest-lid"></div>
+            <div class="chest-lock"></div>
+            <div class="chest-body"></div>
+          </div>
+          <b>${c.name}</b>
+          <p class="sub" style="font-size:0.8rem; margin:2px 0 8px;">Possedute: ${chests[type] || 0}</p>
+          <button class="btn p" style="width:100%; font-size:0.85rem;" onclick="Quests.buyChest('${type}')">🪙 ${c.price}</button>
+        </div>
+      `).join('')}
     </div>
 
-    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
+    <h3 style="margin-top:24px;">🔓 Le tue Casse Pronte</h3>
     <div class="panel" style="text-align:center;">
       <div class="chips" style="justify-content:center; gap:10px;">
-        ${(chests.common || 0) > 0 ? '<button class="btn p" onclick="startChestOpening(\'common\')">✨ Apri Cassa Comune (' + chests.common + ')</button>' : ''}
-        ${(chests.rare || 0) > 0 ? '<button class="btn p" style="background:#3498db; border-color:#3498db;" onclick="startChestOpening(\'rare\')">✨ Apri Cassa Rara (' + chests.rare + ')</button>' : ''}
-        ${(chests.legendary || 0) > 0 ? '<button class="btn p" style="background:#f1c40f; color:#000; border-color:#f1c40f;" onclick="startChestOpening(\'legendary\')">✨ Apri Cassa Leggendaria (' + chests.legendary + ')</button>' : ''}
+        ${Object.entries(CHEST_TYPES).map(([type, c]) => 
+          (chests[type] || 0) > 0 ? `<button class="btn p" onclick="startChestOpening('${type}')">✨ Apri ${c.name} (${chests[type]})</button>` : ''
+        ).join('')}
       </div>
-      ${totalChests === 0 ? '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con gli esercizi o le quest per comprare la tua prima cassa!</p>' : ''}
+      ${totalChests === 0 ? '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con le quest per comprare le casse!</p>' : ''}
     </div>
 
     <h3 style="margin-top:24px;">🎒 La tua Collezione</h3>
     <div class="panel">
       ${(!St.d.inventory || St.d.inventory.length === 0) ? 
-        '<p class="sub" style="text-align:center; margin:0;">Non hai ancora sbloccato oggetti dalle casse! Apri la tua prima cassa per trovare titoli e stili unici.</p>' : 
+        '<p class="sub" style="text-align:center; margin:0;">Nessun oggetto sbloccato. Apri le casse per trovare titoli, stili e avatar!</p>' : 
         '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
           St.d.inventory.map(item => '<div style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ' + item + '</div>').join('') + 
         '</div>'
@@ -1009,35 +1122,16 @@ function shopView() {
   `;
 }
 
-/* ===== Sistema Apertura Casse e Loot Table ===== */
-const LOOT_ITEMS = [
-  { name: "+50 Monete", icon: "🪙", rarity: "common", class: "rarity-common", type: "coins", val: 50 },
-  { name: "+100 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 100 },
-  { name: "+250 Monete", icon: "💎", rarity: "rare", class: "rarity-rare", type: "coins", val: 250 },
-  { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
-  { name: "Titolo: Calligrafo Provetto", icon: "✍️", rarity: "rare", class: "rarity-rare", type: "title", val: "Calligrafo Provetto" },
-  { name: "Titolo: Maestro delle Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle Lettere" },
-  { name: "Stile: Inchiostro Smeraldo", icon: "🖌️", rarity: "epic", class: "rarity-epic", type: "brush", val: "#2ecc71" }
-];
-
 let chestOpeningState = { spinning: false, wonItem: null };
 
 function startChestOpening(type) {
-  if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
-  
-  let chestType = type;
-  if (!chestType) {
-    if (St.d.chests.legendary > 0) chestType = "legendary";
-    else if (St.d.chests.rare > 0) chestType = "rare";
-    else if (St.d.chests.common > 0) chestType = "common";
-  }
-
-  if (!chestType || (St.d.chests[chestType] || 0) <= 0) {
+  if (!St.d.chests) St.d.chests = {};
+  if ((St.d.chests[type] || 0) <= 0) {
     toast("⚠️ Non possiedi questa cassa!");
     return;
   }
 
-  St.d.chests[chestType]--;
+  St.d.chests[type]--;
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
 
@@ -1048,12 +1142,16 @@ function startChestOpening(type) {
 
   const rand = Math.random() * 100;
   let won;
-  if (chestType === "legendary") {
-    won = rand < 40 ? LOOT_ITEMS.find(x => x.rarity === "legendary") : pick(LOOT_ITEMS.filter(x => x.rarity === "epic" || x.rarity === "rare"));
-  } else if (chestType === "rare") {
-    won = rand < 25 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare" || x.rarity === "epic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon" || x.rarity === "common"));
+  if (type === "legendary") {
+    won = rand < 30 ? pick(LOOT_ITEMS.filter(x => x.rarity === "mythic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "legendary"));
+  } else if (type === "magical") {
+    won = rand < 50 ? pick(LOOT_ITEMS.filter(x => x.rarity === "legendary")) : pick(LOOT_ITEMS.filter(x => x.rarity === "epic"));
+  } else if (type === "rare") {
+    won = rand < 40 ? pick(LOOT_ITEMS.filter(x => x.rarity === "epic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "rare"));
+  } else if (type === "silver") {
+    won = rand < 30 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare")) : pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon"));
   } else {
-    won = rand < 15 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common" || x.rarity === "uncommon"));
+    won = rand < 20 ? pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common"));
   }
   if (!won) won = LOOT_ITEMS[0];
   trackItems[28] = won;
@@ -1088,7 +1186,7 @@ function applyReward(item) {
   }
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
-  if (typeof say === "function") say("Mabrouk! Hai sbloccato " + item.name);
+  if (typeof say === "function") say("Mabrouk! Hai trovato " + item.name);
 }
 
 function chestOpenView() {
