@@ -1209,7 +1209,7 @@ function accountView() {
   const user = window.currentUser;
   
   if (!St.d.equipped) {
-    St.d.equipped = { head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
+    St.d.equipped = { hair: "", head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
   }
   const eq = St.d.equipped;
 
@@ -1217,9 +1217,13 @@ function accountView() {
   const unlockedHeads = LOOT_ITEMS.filter(i => i.type === "head" && inv.includes(i.name));
   const unlockedGlasses = LOOT_ITEMS.filter(i => i.type === "glasses" && inv.includes(i.name));
   const unlockedFacial = LOOT_ITEMS.filter(i => i.type === "facial" && inv.includes(i.name));
+  const unlockedHairs = LOOT_ITEMS.filter(i => i.type === "hair" && inv.includes(i.name));
   const unlockedOutfits = LOOT_ITEMS.filter(i => i.type === "outfit" && inv.includes(i.name));
   const unlockedBgs = LOOT_ITEMS.filter(i => i.type === "bg" && inv.includes(i.name));
   const unlockedTitles = LOOT_ITEMS.filter(i => i.type === "title" && inv.includes(i.name));
+
+  // Funzione helper per rendere sicura la chiamata onclick con apostrofi
+  const safeAttr = str => String(str).replace(/'/g, "&#39;");
 
   return `
     <h2>👤 Profilo & Account</h2>
@@ -1259,12 +1263,20 @@ function accountView() {
       <hr style="border:0; border-top:1px dashed var(--bd); margin:16px 0;">
 
       <!-- SELETTORI ACCESSORI -->
+      <h4 style="margin:8px 0;">💈 Capelli</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.hair ? "on" : ""}" onclick="equipItem('hair', '')">Nessuno / Calvo</button>
+        ${unlockedHairs.map(h => `
+          <button class="btn ${eq.hair === h.val ? "on" : ""}" onclick="equipItem('hair', '${safeAttr(h.val)}')">${h.icon}${h.name.replace('Capelli: ', '')}</button>
+        `).join('')}
+      </div>
+
       <h4 style="margin:8px 0;">🎩 Copricapo</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.head ? "on" : ""}" onclick="equipItem('head', '')">Nessuno</button>
         ${unlockedHeads.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare nuovi cappelli!</p>' : ''}
         ${unlockedHeads.map(h => `
-          <button class="btn ${eq.head === h.val ? "on" : ""}" onclick="equipItem('head', '${h.val}')">${h.icon}${h.name.replace('Cappello: ', '')}</button>
+          <button class="btn ${eq.head === h.val ? "on" : ""}" onclick="equipItem('head', '${safeAttr(h.val)}')">${h.icon}${h.name.replace('Cappello: ', '')}</button>
         `).join('')}
       </div>
 
@@ -1273,7 +1285,7 @@ function accountView() {
         <button class="btn ${!eq.glasses ? "on" : ""}" onclick="equipItem('glasses', '')">Nessuno</button>
         ${unlockedGlasses.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare nuovi occhiali!</p>' : ''}
         ${unlockedGlasses.map(g => `
-          <button class="btn ${eq.glasses === g.val ? "on" : ""}" onclick="equipItem('glasses', '${g.val}')">${g.icon}${g.name.replace('Occhiali: ', '')}</button>
+          <button class="btn ${eq.glasses === g.val ? "on" : ""}" onclick="equipItem('glasses', '${safeAttr(g.val)}')">${g.icon}${g.name.replace('Occhiali: ', '')}</button>
         `).join('')}
       </div>
 
@@ -1282,7 +1294,7 @@ function accountView() {
         <button class="btn ${!eq.facial ? "on" : ""}" onclick="equipItem('facial', '')">Nessuno</button>
         ${unlockedFacial.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare barbe o baffi!</p>' : ''}
         ${unlockedFacial.map(f => `
-          <button class="btn ${eq.facial === f.val ? "on" : ""}" onclick="equipItem('facial', '${f.val}')">${f.icon}${f.name.replace('Barba: ', '')}</button>
+          <button class="btn ${eq.facial === f.val ? "on" : ""}" onclick="equipItem('facial', '${safeAttr(f.val)}')">${f.icon}${f.name.replace('Barba: ', '')}</button>
         `).join('')}
       </div>
 
@@ -1291,7 +1303,7 @@ function accountView() {
         <button class="btn ${!eq.outfit ? "on" : ""}" onclick="equipItem('outfit', '')">Default</button>
         ${unlockedOutfits.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare vestiti!</p>' : ''}
         ${unlockedOutfits.map(o => `
-          <button class="btn ${eq.outfit === o.val ? "on" : ""}" onclick="equipItem('outfit', '${o.val}')">${o.icon}${o.name.replace('Abito: ', '')}</button>
+          <button class="btn ${eq.outfit === o.val ? "on" : ""}" onclick="equipItem('outfit', '${safeAttr(o.val)}')">${o.icon}${o.name.replace('Abito: ', '')}</button>
         `).join('')}
       </div>
 
@@ -1300,21 +1312,20 @@ function accountView() {
         <button class="btn ${!eq.bg ? "on" : ""}" onclick="equipItem('bg', '')">Standard</button>
         ${unlockedBgs.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare sfondi!</p>' : ''}
         ${unlockedBgs.map(b => `
-          <button class="btn ${eq.bg === b.val ? "on" : ""}" onclick="equipItem('bg', '${b.val}')">${b.icon}${b.name.replace('Sfondo: ', '')}</button>
+          <button class="btn ${eq.bg === b.val ? "on" : ""}" onclick="equipItem('bg', '${safeAttr(b.val)}')">${b.icon}${b.name.replace('Sfondo: ', '')}</button>
         `).join('')}
       </div>
 
-    <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
+      <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
       <div class="chips" style="justify-content:center;">
-        <button class="btn ${eq.title === "Novizio d'Arabo" || !eq.title ? "on" : ""}" onclick="equipItem('title', 'Novizio d\'Arabo')">🌱 Novizio d'Arabo</button>
-        ${unlockedTitles.map(t => {
-          const safeVal = t.val.replace(/'/g, "\\'");
-          return `<button class="btn ${eq.title === t.val ? "on" : ""}" onclick="equipItem('title', '${safeVal}')">${t.icon} ${t.val}</button>`;
-        }).join('')}
+        <button class="btn ${eq.title === "Novizio d'Arabo" || !eq.title ? "on" : ""}" onclick="equipItem('title', 'Novizio d&#39;Arabo')">🌱 Novizio d'Arabo</button>
+        ${unlockedTitles.map(t => `
+          <button class="btn ${eq.title === t.val ? "on" : ""}" onclick="equipItem('title', '${safeAttr(t.val)}')">${t.icon}${t.val}</button>
+        `).join('')}
       </div>
     </div>
 
-    <!-- SEZIONE COLLEZIONE COMPLETA ORIGINALE -->
+    <!-- SEZIONE COLLEZIONE COMPLETA -->
     <h3>🎒 La tua Collezione (Oggetti & Titoli)</h3>
     <div class="panel">
       ${inv.length === 0 ? 
@@ -1326,7 +1337,6 @@ function accountView() {
     </div>
   `;
 }
-
 function equipItem(type, val) {
   if (!St.d.equipped) St.d.equipped = {};
   St.d.equipped[type] = val;
