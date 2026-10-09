@@ -1086,9 +1086,10 @@ function chestOpenView() {
 }
 
 /* ===== Funzione di Render Principale ===== */
+/* ===== Funzione di Render Principale ===== */
 function render(){
   if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
-  const v = S.view;
+  const v = S.view || S.v || "home";
   const t = ["quiz","ex","hand","hand_smart"].includes(v) ? "cfg" : v;
   const navEl = $("nav");
 
@@ -1102,15 +1103,22 @@ function render(){
   const app = $("app");
   if (!app) return;
 
-  if (v === "home") app.innerHTML = homeView();
-  else if (v === "shop") app.innerHTML = shopView();
-  else if (v === "chest_open") app.innerHTML = chestOpenView();
+  // Rotte per tutte le sezioni dell'app
+  if (v === "home") app.innerHTML = typeof homeView === "function" ? homeView() : "";
+  else if (v === "shop") app.innerHTML = typeof shopView === "function" ? shopView() : "";
+  else if (v === "chest_open") app.innerHTML = typeof chestOpenView === "function" ? chestOpenView() : "";
   else if (v === "alf") app.innerHTML = '<h2>Alfabeto</h2><p class="sub">Tocca una lettera per selezionarla e ascoltarla.</p>' + grid() + detail();
-  else if (v === "account") app.innerHTML = accountView();
-  else if (v === "cfg") app.innerHTML = cfgView();
-  else if (v === "quiz") app.innerHTML = quizView();
-  else if (v === "ex") app.innerHTML = exView();
+  else if (v === "vocab") app.innerHTML = typeof vocabView === "function" ? vocabView() : "";
+  else if (v === "learn") app.innerHTML = typeof learnView === "function" ? learnView() : "";
+  else if (v === "prog") app.innerHTML = typeof progView === "function" ? progView() : "";
+  else if (v === "account") app.innerHTML = typeof accountView === "function" ? accountView() : "";
+  else if (v === "set") app.innerHTML = typeof setView === "function" ? setView() : "";
+  else if (v === "cfg") app.innerHTML = typeof cfgView === "function" ? cfgView() : "";
+  else if (v === "quiz") app.innerHTML = typeof quizView === "function" ? quizView() : "";
+  else if (v === "ex") app.innerHTML = typeof exView === "function" ? exView() : "";
+  else app.innerHTML = typeof homeView === "function" ? homeView() : "";
 }
+
 
 St.load();applyTheme();S.sel=new Set(St.d.sel);Au.init();render();
 </script>
