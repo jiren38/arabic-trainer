@@ -1022,14 +1022,9 @@ function homeView(){
       <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
         
         <!-- Avatar Manichino nella Home -->
-        <div onclick="go('account')" class="avatar-mannequin" style="width:75px; height:75px; margin:0; flex:none; cursor:pointer; background:${eq.bg || "rgba(255,255,255,0.2)"}; border-color:#fff;" title="Personalizza Avatar">
-          <div class="avatar-body-base" style="width:50px; height:25px;"></div>
-          <div class="avatar-head-base" style="top:12px; width:34px; height:36px; border-radius:18px;"></div>
-          ${!eq.glasses ? '<div class="avatar-eyes-default" style="top:24px; width:34px; padding:0 8px;"></div>' : ''}
-          ${eq.outfit ? `<div class="layer-outfit" style="font-size:1.8rem;">${eq.outfit}</div>` : ''}
-          ${eq.facial ? `<div class="layer-facial" style="top:28px; font-size:1.2rem;">${eq.facial}</div>` : ''}
-          ${eq.glasses ? `<div class="layer-glasses" style="top:20px; font-size:1.3rem;">${eq.glasses}</div>` : ''}
-          ${eq.head ? `<div class="layer-head" style="top:-2px; font-size:1.6rem;">${eq.head}</div>` : ''}
+       <!-- Avatar SVG Duolingo Style nella Home -->
+        <div onclick="go('account')" style="cursor:pointer;" title="Personalizza Avatar">
+          ${renderDuoAvatar(eq, 75)}
         </div>
 
         <div>
@@ -1141,7 +1136,7 @@ function accountView() {
   const user = window.currentUser;
   
   if (!St.d.equipped) {
-    St.d.equipped = { eyeStyle: "default", head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
+    St.d.equipped = { head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
   }
   const eq = St.d.equipped;
 
@@ -1179,11 +1174,11 @@ function accountView() {
       <p style="margin:0;"><b>Monete Possedute:</b> 🪙 ${St.d.coins || 0}</p>
     </div>
 
-    <!-- STUDIO CREATIVO AVATAR (OMINO MANICHINO) -->
+    <!-- STUDIO CREATIVO AVATAR (OMINO SVG DUOLINGO) -->
     <h3>🎨 Personalizza Avatar</h3>
     <div class="panel" style="text-align:center; margin-bottom:20px;">
       
-    <!-- OMINO SVG VETTORIALE DUOLINGO STYLE -->
+      <!-- OMINO SVG VETTORIALE DUOLINGO STYLE -->
       ${renderDuoAvatar(eq, 160)}
       
       <div style="font-weight:bold; font-size:1.15rem; color:var(--ac);">${eq.title || "Novizio d'Arabo"}</div>
@@ -1220,7 +1215,7 @@ function accountView() {
 
       <h4 style="margin:8px 0;">🥋 Abiti & Vestiti</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
-        <button class="btn ${!eq.outfit ? "on" : ""}" onclick="equipItem('outfit', '')">Nessuno</button>
+        <button class="btn ${!eq.outfit ? "on" : ""}" onclick="equipItem('outfit', '')">Default</button>
         ${unlockedOutfits.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare vestiti!</p>' : ''}
         ${unlockedOutfits.map(o => `
           <button class="btn ${eq.outfit === o.val ? "on" : ""}" onclick="equipItem('outfit', '${o.val}')">${o.icon}${o.name.replace('Abito: ', '')}</button>
