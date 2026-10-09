@@ -326,15 +326,21 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 <nav id="nav"></nav>
 
 <header>
-  <div style="display:grid; grid-template-columns: 40px 1fr auto; align-items:center; max-width:860px; margin:0 auto; padding:8px 16px;">
-    <button class="menu-toggle" onclick="toggleSidebar()" style="margin:0; justify-self:start;">☰</button>
-    <b onclick="go('home')" style="font-family:'Amiri', serif; font-size:1.6rem; text-align:center; cursor:pointer; letter-spacing:0.02em;" title="Torna alla Home">Arabic Trainer</b>
+  <div style="display:grid; grid-template-columns: 40px auto 1fr auto; align-items:center; max-width:860px; margin:0 auto; padding:8px 16px; gap:8px;">
+    <button class="menu-toggle" onclick="toggleSidebar()" style="margin:0;">☰</button>
+    
+    <!-- Mini Avatar Header -->
+    <div onclick="go('account')" style="cursor:pointer; position:relative; width:38px; height:38px; background:var(--sel); border:2px solid var(--ac); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden;" title="Il tuo Profilo">
+      <div id="hdr_avatar" style="font-size:1.4rem;">🙂</div>
+    </div>
+
+    <b onclick="go('home')" style="font-family:'Amiri', serif; font-size:1.5rem; text-align:center; cursor:pointer; letter-spacing:0.02em;" title="Torna alla Home">Arabic Trainer</b>
+    
     <div id="coin_display" onclick="go('shop')" style="cursor:pointer; display:flex; align-items:center; gap:4px; background:var(--sel); padding:4px 10px; border-radius:20px; font-weight:bold; font-size:0.9rem; border:1px solid var(--bd);" title="Apri lo Shop">
       🪙 <span id="coin_count">100</span>
     </div>
   </div>
 </header>
-
 <main>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="aud" class="score" style="display:none" aria-live="polite"></div>
@@ -908,12 +914,43 @@ function vocabView() {
       words.map(w => `<div class="panel" style="text-align:center; padding:12px; margin:0; cursor:pointer;" onclick="say('${w.ar}')"><div class="ar" style="font-size:1.8rem; color:var(--ac);">${w.ar}</div><div style="font-weight:bold; margin-top:4px;">${w.mean}</div><div style="font-size:0.8rem; margin-top:6px;">🔊 Ascolta</div></div>`).join('') + `</div>`;
   return `<h2>📚 Dizionario Vocaboli</h2><p class="sub">Tutte le parole reali incontrate durante i tuoi allenamenti (${words.length}).</p>${listHtml}`;
 }
-function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.min(100,Math.round(100*y.q/g)),h=new Date().getHours(),o=overall();
- const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
- if(!d.n)return'<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
-  return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div class="panel" style="text-align:center; margin-top:16px; background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, transparent), transparent); border: 1px solid var(--bd);"><p style="margin:0 0 6px; font-weight:600;">Ti piace Arabic Trainer? ☕</p><p class="sub" style="font-size:0.88rem; margin-bottom:12px;">Se questa app ti sta aiutando a studiare l\'arabo, considera di sostenere il progetto con un piccolo caffè!</p><a href="https://buymeacoffee.com/arabictrainer" target="_blank" rel="noopener" class="btn p" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; border-radius:12px;">☕ Offrimi un caffè</a></div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
+function homeView(){
+  const d=St.d, y=d.days[today()]||{q:0,ms:0}, g=d.goal, gp=Math.min(100,Math.round(100*y.q/g)), h=new Date().getHours(), o=overall();
+  const eq = d.equipped || { base: "🙂", title: "Novizio d'Arabo" };
+  const s=(a,b)=>'<div class="stat"><small>'+a+'</small><b>'+b+'</b></div>';
 
+  if(!d.n) return '<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
 
+  return `
+    <div class="hero">
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        
+        <!-- Avatar 3D Grande nella Home -->
+        <div onclick="go('account')" style="cursor:pointer; position:relative; width:80px; height:80px; background:${eq.bg || "rgba(255,255,255,0.2)"}; border:3px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-none:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <div style="font-size:2.6rem; position:absolute; bottom:6px; z-index:1;">${eq.base || "🙂"}</div>
+          <div style="font-size:1.6rem; position:absolute; bottom:8px; z-index:2;">${eq.facial || ""}</div>
+          <div style="font-size:1.6rem; position:absolute; bottom:-4px; z-index:3;">${eq.outfit || ""}</div>
+          <div style="font-size:1.5rem; position:absolute; top:24px; z-index:4;">${eq.glasses || ""}</div>
+          <div style="font-size:1.9rem; position:absolute; top:-2px; z-index:5;">${eq.head || ""}</div>
+        </div>
+
+        <div>
+          <h2>${h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera"} 👋</h2>
+          <p style="margin:2px 0 6px; font-weight:bold; opacity:0.95;">✨ ${eq.title || "Novizio d'Arabo"}</p>
+          <p style="margin:0;">🔥 <b>${dstreak()}</b> giorni consecutivi di studio</p>
+        </div>
+      </div>
+      
+      <div style="margin-top:14px;">
+        <button class="btn hb" onclick="cont()">Continua allenamento →</button> 
+        <button class="btn hb2" onclick="go('vocab')">📚 Apri Vocaboli</button>
+      </div>
+      <div class="wm ar" aria-hidden="true">ع</div>
+    </div>
+    
+    <!-- Resto della homeView... -->
+  `;
+}
 /* ===== Viste Mancanti (Account e Profilo) ===== */
 function accountView() {
   const inv = St.d.inventory || [];
@@ -1020,39 +1057,58 @@ const Quests = {
 };
 
 /* ===== Tabella Oggetti Estesa e Rarità ===== */
+/* ===== Tabella Oggetti Estesa e Ordinata per Rarità ===== */
 const LOOT_ITEMS = [
-  // Comune
+  // ⚪ COMUNE (Common)
   { name: "+50 Monete", icon: "🪙", rarity: "common", class: "rarity-common", type: "coins", val: 50 },
   { name: "Titolo: Novizio d'Arabo", icon: "🌱", rarity: "common", class: "rarity-common", type: "title", val: "Novizio d'Arabo" },
   { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
   { name: "Avatar: Cammello Simpatico", icon: "🐪", rarity: "common", class: "rarity-common", type: "avatar", val: "🐪" },
+  { name: "Cappello: Berretto Sportivo", icon: "🧢", rarity: "common", class: "rarity-common", type: "head", val: "🧢" },
+  { name: "Occhiali: Occhiali da Lettura", icon: "👓", rarity: "common", class: "rarity-common", type: "glasses", val: "👓" },
 
-  // Non Comune
+  // 🟢 NON COMUNE (Uncommon)
   { name: "+120 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 120 },
   { name: "Titolo: Lettore Curioso", icon: "📖", rarity: "uncommon", class: "rarity-uncommon", type: "title", val: "Lettore Curioso" },
   { name: "Stile: Inchiostro Blu Reale", icon: "🖋️", rarity: "uncommon", class: "rarity-uncommon", type: "brush", val: "#2f3fb0" },
   { name: "Avatar: Dattero Dorato", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "avatar", val: "🌴" },
+  { name: "Cappello: Elmo da Cavaliere", icon: "🪖", rarity: "uncommon", class: "rarity-uncommon", type: "head", val: "🪖" },
+  { name: "Occhiali: Occhiali da Sole", icon: "🕶️", rarity: "uncommon", class: "rarity-uncommon", type: "glasses", val: "🕶️" },
+  { name: "Barba: Baffi da Sceicco", icon: "🥸", rarity: "uncommon", class: "rarity-uncommon", type: "facial", val: "🥸" },
+  { name: "Abito: Felpa Streetwear", icon: "🥋", rarity: "uncommon", class: "rarity-uncommon", type: "outfit", val: "🥋" },
+  { name: "Sfondo: Oasi Smeraldo", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "bg", val: "linear-gradient(135deg, #11998e, #38ef7d)" },
 
-  // Raro
+  // 🔵 RARO (Rare)
   { name: "+300 Monete", icon: "💎", rarity: "rare", class: "rarity-rare", type: "coins", val: 300 },
   { name: "Titolo: Calligrafo Provetto", icon: "✍️", rarity: "rare", class: "rarity-rare", type: "title", val: "Calligrafo Provetto" },
   { name: "Titolo: Esploratore delle Dune", icon: "🏜️", rarity: "rare", class: "rarity-rare", type: "title", val: "Esploratore delle Dune" },
   { name: "Stile: Tratto Rubino", icon: "🎨", rarity: "rare", class: "rarity-rare", type: "brush", val: "#e74c3c" },
   { name: "Avatar: Falcone del Deserto", icon: "🦅", rarity: "rare", class: "rarity-rare", type: "avatar", val: "🦅" },
+  { name: "Cappello: Turbante Arabo", icon: "👳", rarity: "rare", class: "rarity-rare", type: "head", val: "👳" },
+  { name: "Occhiali: Monocolo da Erudito", icon: "🧐", rarity: "rare", class: "rarity-rare", type: "glasses", val: "🧐" },
+  { name: "Barba: Barba Folta Reale", icon: "🧔", rarity: "rare", class: "rarity-rare", type: "facial", val: "🧔" },
+  { name: "Sfondo: Deserto Stellato", icon: "🌌", rarity: "rare", class: "rarity-rare", type: "bg", val: "linear-gradient(135deg, #0b132b, #1c2541)" },
 
-  // Epico
+  // 🟣 EPICO (Epic)
   { name: "+600 Monete", icon: "💎", rarity: "epic", class: "rarity-epic", type: "coins", val: 600 },
   { name: "Titolo: Erudito di Baghdad", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "title", val: "Erudito di Baghdad" },
   { name: "Stile: Inchiostro Smeraldo Neon", icon: "🖌️", rarity: "epic", class: "rarity-epic", type: "brush", val: "#2ecc71" },
   { name: "Tema UI: Oasi Notturna", icon: "🌌", rarity: "epic", class: "rarity-epic", type: "theme", val: "oasi" },
+  { name: "Cappello: Tocco da Laurea", icon: "🎓", rarity: "epic", class: "rarity-epic", type: "head", val: "🎓" },
+  { name: "Occhiali: Maschera da Visore", icon: "🥽", rarity: "epic", class: "rarity-epic", type: "glasses", val: "🥽" },
+  { name: "Abito: Armatura Dorata", icon: "🛡️", rarity: "epic", class: "rarity-epic", type: "outfit", val: "🛡️" },
+  { name: "Sfondo: Palazzo Reale", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "bg", val: "linear-gradient(135deg, #8a2387, #e94057, #f27121)" },
 
-  // Leggendario
+  // 🟡 LEGGENDARIO (Legendary)
   { name: "+1500 Monete", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "coins", val: 1500 },
   { name: "Titolo: Maestro delle 28 Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle 28 Lettere" },
   { name: "Stile: Calamo d'Oro Puro", icon: "✨", rarity: "legendary", class: "rarity-legendary", type: "brush", val: "#f1c40f" },
   { name: "Avatar: Genio della Lampada", icon: "🧞", rarity: "legendary", class: "rarity-legendary", type: "avatar", val: "🧞" },
+  { name: "Cappello: Corona Reale", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "head", val: "👑" },
+  { name: "Abito: Mantello da Re", icon: "🧥", rarity: "legendary", class: "rarity-legendary", type: "outfit", val: "🧥" },
+  { name: "Sfondo: Aura di Fuoco", icon: "🔥", rarity: "legendary", class: "rarity-legendary", type: "bg", val: "linear-gradient(135deg, #ff416c, #ff4b2b)" },
 
-  // Mitico
+  // 🔴 MITICO (Mythic)
   { name: "+3000 Monete", icon: "🔥", rarity: "mythic", class: "rarity-mythic", type: "coins", val: 3000 },
   { name: "Titolo: Leggenda della Calligrafia", icon: "⚡", rarity: "mythic", class: "rarity-mythic", type: "title", val: "Leggenda della Calligrafia" },
   { name: "Stile: Fuoco della Fenice", icon: "🔥", rarity: "mythic", class: "rarity-mythic", type: "brush", val: "#ff0844" }
@@ -1223,6 +1279,13 @@ function chestOpenView() {
 
 /* ===== Funzione di Render Principale ===== */
 function render(){
+  if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
+  
+  // Aggiorna l'Avatar nell'Header
+  if($("hdr_avatar")) {
+    const eq = St.d.equipped || {};
+    $("hdr_avatar").textContent = eq.head || eq.base || "🙂";
+  }
   if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
   const v = S.view || S.v || "home";
   const t = ["quiz","ex","hand","hand_smart"].includes(v) ? "cfg" : v;
