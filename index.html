@@ -842,6 +842,28 @@ function homeView(){const d=St.d,y=d.days[today()]||{q:0,ms:0},g=d.goal,gp=Math.
   return'<div class="hero"><div><h2>'+(h<12?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera")+' 👋</h2><p>Continua il tuo percorso di apprendimento della lingua araba.</p><p>🔥 <b>'+dstreak()+'</b> giorni consecutivi di studio</p><button class="btn hb" onclick="cont()">Continua allenamento →</button> <button class="btn hb2" onclick="go(\'vocab\')">📚 Apri Vocaboli</button></div>'+ring(o,"Progresso generale")+'<div class="wm ar" aria-hidden="true">ع</div></div><div class="panel" style="text-align:left;margin-top:12px"><b>Obiettivo di oggi</b>'+bar(gp,"Obiettivo di oggi")+'<div class="sub">'+y.q+' / '+g+' domande · '+Math.round(y.ms/6e4)+' min'+(y.q>=g?" · 🎉 Obiettivo completato!":"")+'</div></div><div class="stats" style="margin-top:12px">'+s("Lettere padroneggiate",L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length+" su 28")+s("Lettere da ripassare",Ms.weak().length)+s("Precisione media",Math.round(100*d.ok/d.n)+"%")+s("Quiz completati",d.done)+s("Lezioni completate",LES.filter((_,i)=>(d.les[i]||0)>=70).length+" su 10")+'</div><div class="panel" style="text-align:center; margin-top:16px; background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, transparent), transparent); border: 1px solid var(--bd);"><p style="margin:0 0 6px; font-weight:600;">Ti piace Arabic Trainer? ☕</p><p class="sub" style="font-size:0.88rem; margin-bottom:12px;">Se questa app ti sta aiutando a studiare l\'arabo, considera di sostenere il progetto con un piccolo caffè!</p><a href="https://buymeacoffee.com/arabictrainer" target="_blank" rel="noopener" class="btn p" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; border-radius:12px;">☕ Offrimi un caffè</a></div><div style="margin-top:18px"><b>Accesso Rapido</b><div class="chips" style="margin-top:8px"><button class="btn" onclick="go(\'alf\')">🔤 Alfabeto</button><button class="btn" onclick="go(\'cfg\')">🧠 Allenamento</button><button class="btn" onclick="go(\'vocab\')">📚 Vocaboli</button><button class="btn" onclick="hs()">✍️ Scrivi a mano</button><button class="btn" onclick="go(\'prog\')">📊 Progressi</button></div></div>'}
 
 
+/* ===== Viste Mancanti (Account e Profilo) ===== */
+function accountView() {
+  const inv = St.d.inventory || [];
+  return `
+    <h2>👤 Profilo & Account</h2>
+    <div class="panel" style="text-align:left; margin-bottom:16px;">
+      <p style="margin:0 0 6px;"><b>Stato Sincronizzazione:</b> ${window.currentUser ? '<span style="color:var(--ok);">Cloud Firebase Attivo ✅</span>' : '<span style="color:var(--mu);">Locale (nessun login)</span>'}</p>
+      <p style="margin:0;"><b>Monete Possedute:</b> 🪙 ${St.d.coins || 0}</p>
+    </div>
+
+    <h3>🎒 La tua Collezione (Oggetti & Titoli)</h3>
+    <div class="panel">
+      ${inv.length === 0 ? 
+        '<p class="sub" style="margin:0;">Nessun oggetto ancora sbloccato. Vai nello Shop per acquistare e aprire le casse!</p>' : 
+        '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
+          inv.map(i => `<span style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ${i}</span>`).join('') + 
+        '</div>'
+      }
+    </div>
+  `;
+}
+
 /* ===== Sistema Quest Giornaliere e Shop Casse ===== */
 const Quests = {
   getTodayQuests() {
@@ -899,7 +921,6 @@ function shopView() {
   const quests = Quests.getTodayQuests();
   if (!St.d.chests) St.d.chests = { common: 0, rare: 0, legendary: 0 };
   const chests = St.d.chests;
-
   const totalChests = (chests.common || 0) + (chests.rare || 0) + (chests.legendary || 0);
 
   return `
@@ -924,7 +945,6 @@ function shopView() {
 
     <h3>📦 Acquista Casse</h3>
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-      
       <div class="panel" style="text-align:center;">
         <div style="font-size:3rem;">📦</div>
         <b>Cassa Comune</b>
@@ -945,10 +965,9 @@ function shopView() {
         <p class="sub" style="font-size:0.85rem; margin:4px 0 10px;">Possedute: ${chests.legendary || 0}</p>
         <button class="btn p" onclick="Quests.buyChest('legendary', 500)">🪙 500 Monete</button>
       </div>
-
     </div>
 
-   <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
+    <h3 style="margin-top:24px;">🔓 Le tue Casse</h3>
     <div class="panel" style="text-align:center;">
       <div class="chips" style="justify-content:center; gap:10px;">
         ${(chests.common || 0) > 0 ? '<button class="btn p" onclick="startChestOpening(\'common\')">✨ Apri Cassa Comune (' + chests.common + ')</button>' : ''}
@@ -1020,8 +1039,7 @@ function startChestOpening(type) {
   trackItems[28] = won;
 
   chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems };
-  S.view = "chest_open";
-  render();
+  go("chest_open");
 
   setTimeout(() => {
     const track = $("roulette_track");
@@ -1086,8 +1104,6 @@ function chestOpenView() {
 }
 
 /* ===== Funzione di Render Principale ===== */
-/* ===== Funzione di Render Principale ===== */
-/* ===== Funzione di Render Principale ===== */
 function render(){
   if($("coin_count")) $("coin_count").textContent = St.d.coins || 0;
   const v = S.view || S.v || "home";
@@ -1104,7 +1120,6 @@ function render(){
   const app = $("app");
   if (!app) return;
 
-  // Gestione di tutte le rotte senza reindirizzare alla Home
   if (v === "home") app.innerHTML = typeof homeView === "function" ? homeView() : "";
   else if (v === "shop") app.innerHTML = typeof shopView === "function" ? shopView() : "";
   else if (v === "chest_open") app.innerHTML = typeof chestOpenView === "function" ? chestOpenView() : "";
@@ -1112,12 +1127,12 @@ function render(){
   else if (v === "vocab") app.innerHTML = typeof vocabView === "function" ? vocabView() : "";
   else if (v === "learn") app.innerHTML = typeof learnView === "function" ? learnView() : "";
   else if (v === "prog") app.innerHTML = typeof progView === "function" ? progView() : "";
-  else if (v === "account") app.innerHTML = typeof accountView === "function" ? accountView() : "";
+  else if (v === "account") app.innerHTML = accountView();
   else if (v === "set") app.innerHTML = typeof setView === "function" ? setView() : "";
   else if (v === "cfg") app.innerHTML = typeof cfgView === "function" ? cfgView() : "";
   else if (v === "quiz") app.innerHTML = typeof quizView === "function" ? quizView() : "";
   else if (v === "ex") app.innerHTML = typeof exView === "function" ? exView() : "";
-  else if (v === "hand" || v === "hand_smart") app.innerHTML = typeof handView === "function" ? handView() : (typeof exView === "function" ? exView() : "");
+  else if (v === "hand" || v === "hand_smart") app.innerHTML = typeof smartHandView === "function" ? smartHandView() : (typeof exView === "function" ? exView() : "");
   else app.innerHTML = typeof homeView === "function" ? homeView() : "";
 }
 
