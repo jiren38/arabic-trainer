@@ -1304,12 +1304,13 @@ function accountView() {
         `).join('')}
       </div>
 
-      <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
+    <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
       <div class="chips" style="justify-content:center;">
-        ${unlockedTitles.length === 0 ? '<button class="btn on">🌱 Novizio d\'Arabo</button>' : ''}
-        ${unlockedTitles.map(t => `
-          <button class="btn ${eq.title === t.val ? "on" : ""}" onclick="equipItem('title', '${t.val}')">${t.icon}${t.val}</button>
-        `).join('')}
+        <button class="btn ${eq.title === "Novizio d'Arabo" || !eq.title ? "on" : ""}" onclick="equipItem('title', 'Novizio d\'Arabo')">🌱 Novizio d'Arabo</button>
+        ${unlockedTitles.map(t => {
+          const safeVal = t.val.replace(/'/g, "\\'");
+          return `<button class="btn ${eq.title === t.val ? "on" : ""}" onclick="equipItem('title', '${safeVal}')">${t.icon} ${t.val}</button>`;
+        }).join('')}
       </div>
     </div>
 
