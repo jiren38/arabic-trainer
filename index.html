@@ -1536,7 +1536,55 @@ function shopView() {
   `;
 }
 
-let chestOpeningState = { spinning: false, wonItem: null };
+/* ===== Sistema Effetti Sonori della Cassa (Senza Voce) ===== */
+const ChestAudio = {
+  ctx: null,
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  },
+  // Suono del rullo che gira (Tick meccanico)
+  playTick() {
+    this.init();
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.04);
+  },
+  // Suono di ottenimento premio (Fanfara)
+  playWin() {
+    this.init();
+    if (!this.ctx) return;
+    const notes = [261.63, 329.63, 392.00, 523.25]; // Do, Mi, Sol, Do
+    notes.forEach((freq, index) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + index * 0.1);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime + index * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + index * 0.1 + 0.3);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(this.ctx.currentTime + index * 0.1);
+      osc.stop(this.ctx.currentTime + index * 0.1 + 0.3);
+    });
+  }
+};
+
+let chestOpeningState = { spinning: false, wonItem: null, trackItems: [], targetOffset: 0 };
 
 function startChestOpening(type) {
   if (!St.d.chests) St.d.chests = {};
@@ -1549,6 +1597,7 @@ function startChestOpening(type) {
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
 
+  // Genera la sequenza fissa per la roulette
   let trackItems = [];
   for (let i = 0; i < 35; i++) {
     trackItems.push(pick(LOOT_ITEMS));
@@ -1568,25 +1617,61 @@ function startChestOpening(type) {
     won = rand < 20 ? pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common"));
   }
   if (!won) won = LOOT_ITEMS[0];
-  trackItems[28] = won;
+  
+  const targetIndex = 26;
+  trackItems[targetIndex] = won;
 
-  chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems };
+  chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems, targetOffset: 0 };
   go("chest_open");
 
   setTimeout(() => {
     const track = $("roulette_track");
-    if (!track) return;
-    
+    const container = document.querySelector(".roulette-container");
+    if (!track || !container) return;
+
     const itemWidth = 90;
-    const containerWidth = Math.min(window.innerWidth - 60, 380);
-    const targetOffset = (28 * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
+    const containerWidth = container.offsetWidth;
+    const offset = (targetIndex * itemWidth) + (itemWidth / 2) - (containerWidth / 2);
+    chestOpeningState.targetOffset = offset;
 
-    track.style.transform = `translateX(-${targetOffset}px)`;
+    track.style.transition = "none";
+    track.style.transform = "translateX(0px)";
 
+    setTimeout(() => {
+      track.style.transition = "transform 4.5s cubic-bezier(0.15, 0.9, 0.15, 1)";
+      track.style.transform = `translateX(-${offset}px)`;
+
+      // Riproduce il suono del rullo che gira
+      let tickCount = 0;
+      const totalTicks = 22;
+      const playNextTick = () => {
+        if (tickCount < totalTicks && chestOpeningState.spinning) {
+          ChestAudio.playTick();
+          tickCount++;
+          const delay = 80 + Math.pow(tickCount, 2) * 6;
+          setTimeout(playNextTick, delay);
+        }
+      };
+      playNextTick();
+    }, 50);
+
+    // Al termine: blocca le icone senza farle scambiare e suona la fanfara
     setTimeout(() => {
       chestOpeningState.spinning = false;
       applyReward(won);
-      render();
+      ChestAudio.playWin();
+      
+      const winBox = $("chest_win_box");
+      const statusText = $("chest_status_text");
+      if (statusText) statusText.textContent = "🎉 Complimenti! Ecco il tuo premio:";
+      if (winBox) {
+        winBox.innerHTML = `
+          <div style="font-size:3.5rem; animation: pulse 0.5s;">${won.icon}</div>
+          <h3 style="font-size:1.4rem; margin:8px 0; color:var(--ac);">${won.name}</h3>
+          <p class="sub">Rarità: <b style="text-transform:capitalize;">${won.rarity}</b></p>
+          <button class="btn p" style="margin-top:12px; padding:12px 24px;" onclick="go('shop')">Torna allo Shop</button>
+        `;
+      }
     }, 4600);
   }, 100);
 }
@@ -1600,21 +1685,23 @@ function applyReward(item) {
   }
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
-  if (typeof say === "function") say("Mabrouk! Hai trovato " + item.name);
+  // Rimosso del tutto l'effetto vocale in arabo
 }
 
 function chestOpenView() {
   const s = chestOpeningState;
-  if (!s.trackItems) return shopView();
+  if (!s.trackItems || s.trackItems.length === 0) return shopView();
+
+  const transformStyle = s.spinning ? '' : `transform: translateX(-${s.targetOffset}px);`;
 
   return `
     <h2>✨ Apertura Cassa</h2>
     <div class="panel" style="text-align:center; padding:30px 16px;">
-      <p class="sub">${s.spinning ? "Apertura in corso... Buona fortuna!" : "🎉 Complimenti! Ecco il tuo premio:"}</p>
+      <p id="chest_status_text" class="sub">${s.spinning ? "Apertura in corso... Buona fortuna!" : "🎉 Complimenti! Ecco il tuo premio:"}</p>
 
       <div class="roulette-container">
         <div class="roulette-marker"></div>
-        <div id="roulette_track" class="roulette-track">
+        <div id="roulette_track" class="roulette-track" style="${transformStyle}">
           ${s.trackItems.map(it => `
             <div class="roulette-item ${it.class}">
               <span>${it.icon}</span>
@@ -1623,14 +1710,14 @@ function chestOpenView() {
         </div>
       </div>
 
-      ${!s.spinning ? `
-        <div style="margin-top:20px;">
+      <div id="chest_win_box" style="margin-top:20px;">
+        ${!s.spinning && s.wonItem ? `
           <div style="font-size:3.5rem;">${s.wonItem.icon}</div>
           <h3 style="font-size:1.4rem; margin:8px 0; color:var(--ac);">${s.wonItem.name}</h3>
           <p class="sub">Rarità: <b style="text-transform:capitalize;">${s.wonItem.rarity}</b></p>
           <button class="btn p" style="margin-top:12px; padding:12px 24px;" onclick="go('shop')">Torna allo Shop</button>
-        </div>
-      ` : `<p style="font-size:1.1rem; color:var(--mu); margin-top:20px;">I rulli stanno girando...</p>`}
+        ` : `<p style="font-size:1.1rem; color:var(--mu);">I rulli stanno girando...</p>`}
+      </div>
     </div>
   `;
 }
