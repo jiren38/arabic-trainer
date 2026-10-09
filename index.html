@@ -1078,36 +1078,105 @@ function homeView(){
   `;
 }
 
-  function renderDuoAvatar(eq, size = 160) {
-  const isMini = size < 100;
-  const hatClass = isMini ? 'style="top:4px; font-size:1.8rem;"' : '';
-  const glassClass = isMini ? 'style="top:24px; font-size:1.3rem;"' : '';
-  const beardClass = isMini ? 'style="top:32px; font-size:1.3rem;"' : '';
+ function renderDuoAvatar(eq = {}, size = 160) {
+  // 1. SFONDI VETTORIALI
+  let bgStyle = "var(--sel)";
+  if (eq.bg === "emerald") bgStyle = "linear-gradient(135deg, #11998e, #38ef7d)";
+  else if (eq.bg === "night") bgStyle = "linear-gradient(135deg, #0b132b, #1c2541)";
+  else if (eq.bg === "palace") bgStyle = "linear-gradient(135deg, #8a2387, #e94057, #f27121)";
+  else if (eq.bg === "fire") bgStyle = "linear-gradient(135deg, #ff416c, #ff4b2b)";
 
-  // Gestione Stile Abito Vettoriale (Sostituisce il corpo)
+  // 2. ABITI VETTORIALI (Busto)
   let bodyColor = "#34495e";
   let bodyDetail = `<path d="M 50 120 Q 80 100 110 120 L 110 160 L 50 160 Z" fill="#2c3e50" />`;
-  
   if (eq.outfit === "streetwear") {
     bodyColor = "#e74c3c";
-    bodyDetail = `<path d="M 70 115 L 90 115 L 80 140 Z" fill="#fff" />`;
+    bodyDetail = `<path d="M 70 115 L 90 115 L 80 140 Z" fill="#fff" /><path d="M 65 130 L 95 130" stroke="#fff" stroke-width="3" />`;
   } else if (eq.outfit === "armor") {
     bodyColor = "#f1c40f";
-    bodyDetail = `<path d="M 60 120 Q 80 100 100 120 Q 80 140 60 120 Z" fill="#e67e22" />`;
+    bodyDetail = `<path d="M 60 120 Q 80 100 100 120 Q 80 140 60 120 Z" fill="#e67e22" /><circle cx="80" cy="120" r="6" fill="#fff" />`;
   } else if (eq.outfit === "king") {
     bodyColor = "#8e44ad";
     bodyDetail = `<path d="M 50 110 L 110 110 L 110 160 L 50 160 Z" fill="#8e44ad" /><path d="M 75 110 L 85 110 L 85 160 L 75 160 Z" fill="#f1c40f" />`;
   }
 
-  // Occhi e Espressione (Nascosti automaticamente se ha gli occhiali)
-  const eyesAndMouth = eq.glasses ? '' : `
-    <circle cx="68" cy="65" r="4" fill="#2c3e50" />
-    <circle cx="92" cy="65" r="4" fill="#2c3e50" />
+  // 3. OCCHIALI VETTORIALI
+  let glassesSVG = '';
+  if (eq.glasses === "reading") {
+    glassesSVG = `
+      <circle cx="65" cy="65" r="10" stroke="#2c3e50" stroke-width="3" fill="none" />
+      <circle cx="95" cy="65" r="10" stroke="#2c3e50" stroke-width="3" fill="none" />
+      <line x1="75" y1="65" x2="85" y2="65" stroke="#2c3e50" stroke-width="3" />
+    `;
+  } else if (eq.glasses === "sunglasses") {
+    glassesSVG = `
+      <path d="M 52 58 L 78 58 L 74 72 L 56 72 Z" fill="#111" />
+      <path d="M 82 58 L 108 58 L 104 72 L 86 72 Z" fill="#111" />
+      <line x1="78" y1="62" x2="82" y2="62" stroke="#111" stroke-width="3" />
+    `;
+  } else if (eq.glasses === "monocle") {
+    glassesSVG = `
+      <circle cx="95" cy="65" r="11" stroke="#f1c40f" stroke-width="3" fill="rgba(241,196,15,0.2)" />
+      <path d="M 95 76 Q 90 95 80 110" stroke="#f1c40f" stroke-width="2" fill="none" />
+    `;
+  } else if (eq.glasses === "cyber") {
+    glassesSVG = `
+      <rect x="50" y="56" width="60" height="18" rx="4" fill="#00f2fe" opacity="0.8" />
+      <rect x="52" y="58" width="56" height="14" rx="2" stroke="#fff" stroke-width="2" fill="none" />
+    `;
+  }
+
+  // 4. OCCHI E ESPRESSIONE BASE (Nascosti solo se ci sono occhiali coprenti)
+  const hideEyes = eq.glasses === "sunglasses" || eq.glasses === "cyber";
+  const eyesAndMouth = hideEyes ? '' : `
+    <circle cx="66" cy="65" r="4" fill="#2c3e50" />
+    <circle cx="94" cy="65" r="4" fill="#2c3e50" />
     <path d="M 73 80 Q 80 88 87 80" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round" />
   `;
 
+  // 5. BARBA / BAFFI VETTORIALI
+  let facialSVG = '';
+  if (eq.facial === "mustache") {
+    facialSVG = `<path d="M 65 77 Q 80 72 80 78 Q 80 72 95 77 Q 80 85 65 77 Z" fill="#2c3e50" />`;
+  } else if (eq.facial === "fullbeard") {
+    facialSVG = `<path d="M 50 70 C 50 105, 110 105, 110 70 C 100 95, 60 95, 50 70 Z" fill="#2c3e50" />`;
+  }
+
+  // 6. CAPPELLI E COPRICAPO VETTORIALI
+  let headSVG = '';
+  if (eq.head === "cap") {
+    headSVG = `
+      <path d="M 45 48 C 45 25, 115 25, 115 48 Z" fill="#e74c3c" />
+      <path d="M 35 48 L 80 48 L 80 44 Z" fill="#c0392b" />
+    `;
+  } else if (eq.head === "turban") {
+    headSVG = `
+      <ellipse cx="80" cy="40" rx="42" ry="22" fill="#f39c12" />
+      <circle cx="80" cy="38" r="8" fill="#e67e22" />
+      <circle cx="80" cy="38" r="4" fill="#f1c40f" />
+    `;
+  } else if (eq.head === "crown") {
+    headSVG = `
+      <path d="M 48 48 L 48 28 L 64 38 L 80 22 L 96 38 L 112 28 L 112 48 Z" fill="#f1c40f" stroke="#d4ac0d" stroke-width="2" />
+      <circle cx="48" cy="26" r="3" fill="#e74c3c" />
+      <circle cx="80" cy="20" r="4" fill="#3498db" />
+      <circle cx="112" cy="26" r="3" fill="#2ecc71" />
+    `;
+  } else if (eq.head === "grad") {
+    headSVG = `
+      <polygon points="80,18 125,32 80,46 35,32" fill="#2c3e50" />
+      <rect x="62" y="38" width="36" height="14" fill="#1a252f" />
+      <path d="M 115 32 L 120 55" stroke="#f1c40f" stroke-width="2" />
+    `;
+  } else if (eq.head === "helmet") {
+    headSVG = `
+      <path d="M 46 52 C 46 22, 114 22, 114 52 Z" fill="#95a5a6" />
+      <rect x="42" y="48" width="76" height="6" rx="3" fill="#7f8c8d" />
+    `;
+  }
+
   return `
-    <div class="avatar-box" style="width:${size}px; height:${size}px; background:${eq.bg || "var(--sel)"};">
+    <div class="avatar-box" style="width:${size}px; height:${size}px; background:${bgStyle};">
       <svg class="avatar-svg" viewBox="0 0 160 160">
         <!-- Busto / Vestito -->
         <path d="M 35 160 C 35 110, 125 110, 125 160 Z" fill="${bodyColor}" />
@@ -1118,15 +1187,19 @@ function homeView(){
 
         <!-- Testa Base Vettoriale -->
         <ellipse cx="80" cy="68" rx="32" ry="34" fill="#f1c27d" />
-        
+
         <!-- Occhi e Bocca Base -->
         ${eyesAndMouth}
-      </svg>
 
-      <!-- Accessori Stratificati con Posizionamento Fisso -->
-      ${eq.facial ? `<div class="acc-slot acc-beard" ${beardClass}>${eq.facial}</div>` : ''}
-      ${eq.glasses ? `<div class="acc-slot acc-glasses" ${glassClass}>${eq.glasses}</div>` : ''}
-      ${eq.head ? `<div class="acc-slot acc-hat" ${hatClass}>${eq.head}</div>` : ''}
+        <!-- Barba / Baffi -->
+        ${facialSVG}
+
+        <!-- Occhiali -->
+        ${glassesSVG}
+
+        <!-- Copricapo / Cappello -->
+        ${headSVG}
+      </svg>
     </div>
   `;
 }
@@ -1140,7 +1213,7 @@ function accountView() {
   }
   const eq = St.d.equipped;
 
-  // Filtra oggetti sbloccati per ogni categoria
+  // Filtra oggetti sbloccati per ogni categoria dall'inventario
   const unlockedHeads = LOOT_ITEMS.filter(i => i.type === "head" && inv.includes(i.name));
   const unlockedGlasses = LOOT_ITEMS.filter(i => i.type === "glasses" && inv.includes(i.name));
   const unlockedFacial = LOOT_ITEMS.filter(i => i.type === "facial" && inv.includes(i.name));
@@ -1181,7 +1254,7 @@ function accountView() {
       <!-- OMINO SVG VETTORIALE DUOLINGO STYLE -->
       ${renderDuoAvatar(eq, 160)}
       
-      <div style="font-weight:bold; font-size:1.15rem; color:var(--ac);">${eq.title || "Novizio d'Arabo"}</div>
+      <div style="font-weight:bold; font-size:1.15rem; color:var(--ac); margin-top:8px;">${eq.title || "Novizio d'Arabo"}</div>
 
       <hr style="border:0; border-top:1px dashed var(--bd); margin:16px 0;">
 
@@ -1333,19 +1406,19 @@ const LOOT_ITEMS = [
   { name: "Titolo: Novizio d'Arabo", icon: "🌱", rarity: "common", class: "rarity-common", type: "title", val: "Novizio d'Arabo" },
   { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
   { name: "Avatar: Cammello Simpatico", icon: "🐪", rarity: "common", class: "rarity-common", type: "avatar", val: "🐪" },
-  { name: "Cappello: Berretto Sportivo", icon: "🧢", rarity: "common", class: "rarity-common", type: "head", val: "🧢" },
-  { name: "Occhiali: Occhiali da Lettura", icon: "👓", rarity: "common", class: "rarity-common", type: "glasses", val: "👓" },
+  { name: "Cappello: Berretto Sportivo", icon: "🧢", rarity: "common", class: "rarity-common", type: "head", val: "cap" },
+  { name: "Occhiali: Occhiali da Lettura", icon: "👓", rarity: "common", class: "rarity-common", type: "glasses", val: "reading" },
 
   // 🟢 NON COMUNE (Uncommon)
   { name: "+120 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 120 },
   { name: "Titolo: Lettore Curioso", icon: "📖", rarity: "uncommon", class: "rarity-uncommon", type: "title", val: "Lettore Curioso" },
   { name: "Stile: Inchiostro Blu Reale", icon: "🖋️", rarity: "uncommon", class: "rarity-uncommon", type: "brush", val: "#2f3fb0" },
   { name: "Avatar: Dattero Dorato", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "avatar", val: "🌴" },
-  { name: "Cappello: Elmo da Cavaliere", icon: "🪖", rarity: "uncommon", class: "rarity-uncommon", type: "head", val: "🪖" },
-  { name: "Occhiali: Occhiali da Sole", icon: "🕶️", rarity: "uncommon", class: "rarity-uncommon", type: "glasses", val: "🕶️" },
-  { name: "Barba: Baffi da Sceicco", icon: "🥸", rarity: "uncommon", class: "rarity-uncommon", type: "facial", val: "🥸" },
-{ name: "Abito: Felpa Streetwear", icon: "🥋", rarity: "uncommon", class: "rarity-uncommon", type: "outfit", val: "streetwear" },
-  { name: "Sfondo: Oasi Smeraldo", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "bg", val: "linear-gradient(135deg, #11998e, #38ef7d)" },
+  { name: "Cappello: Elmo da Cavaliere", icon: "🪖", rarity: "uncommon", class: "rarity-uncommon", type: "head", val: "helmet" },
+  { name: "Occhiali: Occhiali da Sole", icon: "🕶️", rarity: "uncommon", class: "rarity-uncommon", type: "glasses", val: "sunglasses" },
+  { name: "Barba: Baffi da Sceicco", icon: "🥸", rarity: "uncommon", class: "rarity-uncommon", type: "facial", val: "mustache" },
+  { name: "Abito: Felpa Streetwear", icon: "🥋", rarity: "uncommon", class: "rarity-uncommon", type: "outfit", val: "streetwear" },
+  { name: "Sfondo: Oasi Smeraldo", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "bg", val: "emerald" },
 
   // 🔵 RARO (Rare)
   { name: "+300 Monete", icon: "💎", rarity: "rare", class: "rarity-rare", type: "coins", val: 300 },
@@ -1353,29 +1426,29 @@ const LOOT_ITEMS = [
   { name: "Titolo: Esploratore delle Dune", icon: "🏜️", rarity: "rare", class: "rarity-rare", type: "title", val: "Esploratore delle Dune" },
   { name: "Stile: Tratto Rubino", icon: "🎨", rarity: "rare", class: "rarity-rare", type: "brush", val: "#e74c3c" },
   { name: "Avatar: Falcone del Deserto", icon: "🦅", rarity: "rare", class: "rarity-rare", type: "avatar", val: "🦅" },
-  { name: "Cappello: Turbante Arabo", icon: "👳", rarity: "rare", class: "rarity-rare", type: "head", val: "👳" },
-  { name: "Occhiali: Monocolo da Erudito", icon: "🧐", rarity: "rare", class: "rarity-rare", type: "glasses", val: "🧐" },
-  { name: "Barba: Barba Folta Reale", icon: "🧔", rarity: "rare", class: "rarity-rare", type: "facial", val: "🧔" },
-  { name: "Sfondo: Deserto Stellato", icon: "🌌", rarity: "rare", class: "rarity-rare", type: "bg", val: "linear-gradient(135deg, #0b132b, #1c2541)" },
+  { name: "Cappello: Turbante Arabo", icon: "👳", rarity: "rare", class: "rarity-rare", type: "head", val: "turban" },
+  { name: "Occhiali: Monocolo da Erudito", icon: "🧐", rarity: "rare", class: "rarity-rare", type: "glasses", val: "monocle" },
+  { name: "Barba: Barba Folta Reale", icon: "🧔", rarity: "rare", class: "rarity-rare", type: "facial", val: "fullbeard" },
+  { name: "Sfondo: Deserto Stellato", icon: "🌌", rarity: "rare", class: "rarity-rare", type: "bg", val: "night" },
 
   // 🟣 EPICO (Epic)
   { name: "+600 Monete", icon: "💎", rarity: "epic", class: "rarity-epic", type: "coins", val: 600 },
   { name: "Titolo: Erudito di Baghdad", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "title", val: "Erudito di Baghdad" },
   { name: "Stile: Inchiostro Smeraldo Neon", icon: "🖌️", rarity: "epic", class: "rarity-epic", type: "brush", val: "#2ecc71" },
   { name: "Tema UI: Oasi Notturna", icon: "🌌", rarity: "epic", class: "rarity-epic", type: "theme", val: "oasi" },
-  { name: "Cappello: Tocco da Laurea", icon: "🎓", rarity: "epic", class: "rarity-epic", type: "head", val: "🎓" },
-  { name: "Occhiali: Maschera da Visore", icon: "🥽", rarity: "epic", class: "rarity-epic", type: "glasses", val: "🥽" },
- { name: "Abito: Armatura Dorata", icon: "🛡️", rarity: "epic", class: "rarity-epic", type: "outfit", val: "armor" },
-  { name: "Sfondo: Palazzo Reale", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "bg", val: "linear-gradient(135deg, #8a2387, #e94057, #f27121)" },
+  { name: "Cappello: Tocco da Laurea", icon: "🎓", rarity: "epic", class: "rarity-epic", type: "head", val: "grad" },
+  { name: "Occhiali: Maschera da Visore", icon: "🥽", rarity: "epic", class: "rarity-epic", type: "glasses", val: "cyber" },
+  { name: "Abito: Armatura Dorata", icon: "🛡️", rarity: "epic", class: "rarity-epic", type: "outfit", val: "armor" },
+  { name: "Sfondo: Palazzo Reale", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "bg", val: "palace" },
 
   // 🟡 LEGGENDARIO (Legendary)
   { name: "+1500 Monete", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "coins", val: 1500 },
   { name: "Titolo: Maestro delle 28 Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle 28 Lettere" },
   { name: "Stile: Calamo d'Oro Puro", icon: "✨", rarity: "legendary", class: "rarity-legendary", type: "brush", val: "#f1c40f" },
   { name: "Avatar: Genio della Lampada", icon: "🧞", rarity: "legendary", class: "rarity-legendary", type: "avatar", val: "🧞" },
-  { name: "Cappello: Corona Reale", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "head", val: "👑" },
- { name: "Abito: Mantello da Re", icon: "🧥", rarity: "legendary", class: "rarity-legendary", type: "outfit", val: "king" },
-  { name: "Sfondo: Aura di Fuoco", icon: "🔥", rarity: "legendary", class: "rarity-legendary", type: "bg", val: "linear-gradient(135deg, #ff416c, #ff4b2b)" },
+  { name: "Cappello: Corona Reale", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "head", val: "crown" },
+  { name: "Abito: Mantello da Re", icon: "🧥", rarity: "legendary", class: "rarity-legendary", type: "outfit", val: "king" },
+  { name: "Sfondo: Aura di Fuoco", icon: "🔥", rarity: "legendary", class: "rarity-legendary", type: "bg", val: "fire" },
 
   // 🔴 MITICO (Mythic)
   { name: "+3000 Monete", icon: "🔥", rarity: "mythic", class: "rarity-mythic", type: "coins", val: 3000 },
