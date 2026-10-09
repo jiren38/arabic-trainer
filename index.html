@@ -309,6 +309,82 @@ main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 120px; }
 .rarity-epic { border-color: #9b59b6; background: rgba(155,89,182,0.25); }
 .rarity-legendary { border-color: #f1c40f; background: rgba(241,196,15,0.3); box-shadow: inset 0 0 15px rgba(241,196,15,0.5); }
 .rarity-mythic { border-color: #ff0844; background: rgba(255,8,68,0.35); box-shadow: inset 0 0 20px rgba(255,8,68,0.6); }
+  /* Styling Avatar Vettoriale / Manichino Modulare */
+.avatar-mannequin {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  border: 4px solid var(--ac);
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  background: var(--sel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Corpo / Busto dell'omino base */
+.avatar-body-base {
+  position: absolute;
+  bottom: 0;
+  width: 90px;
+  height: 45px;
+  background: #34495e;
+  border-radius: 45px 45px 0 0;
+  z-index: 2;
+}
+
+/* Testa dell'omino base */
+.avatar-head-base {
+  position: absolute;
+  top: 25px;
+  width: 60px;
+  height: 65px;
+  background: #f1c27d;
+  border-radius: 30px;
+  z-index: 3;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
+}
+
+/* Occhi base (se non ci sono occhiali o maschere) */
+.avatar-eyes-default {
+  position: absolute;
+  top: 48px;
+  width: 60px;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 14px;
+  z-index: 4;
+}
+.avatar-eyes-default::before, .avatar-eyes-default::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #2c3e50;
+  border-radius: 50%;
+}
+
+/* Bocca base */
+.avatar-mouth-default {
+  position: absolute;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 7px;
+  border-bottom: 2px solid #c0392b;
+  border-radius: 0 0 10px 10px;
+  z-index: 4;
+}
+
+/* Layer Accessori Posizionati */
+.layer-bg { position: absolute; inset: 0; z-index: 1; }
+.layer-outfit { position: absolute; bottom: 0; font-size: 3rem; z-index: 3; line-height: 1; }
+.layer-facial { position: absolute; top: 56px; font-size: 2rem; z-index: 5; line-height: 1; }
+.layer-glasses { position: absolute; top: 40px; font-size: 2.2rem; z-index: 6; line-height: 1; }
+.layer-head { position: absolute; top: 2px; font-size: 2.8rem; z-index: 7; line-height: 1; }
 </style>
 
 <meta name="theme-color" content="#2f3fb0">
@@ -922,16 +998,18 @@ function homeView(){
   if(!d.n) return '<div class="hero"><div><h2>Il tuo percorso inizia qui</h2><p>Completa il primo allenamento: qui compariranno progressi, serie e lettere da ripassare.</p><button class="btn hb" onclick="cont()">Inizia il primo allenamento →</button> <button class="btn hb2" onclick="go(\'learn\')">Vai al percorso</button></div><div class="wm ar" aria-hidden="true">ع</div></div>';
 
   return `
-    <div class="hero">
+   <div class="hero">
       <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
         
-        <!-- Avatar 3D nella Home -->
-        <div onclick="go('account')" style="cursor:pointer; position:relative; width:80px; height:80px; background:${eq.bg || "rgba(255,255,255,0.2)"}; border:3px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);" title="Personalizza Avatar">
-          <div style="font-size:2.6rem; position:absolute; bottom:6px; z-index:1;">${eq.base || "🙂"}</div>
-          <div style="font-size:1.6rem; position:absolute; bottom:8px; z-index:2;">${eq.facial || ""}</div>
-          <div style="font-size:1.6rem; position:absolute; bottom:-4px; z-index:3;">${eq.outfit || ""}</div>
-          <div style="font-size:1.5rem; position:absolute; top:24px; z-index:4;">${eq.glasses || ""}</div>
-          <div style="font-size:1.9rem; position:absolute; top:-2px; z-index:5;">${eq.head || ""}</div>
+        <!-- Avatar Manichino nella Home -->
+        <div onclick="go('account')" class="avatar-mannequin" style="width:75px; height:75px; margin:0; flex:none; cursor:pointer; background:${eq.bg || "rgba(255,255,255,0.2)"}; border-color:#fff;" title="Personalizza Avatar">
+          <div class="avatar-body-base" style="width:50px; height:25px;"></div>
+          <div class="avatar-head-base" style="top:12px; width:34px; height:36px; border-radius:18px;"></div>
+          ${!eq.glasses ? '<div class="avatar-eyes-default" style="top:24px; width:34px; padding:0 8px;"></div>' : ''}
+          ${eq.outfit ? `<div class="layer-outfit" style="font-size:1.8rem;">${eq.outfit}</div>` : ''}
+          ${eq.facial ? `<div class="layer-facial" style="top:28px; font-size:1.2rem;">${eq.facial}</div>` : ''}
+          ${eq.glasses ? `<div class="layer-glasses" style="top:20px; font-size:1.3rem;">${eq.glasses}</div>` : ''}
+          ${eq.head ? `<div class="layer-head" style="top:-2px; font-size:1.6rem;">${eq.head}</div>` : ''}
         </div>
 
         <div>
@@ -990,7 +1068,7 @@ function accountView() {
   const user = window.currentUser;
   
   if (!St.d.equipped) {
-    St.d.equipped = { base: "🙂", head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
+    St.d.equipped = { eyeStyle: "default", head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
   }
   const eq = St.d.equipped;
 
@@ -1003,108 +1081,98 @@ function accountView() {
   const unlockedTitles = LOOT_ITEMS.filter(i => i.type === "title" && inv.includes(i.name));
 
   return `
-    <h2>👤 Profilo & Creazione Avatar</h2>
+    <h2>👤 Profilo & Account</h2>
     
+    <!-- BOX STATO ACCOUNT & FIREBASE -->
     <div class="panel" style="text-align:left; margin-bottom:16px;">
       ${user ? `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <p style="margin:0 0 4px; font-weight:600;">👋 Ciao, ${user.email || "Utente Google"}</p>
-            <p style="margin:0; color:var(--ok); font-size:0.9rem;">✅ Sincronizzazione Cloud Attiva</p>
+            <p style="margin:0; color:var(--ok); font-size:0.9rem;">✅ Cloud Firebase Attivo e Sincronizzato</p>
           </div>
-          <button class="btn" onclick="window.fbLogout().then(() => render())" style="border-color:var(--ko); color:var(--ko);">🚪 Esci</button>
+          <button class="btn" onclick="window.fbLogout().then(() => render())" style="border-color:var(--ko); color:var(--ko);">🚪 Esci (Logout)</button>
         </div>
       ` : `
         <div style="text-align:center; padding:10px 0;">
-          <p style="margin:0 0 12px; font-weight:600;">Accedi per salvare i tuoi progressi e l'avatar nel Cloud.</p>
-          <button class="btn p" onclick="window.fbLoginGoogle().then(() => render())">🌐 Accedi con Google</button>
+          <p style="margin:0 0 12px; font-weight:600;">Accedi per salvare i tuoi progressi nel Cloud e sincronizzarli su più dispositivi.</p>
+          <div class="chips" style="justify-content:center; gap:10px;">
+            <button class="btn p" onclick="window.fbLoginGoogle().then(() => render())">🌐 Accedi con Google</button>
+          </div>
         </div>
       `}
+      
       <hr style="border:0; border-top:1px solid var(--bd); margin:16px 0 12px 0;">
       <p style="margin:0;"><b>Monete Possedute:</b> 🪙 ${St.d.coins || 0}</p>
     </div>
 
-    <!-- STUDIO CREATIVO AVATAR -->
-    <h3>🎨 Studio Avatar</h3>
+    <!-- STUDIO CREATIVO AVATAR (OMINO MANICHINO) -->
+    <h3>🎨 Personalizza Avatar</h3>
     <div class="panel" style="text-align:center; margin-bottom:20px;">
       
-      <!-- Manichino Avatar Stratificato 3D -->
-      <div style="position:relative; width:140px; height:140px; margin:0 auto 12px; background:${eq.bg || "var(--sel)"}; border:3px solid var(--ac); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.2);">
-        <!-- Livello 1: Base Volto -->
-        <div style="font-size:4.2rem; position:absolute; bottom:12px; z-index:1;">${eq.base || "🙂"}</div>
-        <!-- Livello 2: Barba / Baffi -->
-        <div style="font-size:2.5rem; position:absolute; bottom:18px; z-index:2;">${eq.facial || ""}</div>
-        <!-- Livello 3: Abito -->
-        <div style="font-size:2.6rem; position:absolute; bottom:-6px; z-index:3;">${eq.outfit || ""}</div>
-        <!-- Livello 4: Occhiali -->
-        <div style="font-size:2.3rem; position:absolute; top:42px; z-index:4;">${eq.glasses || ""}</div>
-        <!-- Livello 5: Cappello / Copricapo -->
-        <div style="font-size:3rem; position:absolute; top:-4px; z-index:5;">${eq.head || ""}</div>
+      <!-- OMINO MANICHINO MODULARE -->
+      <div class="avatar-mannequin" style="background: ${eq.bg || "var(--sel)"};">
+        <div class="avatar-body-base"></div>
+        <div class="avatar-head-base"></div>
+        
+        ${!eq.glasses ? '<div class="avatar-eyes-default"></div><div class="avatar-mouth-default"></div>' : ''}
+
+        ${eq.outfit ? `<div class="layer-outfit">${eq.outfit}</div>` : ''}
+        ${eq.facial ? `<div class="layer-facial">${eq.facial}</div>` : ''}
+        ${eq.glasses ? `<div class="layer-glasses">${eq.glasses}</div>` : ''}
+        ${eq.head ? `<div class="layer-head">${eq.head}</div>` : ''}
       </div>
       
-      <div style="font-weight:bold; font-size:1.15rem; color:var(--ac);">${eq.title || "Nessun Titolo"}</div>
+      <div style="font-weight:bold; font-size:1.15rem; color:var(--ac);">${eq.title || "Novizio d'Arabo"}</div>
 
       <hr style="border:0; border-top:1px dashed var(--bd); margin:16px 0;">
 
-      <!-- Selettore Espressione / Base -->
-      <h4 style="margin:8px 0;">😀 Espressione Base</h4>
-      <div class="chips" style="justify-content:center; margin-bottom:12px;">
-        ${["🙂", "😎", "😉", "🧞", "🦁"].map(emoji => `
-          <button class="btn ${eq.base === emoji ? "on" : ""}" onclick="equipItem('base', '${emoji}')">${emoji}</button>
-        `).join('')}
-      </div>
-
-      <!-- Selettore Cappelli -->
+      <!-- SELETTORI ACCESSORI -->
       <h4 style="margin:8px 0;">🎩 Copricapo</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.head ? "on" : ""}" onclick="equipItem('head', '')">Nessuno</button>
-        ${unlockedHeads.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova cappelli nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedHeads.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare nuovi cappelli!</p>' : ''}
         ${unlockedHeads.map(h => `
           <button class="btn ${eq.head === h.val ? "on" : ""}" onclick="equipItem('head', '${h.val}')">${h.icon}${h.name.replace('Cappello: ', '')}</button>
         `).join('')}
       </div>
 
-      <!-- Selettore Occhiali -->
-      <h4 style="margin:8px 0;">🕶️ Occhiali & Visore</h4>
+      <h4 style="margin:8px 0;">🕶️ Occhiali & Visori</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.glasses ? "on" : ""}" onclick="equipItem('glasses', '')">Nessuno</button>
-        ${unlockedGlasses.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova occhiali nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedGlasses.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare nuovi occhiali!</p>' : ''}
         ${unlockedGlasses.map(g => `
           <button class="btn ${eq.glasses === g.val ? "on" : ""}" onclick="equipItem('glasses', '${g.val}')">${g.icon}${g.name.replace('Occhiali: ', '')}</button>
         `).join('')}
       </div>
 
-      <!-- Selettore Baffi/Barba -->
       <h4 style="margin:8px 0;">🧔 Barba & Baffi</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.facial ? "on" : ""}" onclick="equipItem('facial', '')">Nessuno</button>
-        ${unlockedFacial.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova barbe o baffi nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedFacial.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare barbe o baffi!</p>' : ''}
         ${unlockedFacial.map(f => `
           <button class="btn ${eq.facial === f.val ? "on" : ""}" onclick="equipItem('facial', '${f.val}')">${f.icon}${f.name.replace('Barba: ', '')}</button>
         `).join('')}
       </div>
 
-      <!-- Selettore Abiti -->
       <h4 style="margin:8px 0;">🥋 Abiti & Vestiti</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.outfit ? "on" : ""}" onclick="equipItem('outfit', '')">Nessuno</button>
-        ${unlockedOutfits.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova vestiti nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedOutfits.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare vestiti!</p>' : ''}
         ${unlockedOutfits.map(o => `
           <button class="btn ${eq.outfit === o.val ? "on" : ""}" onclick="equipItem('outfit', '${o.val}')">${o.icon}${o.name.replace('Abito: ', '')}</button>
         `).join('')}
       </div>
 
-      <!-- Selettore Sfondo -->
       <h4 style="margin:8px 0;">🌌 Sfondo / Aura</h4>
       <div class="chips" style="justify-content:center; margin-bottom:12px;">
         <button class="btn ${!eq.bg ? "on" : ""}" onclick="equipItem('bg', '')">Standard</button>
-        ${unlockedBgs.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova sfondi nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedBgs.length === 0 ? '<p class="sub" style="font-size:0.85rem; width:100%;">Apri le casse nello Shop per trovare sfondi!</p>' : ''}
         ${unlockedBgs.map(b => `
           <button class="btn ${eq.bg === b.val ? "on" : ""}" onclick="equipItem('bg', '${b.val}')">${b.icon}${b.name.replace('Sfondo: ', '')}</button>
         `).join('')}
       </div>
 
-      <!-- Selettore Titolo -->
       <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
       <div class="chips" style="justify-content:center;">
         ${unlockedTitles.length === 0 ? '<button class="btn on">🌱 Novizio d\'Arabo</button>' : ''}
@@ -1114,10 +1182,11 @@ function accountView() {
       </div>
     </div>
 
-    <h3>🎒 La tua Collezione Completa</h3>
+    <!-- SEZIONE COLLEZIONE COMPLETA ORIGINALE -->
+    <h3>🎒 La tua Collezione (Oggetti & Titoli)</h3>
     <div class="panel">
       ${inv.length === 0 ? 
-        '<p class="sub" style="margin:0;">Nessun oggetto ancora sbloccato. Apri le casse nello Shop per trovare nuovi accessori!</p>' : 
+        '<p class="sub" style="margin:0;">Nessun oggetto ancora sbloccato. Vai nello Shop per acquistare e aprire le casse!</p>' : 
         '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
           inv.map(i => `<span style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ${i}</span>`).join('') + 
         '</div>'
