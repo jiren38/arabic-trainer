@@ -925,8 +925,8 @@ function homeView(){
     <div class="hero">
       <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
         
-        <!-- Avatar 3D Grande nella Home -->
-        <div onclick="go('account')" style="cursor:pointer; position:relative; width:80px; height:80px; background:${eq.bg || "rgba(255,255,255,0.2)"}; border:3px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-none:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+        <!-- Avatar 3D nella Home -->
+        <div onclick="go('account')" style="cursor:pointer; position:relative; width:80px; height:80px; background:${eq.bg || "rgba(255,255,255,0.2)"}; border:3px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none; box-shadow:0 4px 12px rgba(0,0,0,0.3);" title="Personalizza Avatar">
           <div style="font-size:2.6rem; position:absolute; bottom:6px; z-index:1;">${eq.base || "🙂"}</div>
           <div style="font-size:1.6rem; position:absolute; bottom:8px; z-index:2;">${eq.facial || ""}</div>
           <div style="font-size:1.6rem; position:absolute; bottom:-4px; z-index:3;">${eq.outfit || ""}</div>
@@ -947,50 +947,192 @@ function homeView(){
       </div>
       <div class="wm ar" aria-hidden="true">ع</div>
     </div>
-    
-    <!-- Resto della homeView... -->
+
+    <!-- Obiettivo di oggi -->
+    <div class="panel" style="text-align:left; margin-top:12px;">
+      <b>Obiettivo di oggi</b>
+      ${bar(gp, "Obiettivo di oggi")}
+      <div class="sub">${y.q} / ${g} domande · ${Math.round(y.ms/6e4)} min ${y.q>=g ? "· 🎉 Obiettivo completato!" : ""}</div>
+    </div>
+
+    <!-- Statistiche Home -->
+    <div class="stats" style="margin-top:12px;">
+      ${s("Lettere padroneggiate", L.filter((_,i)=>Ms.st(i)[1]==="Padroneggiata").length + " su 28")}
+      ${s("Lettere da ripassare", Ms.weak().length)}
+      ${s("Precisione media", Math.round(100*d.ok/d.n) + "%")}
+      ${s("Quiz completati", d.done)}
+      ${s("Lezioni completate", LES.filter((_,i)=>(d.les[i]||0)>=70).length + " su 10")}
+    </div>
+
+    <!-- Banner Supporto BuyMeACoffee -->
+    <div class="panel" style="text-align:center; margin-top:16px; background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, transparent), transparent); border: 1px solid var(--bd);">
+      <p style="margin:0 0 6px; font-weight:600;">Ti piace Arabic Trainer? ☕</p>
+      <p class="sub" style="font-size:0.88rem; margin-bottom:12px;">Se questa app ti sta aiutando a studiare l'arabo, considera di sostenere il progetto con un piccolo caffè!</p>
+      <a href="https://buymeacoffee.com/arabictrainer" target="_blank" rel="noopener" class="btn p" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; border-radius:12px;">☕ Offrimi un caffè</a>
+    </div>
+
+    <!-- Accesso Rapido -->
+    <div style="margin-top:18px;">
+      <b>Accesso Rapido</b>
+      <div class="chips" style="margin-top:8px;">
+        <button class="btn" onclick="go('alf')">🔤 Alfabeto</button>
+        <button class="btn" onclick="go('cfg')">🧠 Allenamento</button>
+        <button class="btn" onclick="go('vocab')">📚 Vocaboli</button>
+        <button class="btn" onclick="hs()">✍️ Scrivi a mano</button>
+        <button class="btn" onclick="go('prog')">📊 Progressi</button>
+      </div>
+    </div>
   `;
 }
 /* ===== Viste Mancanti (Account e Profilo) ===== */
 function accountView() {
   const inv = St.d.inventory || [];
   const user = window.currentUser;
+  
+  if (!St.d.equipped) {
+    St.d.equipped = { base: "🙂", head: "", glasses: "", facial: "", outfit: "", bg: "", title: "Novizio d'Arabo" };
+  }
+  const eq = St.d.equipped;
+
+  // Filtra oggetti sbloccati per ogni categoria
+  const unlockedHeads = LOOT_ITEMS.filter(i => i.type === "head" && inv.includes(i.name));
+  const unlockedGlasses = LOOT_ITEMS.filter(i => i.type === "glasses" && inv.includes(i.name));
+  const unlockedFacial = LOOT_ITEMS.filter(i => i.type === "facial" && inv.includes(i.name));
+  const unlockedOutfits = LOOT_ITEMS.filter(i => i.type === "outfit" && inv.includes(i.name));
+  const unlockedBgs = LOOT_ITEMS.filter(i => i.type === "bg" && inv.includes(i.name));
+  const unlockedTitles = LOOT_ITEMS.filter(i => i.type === "title" && inv.includes(i.name));
 
   return `
-    <h2>👤 Profilo & Account</h2>
+    <h2>👤 Profilo & Creazione Avatar</h2>
     
     <div class="panel" style="text-align:left; margin-bottom:16px;">
       ${user ? `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <p style="margin:0 0 4px; font-weight:600;">👋 Ciao, ${user.email || "Utente Google"}</p>
-            <p style="margin:0; color:var(--ok); font-size:0.9rem;">✅ Cloud Firebase Attivo e Sincronizzato</p>
+            <p style="margin:0; color:var(--ok); font-size:0.9rem;">✅ Sincronizzazione Cloud Attiva</p>
           </div>
-          <button class="btn" onclick="window.fbLogout().then(() => render())" style="border-color:var(--ko); color:var(--ko);">🚪 Esci (Logout)</button>
+          <button class="btn" onclick="window.fbLogout().then(() => render())" style="border-color:var(--ko); color:var(--ko);">🚪 Esci</button>
         </div>
       ` : `
         <div style="text-align:center; padding:10px 0;">
-          <p style="margin:0 0 12px; font-weight:600;">Accedi per salvare i tuoi progressi nel Cloud e sincronizzarli su più dispositivi.</p>
-          <div class="chips" style="justify-content:center; gap:10px;">
-            <button class="btn p" onclick="window.fbLoginGoogle().then(() => render())">🌐 Accedi con Google</button>
-          </div>
+          <p style="margin:0 0 12px; font-weight:600;">Accedi per salvare i tuoi progressi e l'avatar nel Cloud.</p>
+          <button class="btn p" onclick="window.fbLoginGoogle().then(() => render())">🌐 Accedi con Google</button>
         </div>
       `}
-      
       <hr style="border:0; border-top:1px solid var(--bd); margin:16px 0 12px 0;">
       <p style="margin:0;"><b>Monete Possedute:</b> 🪙 ${St.d.coins || 0}</p>
     </div>
 
-    <h3>🎒 La tua Collezione (Oggetti & Titoli)</h3>
+    <!-- STUDIO CREATIVO AVATAR -->
+    <h3>🎨 Studio Avatar</h3>
+    <div class="panel" style="text-align:center; margin-bottom:20px;">
+      
+      <!-- Manichino Avatar Stratificato 3D -->
+      <div style="position:relative; width:140px; height:140px; margin:0 auto 12px; background:${eq.bg || "var(--sel)"}; border:3px solid var(--ac); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.2);">
+        <!-- Livello 1: Base Volto -->
+        <div style="font-size:4.2rem; position:absolute; bottom:12px; z-index:1;">${eq.base || "🙂"}</div>
+        <!-- Livello 2: Barba / Baffi -->
+        <div style="font-size:2.5rem; position:absolute; bottom:18px; z-index:2;">${eq.facial || ""}</div>
+        <!-- Livello 3: Abito -->
+        <div style="font-size:2.6rem; position:absolute; bottom:-6px; z-index:3;">${eq.outfit || ""}</div>
+        <!-- Livello 4: Occhiali -->
+        <div style="font-size:2.3rem; position:absolute; top:42px; z-index:4;">${eq.glasses || ""}</div>
+        <!-- Livello 5: Cappello / Copricapo -->
+        <div style="font-size:3rem; position:absolute; top:-4px; z-index:5;">${eq.head || ""}</div>
+      </div>
+      
+      <div style="font-weight:bold; font-size:1.15rem; color:var(--ac);">${eq.title || "Nessun Titolo"}</div>
+
+      <hr style="border:0; border-top:1px dashed var(--bd); margin:16px 0;">
+
+      <!-- Selettore Espressione / Base -->
+      <h4 style="margin:8px 0;">😀 Espressione Base</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        ${["🙂", "😎", "😉", "🧞", "🦁"].map(emoji => `
+          <button class="btn ${eq.base === emoji ? "on" : ""}" onclick="equipItem('base', '${emoji}')">${emoji}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Cappelli -->
+      <h4 style="margin:8px 0;">🎩 Copricapo</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.head ? "on" : ""}" onclick="equipItem('head', '')">Nessuno</button>
+        ${unlockedHeads.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova cappelli nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedHeads.map(h => `
+          <button class="btn ${eq.head === h.val ? "on" : ""}" onclick="equipItem('head', '${h.val}')">${h.icon}${h.name.replace('Cappello: ', '')}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Occhiali -->
+      <h4 style="margin:8px 0;">🕶️ Occhiali & Visore</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.glasses ? "on" : ""}" onclick="equipItem('glasses', '')">Nessuno</button>
+        ${unlockedGlasses.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova occhiali nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedGlasses.map(g => `
+          <button class="btn ${eq.glasses === g.val ? "on" : ""}" onclick="equipItem('glasses', '${g.val}')">${g.icon}${g.name.replace('Occhiali: ', '')}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Baffi/Barba -->
+      <h4 style="margin:8px 0;">🧔 Barba & Baffi</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.facial ? "on" : ""}" onclick="equipItem('facial', '')">Nessuno</button>
+        ${unlockedFacial.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova barbe o baffi nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedFacial.map(f => `
+          <button class="btn ${eq.facial === f.val ? "on" : ""}" onclick="equipItem('facial', '${f.val}')">${f.icon}${f.name.replace('Barba: ', '')}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Abiti -->
+      <h4 style="margin:8px 0;">🥋 Abiti & Vestiti</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.outfit ? "on" : ""}" onclick="equipItem('outfit', '')">Nessuno</button>
+        ${unlockedOutfits.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova vestiti nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedOutfits.map(o => `
+          <button class="btn ${eq.outfit === o.val ? "on" : ""}" onclick="equipItem('outfit', '${o.val}')">${o.icon}${o.name.replace('Abito: ', '')}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Sfondo -->
+      <h4 style="margin:8px 0;">🌌 Sfondo / Aura</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.bg ? "on" : ""}" onclick="equipItem('bg', '')">Standard</button>
+        ${unlockedBgs.length === 0 ? '<p class="sub" style="font-size:0.85rem;">Trova sfondi nelle casse dello Shop per sbloccarli!</p>' : ''}
+        ${unlockedBgs.map(b => `
+          <button class="btn ${eq.bg === b.val ? "on" : ""}" onclick="equipItem('bg', '${b.val}')">${b.icon}${b.name.replace('Sfondo: ', '')}</button>
+        `).join('')}
+      </div>
+
+      <!-- Selettore Titolo -->
+      <h4 style="margin:8px 0;">📜 Titolo Equipaggiato</h4>
+      <div class="chips" style="justify-content:center;">
+        ${unlockedTitles.length === 0 ? '<button class="btn on">🌱 Novizio d\'Arabo</button>' : ''}
+        ${unlockedTitles.map(t => `
+          <button class="btn ${eq.title === t.val ? "on" : ""}" onclick="equipItem('title', '${t.val}')">${t.icon}${t.val}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <h3>🎒 La tua Collezione Completa</h3>
     <div class="panel">
       ${inv.length === 0 ? 
-        '<p class="sub" style="margin:0;">Nessun oggetto ancora sbloccato. Vai nello Shop per acquistare e aprire le casse!</p>' : 
+        '<p class="sub" style="margin:0;">Nessun oggetto ancora sbloccato. Apri le casse nello Shop per trovare nuovi accessori!</p>' : 
         '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
           inv.map(i => `<span style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ${i}</span>`).join('') + 
         '</div>'
       }
     </div>
   `;
+}
+
+function equipItem(type, val) {
+  if (!St.d.equipped) St.d.equipped = {};
+  St.d.equipped[type] = val;
+  St.save();
+  if (window.saveCloudProgress) window.saveCloudProgress();
+  toast("✨ Avatar aggiornato!");
+  render();
 }
 
 /* ===== Sistema Quest Giornaliere e Shop Casse ===== */
