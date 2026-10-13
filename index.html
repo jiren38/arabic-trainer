@@ -493,6 +493,21 @@ input[type=text]:focus,.fc-editor input:focus,.fc-editor textarea:focus{outline:
 #hdr_avatar.avatar-mini{position:relative!important;display:block!important;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;padding:1px!important;line-height:0!important;overflow:hidden!important;border-radius:50%!important;}
 #hdr_avatar.avatar-mini>.avatar-box{position:absolute!important;inset:1px!important;width:auto!important;height:auto!important;min-width:0!important;min-height:0!important;margin:0!important;border:0!important;border-radius:50%!important;overflow:hidden!important;}
 #hdr_avatar.avatar-mini .avatar-svg{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;max-width:none!important;max-height:none!important;transform:scale(1.2)!important;transform-origin:50% 50%!important;}
+
+/* Gacha: vetrina dei premi, probabilita chiare e apertura cinematografica */
+.gacha-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;gap:20px;min-height:220px;margin:14px 0 28px;padding:clamp(22px,4vw,34px);overflow:hidden;border-radius:26px;color:#fff;background:radial-gradient(circle at 82% 48%,rgba(255,221,130,.28),transparent 24%),linear-gradient(125deg,#172e3b 0%,#235a51 50%,#92713b 100%);box-shadow:0 16px 38px rgba(28,68,50,.22)}
+.gacha-hero:before,.gacha-hero:after{content:"";position:absolute;z-index:-1;border:1px solid rgba(255,255,255,.15);border-radius:50%;width:220px;height:220px;right:22px;top:0;transform:scale(1.45)}.gacha-hero:after{width:150px;height:150px;right:56px;top:35px;transform:scale(1.4)}
+.gacha-hero-copy{max-width:620px}.gacha-hero h2{margin:5px 0 8px;font-size:clamp(1.6rem,3vw,2.15rem);line-height:1.12;letter-spacing:-.04em}.gacha-hero p{max-width:560px;margin:0 0 16px;color:rgba(255,255,255,.84)}.gacha-hero .eyebrow{color:#f5d88d}.gacha-progress{height:8px;max-width:430px;margin:12px 0 7px;border-radius:9px;background:rgba(255,255,255,.2);overflow:hidden}.gacha-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a5e6ad,#f5d788);transition:width .5s}.gacha-hero small{color:rgba(255,255,255,.86)}.gacha-hero-art{position:relative;display:grid;place-items:center;min-height:150px}.gacha-hero-art .chest-3d{transform:scale(1.32);filter:drop-shadow(0 15px 12px rgba(0,0,0,.3));animation:gacha-float 2.6s ease-in-out infinite}.gacha-hero-art>span{position:absolute;color:#ffe9a7;font-size:1.6rem;animation:twinkle 1.8s ease-in-out infinite alternate}.gacha-hero-art>span:first-child{left:12%;top:13%}.gacha-hero-art>span:last-child{right:9%;bottom:12%;animation-delay:.6s}.gacha-jump{grid-column:1;justify-self:start;background:#fff;color:#174735;border:0;box-shadow:0 3px 0 #c5d9c9}.gacha-jump:hover{background:#f3fff5}.gacha-jump b{margin-left:7px}
+@keyframes gacha-float{50%{transform:scale(1.32) translateY(-6px)}}@keyframes twinkle{to{opacity:.4;transform:scale(.8) rotate(24deg)}}
+.gacha-section-head,.ready-chests-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0 12px}.gacha-section-head h3,.ready-chests-heading h3{margin:2px 0}.gacha-section-head .sub{margin:0}.gacha-wallet,.ready-total{padding:8px 12px;border:1px solid var(--bd);border-radius:99px;background:var(--card);font-weight:800;white-space:nowrap}
+.gacha-chest-grid{align-items:stretch}.gacha-card{display:flex;flex-direction:column;align-items:center;min-height:295px;padding:14px!important;overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}.gacha-card:hover{transform:translateY(-5px);box-shadow:0 7px 0 color-mix(in srgb,var(--ac) 16%,var(--bd)),var(--sh)}.chest-card-top{display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;font-size:.68rem;color:var(--mu);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.chest-tier{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chest-owned{padding:3px 7px;border-radius:99px;background:var(--sel);color:var(--ac);white-space:nowrap}.gacha-card .chest-3d{margin:22px auto 17px;transform:scale(1.1);transition:transform .22s;filter:drop-shadow(0 7px 6px rgba(0,0,0,.13))}.gacha-card:hover .chest-3d{transform:scale(1.16) translateY(-3px)}.chest-name{min-height:1.5em;font-size:1.02rem}.chest-drop-rates{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:10px 0 13px}.drop-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border-radius:99px;border:1px solid var(--bd);font-size:.66rem;font-weight:800;white-space:nowrap;background:var(--card)}.drop-chip i{width:7px;height:7px;border-radius:50%;background:currentColor}.drop-chip.rarity-common{color:#6a7a81}.drop-chip.rarity-uncommon{color:#21834a}.drop-chip.rarity-rare{color:#267db2}.drop-chip.rarity-epic{color:#8d4aaa}.drop-chip.rarity-legendary{color:#a87a00}.drop-chip.rarity-mythic{color:#cd345b}.chest-buy{margin-top:auto;min-height:43px}.chest-buy:disabled{filter:grayscale(.35);opacity:.65;box-shadow:none}
+.ready-chests{margin:24px 0;padding:18px;border:1px solid var(--bd);border-radius:22px;background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--sel) 50%,var(--card)));box-shadow:var(--sh)}.ready-chests-heading{margin:0 0 12px}.ready-chests-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.open-chest-btn{display:flex;align-items:center;gap:11px;min-height:64px;text-align:left}.open-chest-btn .open-chest-icon{font-size:1.7rem}.open-chest-btn span:nth-child(2){flex:1}.open-chest-btn small{display:block;font-weight:500;opacity:.8}.open-chest-btn>b{font-size:1.25rem}.ready-empty{margin:6px 0 0;color:var(--mu);text-align:center}
+.gacha-album{margin:22px 0;padding:0;border:1px solid var(--bd);border-radius:20px;overflow:hidden;background:var(--card);box-shadow:var(--sh)}.gacha-album>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 19px;cursor:pointer;list-style:none;color:var(--tx);font-weight:800}.gacha-album>summary::-webkit-details-marker{display:none}.gacha-album>summary:after{content:"⌄";font-size:1.2rem;color:var(--ac)}.gacha-album[open]>summary:after{content:"⌃"}.gacha-album>summary b{margin-left:auto;color:var(--ac);font-size:.84rem}.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px;padding:0 16px 17px}.album-item{display:grid;grid-template-columns:36px 1fr;align-items:center;gap:1px 9px;min-height:62px;padding:8px;border:1px solid var(--bd);border-left:3px solid currentColor;border-radius:13px;background:var(--bg)}.album-item-icon{grid-row:span 2;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,currentColor 13%,var(--card));font-size:1.3rem;font-weight:900}.album-item-name{overflow:hidden;text-overflow:ellipsis;font-size:.73rem;font-weight:750;line-height:1.2}.album-item small{font-size:.64rem;color:var(--mu)}.album-item.is-locked{opacity:.6}.album-item.rarity-common{color:#71818a}.album-item.rarity-uncommon{color:#318755}.album-item.rarity-rare{color:#398abb}.album-item.rarity-epic{color:#9b5eb0}.album-item.rarity-legendary{color:#b08a2c}.album-item.rarity-mythic{color:#d34769}
+.opening-page{max-width:1000px;margin:0 auto}.opening-heading{display:flex;align-items:center;gap:16px;margin:5px 0 15px}.opening-heading>div{flex:1}.opening-heading h2{margin:1px 0;font-size:1.45rem}.opening-heading .eyebrow{color:var(--mu)}.opening-glow{font-size:2rem;color:#d5a83f;animation:twinkle .8s alternate infinite}.opening-panel{overflow:hidden;padding:clamp(16px,4vw,34px)!important;text-align:center!important;background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--ac) 9%,transparent),transparent 55%),var(--card)}.opening-status{margin:2px 0;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:850;letter-spacing:-.025em}.opening-caption{margin:3px 0 13px}.roulette-container{height:128px;max-width:800px;margin:22px auto 12px;border:1px solid color-mix(in srgb,#e2ba5d 60%,var(--bd));border-radius:19px;background:radial-gradient(ellipse at center,#33434b,#18232a 70%);box-shadow:inset 0 0 26px rgba(0,0,0,.28),0 10px 26px rgba(20,39,29,.15)}.roulette-container:before,.roulette-container:after{content:"";position:absolute;z-index:3;top:0;bottom:0;width:50px;pointer-events:none}.roulette-container:before{left:0;background:linear-gradient(90deg,#18232a,transparent)}.roulette-container:after{right:0;background:linear-gradient(270deg,#18232a,transparent)}.roulette-marker{z-index:5;width:3px;background:linear-gradient(#ffecaa,#dfab35);box-shadow:0 0 12px rgba(255,209,92,.85)}.roulette-marker span{position:absolute;top:-1px;left:50%;transform:translateX(-50%);color:#ffdb78;text-shadow:0 2px 8px #000;font-size:1.1rem}.roulette-track{top:14px;height:100px}.roulette-item{width:80px;height:94px;margin:0 5px;border-radius:15px;background:linear-gradient(155deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 1px rgba(255,255,255,.16),0 4px 10px rgba(0,0,0,.2);color:#fff}.roulette-item span{font-size:2rem;line-height:1.1}.roulette-item small{margin-top:5px;color:rgba(255,255,255,.8);font-size:.58rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.roulette-item.rarity-common{border-color:#a9bac0}.roulette-item.rarity-uncommon{border-color:#58c17b}.roulette-item.rarity-rare{border-color:#57aee2}.roulette-item.rarity-epic{border-color:#bd79d2}.roulette-item.rarity-legendary{border-color:#edc457;box-shadow:inset 0 0 12px rgba(239,194,77,.18)}.roulette-item.rarity-mythic{border-color:#f07191;box-shadow:inset 0 0 14px rgba(236,70,112,.26)}.spin-progress{height:4px;max-width:520px;margin:0 auto 18px;border-radius:4px;background:var(--bd);overflow:hidden}.spin-progress i{display:block;width:0;height:100%;background:linear-gradient(90deg,#56b977,#f0c15a)}.opening-panel:has(.spin-hint) .spin-progress i{animation:spin-progress 4.5s ease-out forwards}@keyframes spin-progress{to{width:100%}}.spin-hint{padding:12px;color:var(--mu);font-weight:700}.reward-reveal{position:relative;max-width:540px;margin:8px auto 0;padding:22px 18px 20px;overflow:hidden;border:1px solid var(--bd);border-radius:22px;background:radial-gradient(ellipse at 50% 10%,color-mix(in srgb,currentColor 11%,var(--card)),var(--card) 64%);animation:reward-pop .5s cubic-bezier(.18,.8,.3,1.2) both}.reward-reveal.rarity-rare{color:#398abb}.reward-reveal.rarity-epic{color:#9b5eb0}.reward-reveal.rarity-legendary{color:#b08a2c}.reward-reveal.rarity-mythic{color:#d34769}.reward-confetti{position:absolute;top:12px;left:0;right:0;opacity:.56;font-size:1.2rem;letter-spacing:.8rem;animation:twinkle .9s alternate infinite}.reward-showcase{display:grid;place-items:center;min-height:145px;margin:8px auto}.reward-showcase .avatar-box{width:132px!important;height:132px!important;border-width:3px;box-shadow:0 8px 22px rgba(18,36,25,.2)}.reward-large-icon{display:grid;place-items:center;width:118px;height:118px;border:1px solid color-mix(in srgb,currentColor 30%,var(--bd));border-radius:50%;background:var(--sel);box-shadow:0 9px 25px rgba(16,37,22,.12);font-size:4rem;animation:reward-float 1.8s ease-in-out infinite}.reward-rarity{display:inline-flex;padding:5px 11px;border:1px solid currentColor;border-radius:99px;background:var(--card);font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.reward-reveal h3{margin:9px 0 2px;font-size:1.35rem;color:var(--tx)}.reward-reveal p{margin:4px 0 15px;color:var(--mu)}.reward-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px}.reward-actions .btn{min-width:150px}.reward-actions .btn.p{color:#fff}.reward-reveal .sub{color:var(--mu)}@keyframes reward-pop{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes reward-float{50%{transform:translateY(-5px)}}
+@media(max-width:680px){.gacha-hero{grid-template-columns:minmax(0,1fr) 92px;gap:8px;padding:19px;border-radius:21px;min-height:198px}.gacha-hero-art{min-height:108px;transform:scale(.82)}.gacha-hero h2{font-size:1.48rem}.gacha-hero p{font-size:.9rem}.gacha-jump{font-size:.88rem}.gacha-card{min-height:276px}.chest-3d{transform:scale(.96)}.gacha-card:hover .chest-3d{transform:scale(1.02)}.roulette-container{height:118px}.roulette-track{top:11px}.roulette-item{height:92px}.opening-heading{gap:9px}.opening-heading .btn{padding:8px 10px}.album-grid{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}}
+@media(prefers-reduced-motion:reduce){.gacha-hero-art .chest-3d,.gacha-hero-art>span,.reward-large-icon,.reward-confetti,.opening-glow{animation:none!important}.reward-reveal{animation:none!important}.spin-progress i{animation:none!important}}
+.opening-panel.is-spinning .spin-progress i{animation:spin-progress 8.2s cubic-bezier(.08,.82,.12,1) forwards}.roulette-container.is-spinning{animation:roulette-aura 1.15s ease-in-out infinite alternate;border-color:#f1c65d;box-shadow:inset 0 0 30px rgba(0,0,0,.36),0 0 24px rgba(229,181,69,.2),0 10px 26px rgba(20,39,29,.15)}.roulette-container.is-spinning .roulette-marker{animation:marker-glow .65s ease-in-out infinite alternate}.roulette-visual{display:grid;place-items:center;width:100%;height:58px;overflow:hidden}.roulette-visual .loot-object-avatar,.loot-object-avatar{display:grid;place-items:center}.roulette-visual .avatar-box,.loot-object-avatar .avatar-box{margin:0!important;border-width:2px!important;box-shadow:none!important}.roulette-visual .avatar-box{width:50px!important;height:50px!important}.loot-object-coin,.loot-object-tool,.loot-object-theme{display:grid;place-items:center;gap:0;width:100%;height:100%;color:#fff}.loot-object-coin svg,.loot-object-tool svg{width:44px;height:44px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}.loot-object-coin b,.loot-object-tool b,.loot-object-theme b{font-size:.58rem;line-height:1;font-weight:850}.loot-object-title{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:5px;width:100%;height:100%;padding:4px;color:#f7edcf}.loot-object-title svg{width:32px;height:36px}.loot-object-title b{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3;font-size:.58rem;line-height:1.08;text-align:left}.reward-showcase .loot-object-title{max-width:260px;min-height:90px;grid-template-columns:64px 1fr;gap:14px;padding:12px;border:1px solid #dcc798;border-radius:16px;background:linear-gradient(145deg,#fff8e6,#ead7aa);color:#44351f}.reward-showcase .loot-object-title svg{width:60px;height:66px}.reward-showcase .loot-object-title b{font-size:1rem;line-height:1.2}.reward-showcase .loot-object-coin svg,.reward-showcase .loot-object-tool svg{width:100px;height:100px}.reward-showcase .loot-object-coin b,.reward-showcase .loot-object-tool b{font-size:.9rem;color:var(--tx)}.loot-object-theme{position:relative;grid-template-columns:repeat(3,13px);grid-template-rows:1fr auto;align-content:center;gap:5px;width:90%;height:48px;padding:6px;border:1px solid rgba(255,255,255,.45);border-radius:12px;background:linear-gradient(135deg,#152d3c,#39776e);box-shadow:0 4px 10px rgba(0,0,0,.2)}.loot-object-theme i{width:13px;height:24px;border:1px solid rgba(255,255,255,.6);border-radius:5px;background:#8bd5bc}.loot-object-theme i:nth-child(2){background:#e4c77a}.loot-object-theme i:nth-child(3){background:#b878b4}.loot-object-theme b{grid-column:1/-1;text-align:center}.album-item-icon .loot-object-avatar .avatar-box{width:34px!important;height:34px!important}.album-item-icon .loot-object-coin svg,.album-item-icon .loot-object-tool svg{width:28px;height:28px}.album-item-icon .loot-object-title{grid-template-columns:1fr;padding:0}.album-item-icon .loot-object-title svg{display:none}.album-item-icon .loot-object-title b{font-size:.48rem;text-align:center}.album-item-icon .loot-object-theme{height:28px;grid-template-columns:repeat(3,7px);gap:2px;padding:3px}.album-item-icon .loot-object-theme i{width:7px;height:12px}.album-item-icon .loot-object-theme b{font-size:.42rem}.album-locked{font-size:1rem;font-weight:900}
+@keyframes roulette-aura{to{box-shadow:inset 0 0 34px rgba(0,0,0,.42),0 0 32px rgba(229,181,69,.4),0 10px 26px rgba(20,39,29,.15)}}@keyframes marker-glow{to{filter:drop-shadow(0 0 9px #ffe087);width:4px}}
 </style>
 
 <meta name="theme-color" content="#2f3fb0">
@@ -1258,7 +1273,8 @@ function homeView(){
 }
 
 function avatarEquipment(){
-  if(!St.d.equipped)St.d.equipped={hair:"",head:"",glasses:"",facial:"",outfit:"",bg:"",title:"Novizio d'Arabo"};
+  if(!St.d.equipped)St.d.equipped={avatar:"",hair:"",head:"",glasses:"",facial:"",outfit:"",bg:"",title:"Novizio d'Arabo"};
+  if(typeof St.d.equipped.avatar==="undefined")St.d.equipped.avatar="";
   return St.d.equipped;
 }
 function renderDuoAvatar(eq = {}, size = 160) {
@@ -1268,6 +1284,16 @@ function renderDuoAvatar(eq = {}, size = 160) {
   else if (eq.bg === "night") bgStyle = "linear-gradient(135deg, #0b132b, #1c2541)";
   else if (eq.bg === "palace") bgStyle = "linear-gradient(135deg, #8a2387, #e94057, #f27121)";
   else if (eq.bg === "fire") bgStyle = "linear-gradient(135deg, #ff416c, #ff4b2b)";
+  else if (eq.bg === "dawn") bgStyle = "linear-gradient(135deg, #f6b26b, #f8e2b8 55%, #6b9d91)";
+
+  // Avatar speciali vettoriali, equipaggiabili dalla sezione Profilo.
+  const specialAvatars={
+    camel:`<ellipse cx="79" cy="119" rx="43" ry="20" fill="#bf8248"/><path d="M48 116 Q48 90 62 89 Q72 87 77 104 Q84 88 96 91 Q109 94 108 116Z" fill="#d5a263" stroke="#8e5a35" stroke-width="3"/><path d="M93 105 Q106 78 108 58 Q110 44 123 42 L133 48 L131 57 L122 55 Q119 75 116 111Z" fill="#d5a263" stroke="#8e5a35" stroke-width="3" stroke-linejoin="round"/><path d="M121 44 Q117 30 109 27 Q107 40 115 47 M127 43 Q134 33 140 34 Q139 45 131 49" fill="#d5a263" stroke="#8e5a35" stroke-width="3"/><ellipse cx="130" cy="53" rx="13" ry="9" fill="#edc083"/><circle cx="126" cy="47" r="2.5" fill="#263b36"/><path d="M140 54 l8 3 -8 3" fill="#d98a3f"/><path d="M58 132 L55 146 M102 132 L106 146 M51 147 L61 147 M101 147 L111 147" stroke="#8e5a35" stroke-width="4" stroke-linecap="round"/><path d="M55 97 Q46 92 40 98" fill="none" stroke="#8e5a35" stroke-width="3" stroke-linecap="round"/>`,
+    palm:`<path d="M80 63 Q78 91 76 121 L88 121 Q85 91 86 64Z" fill="#9c6339"/><path d="M80 70 Q56 56 48 39 Q67 39 82 59 Q72 34 76 20 Q90 37 86 59 Q101 35 119 35 Q113 55 88 68 Q112 53 130 58 Q116 75 91 74Z" fill="#348b60" stroke="#236545" stroke-width="3" stroke-linejoin="round"/><path d="M72 120 Q61 130 57 145 Q80 137 102 145 Q99 130 88 120Z" fill="#d5a263" stroke="#8e5a35" stroke-width="3"/><circle cx="73" cy="127" r="3" fill="#273b34"/><circle cx="88" cy="127" r="3" fill="#273b34"/><path d="M74 135 Q80 140 87 135" fill="none" stroke="#8e5a35" stroke-width="2.5" stroke-linecap="round"/><circle cx="77" cy="66" r="4" fill="#d9963e"/><circle cx="88" cy="67" r="4" fill="#d9963e"/>`,
+    falcon:`<path d="M80 128 Q45 122 42 91 Q38 69 57 56 Q48 84 67 91 Q74 61 99 46 Q96 72 112 82 Q131 94 114 119 Q100 134 80 128Z" fill="#a87649" stroke="#63452f" stroke-width="3" stroke-linejoin="round"/><path d="M78 119 Q54 105 56 83 Q73 93 84 102 Q84 80 101 64 Q97 92 109 105 Q99 123 78 119Z" fill="#d8bd8d"/><path d="M100 70 Q116 64 127 74 L112 86Z" fill="#c98a43" stroke="#63452f" stroke-width="2"/><circle cx="106" cy="72" r="3" fill="#263b36"/><path d="M75 126 L70 142 M91 126 L96 142 M63 144 L77 144 M91 144 L104 144" stroke="#b77a35" stroke-width="4" stroke-linecap="round"/><path d="M81 55 L77 43 L87 51 L94 39 L95 57" fill="#7a5035"/>`,
+    genie:`<path d="M46 147 Q50 111 80 108 Q111 111 115 147 L108 154 L52 154Z" fill="#276f83" stroke="#174957" stroke-width="3"/><path d="M66 120 L80 134 L95 120 M80 134 L80 153" fill="none" stroke="#e5c36f" stroke-width="4"/><ellipse cx="80" cy="76" rx="28" ry="32" fill="#bd845a"/><path d="M52 65 Q54 31 80 30 Q108 31 109 66 Q98 51 80 51 Q62 51 52 65Z" fill="#24627a" stroke="#174957" stroke-width="3"/><path d="M56 55 Q80 45 105 55 M58 47 Q80 39 102 47" fill="none" stroke="#e5c36f" stroke-width="6" stroke-linecap="round"/><circle cx="70" cy="75" r="3" fill="#233b3d"/><circle cx="90" cy="75" r="3" fill="#233b3d"/><path d="M73 89 Q80 94 87 89" fill="none" stroke="#774735" stroke-width="2.5" stroke-linecap="round"/><path d="M47 111 Q31 107 34 95 Q39 85 48 91 M113 111 Q129 107 126 95 Q121 85 112 91" fill="none" stroke="#276f83" stroke-width="7" stroke-linecap="round"/>`
+  };
+  if(Object.prototype.hasOwnProperty.call(specialAvatars,eq.avatar))return `<div class="avatar-box special-avatar-box" style="width:${size}px;height:${size}px;background:${bgStyle}"><svg class="avatar-svg" viewBox="0 0 160 160" role="img" aria-label="Avatar personalizzato"><circle cx="80" cy="80" r="78" fill="transparent"/>${specialAvatars[eq.avatar]}</svg></div>`;
 
   // 2. ABITI VETTORIALI (Busto)
   let bodyColor = "#34495e";
@@ -1290,6 +1316,9 @@ function renderDuoAvatar(eq = {}, size = 160) {
   } else if (eq.outfit === "calligraphy") {
     bodyColor = "#304b85";
     bodyDetail = `<path d="M 52 119 Q 80 104 108 119 L 108 160 L 52 160 Z" fill="#365b9b"/><path d="M 65 126 Q 80 139 95 126 M 69 143 Q 80 151 91 143" fill="none" stroke="#e0bf69" stroke-width="3"/><path d="M 80 112 L 80 124" stroke="#e0bf69" stroke-width="3"/>`;
+  } else if (eq.outfit === "astronomer") {
+    bodyColor = "#283b62";
+    bodyDetail = `<path d="M 52 119 Q 80 103 108 119 L 108 160 L 52 160 Z" fill="#293d66"/><path d="M 62 121 L 80 137 L 98 121 M 80 137 L 80 158" fill="none" stroke="#d9bd75" stroke-width="3"/><circle cx="80" cy="145" r="3" fill="#f4df9b"/>`;
   }
 
   // 3. OCCHIALI VETTORIALI
@@ -1350,6 +1379,7 @@ function renderDuoAvatar(eq = {}, size = 160) {
   else if (eq.hair === "waves") hairSVG = `<path d="M48 66 C43 38 52 26 64 32 C72 20 82 28 84 31 C96 23 109 31 108 40 C120 44 116 58 112 67 Q105 55 99 55 Q92 47 85 55 Q76 46 69 55 Q59 49 54 67Z" fill="#3d2c24"/><path d="M55 45 Q61 37 68 44 M82 39 Q90 33 97 40 M101 47 Q107 42 111 49" fill="none" stroke="#75513b" stroke-width="3" stroke-linecap="round"/>`;
   else if (eq.hair === "braids") hairSVG = `<path d="M49 67 Q45 30 80 30 Q115 30 111 67 Q99 49 80 52 Q61 49 49 67Z" fill="#6b422b"/><path d="M51 58 Q43 77 49 105 M109 58 Q117 77 111 105" fill="none" stroke="#6b422b" stroke-width="9" stroke-linecap="round"/><path d="M47 72 L53 76 M46 84 L53 88 M47 96 L53 100 M107 76 L113 72 M107 88 L114 84 M107 100 L113 96" stroke="#c38a4d" stroke-width="2.5"/>`;
   else if (eq.hair === "fade") hairSVG = `<path d="M49 61 Q48 29 80 29 Q112 29 111 61 Q100 47 80 49 Q60 47 49 61Z" fill="#242b30"/><path d="M50 53 Q80 44 110 53" fill="none" stroke="#53616a" stroke-width="3"/>`;
+  else if (eq.hair === "copper") hairSVG = `<path d="M49 66 Q45 29 80 29 Q116 29 111 66 Q98 50 80 52 Q62 50 49 66Z" fill="#a94f32"/><path d="M56 45 Q64 36 72 43 M84 38 Q95 34 103 44" fill="none" stroke="#df9162" stroke-width="3" stroke-linecap="round"/>`;
 
   // 6. CAPPELLI E COPRICAPO VETTORIALI
   let headSVG = '';
@@ -1395,6 +1425,8 @@ function renderDuoAvatar(eq = {}, size = 160) {
     headSVG = `<path d="M46 52 Q48 25 80 25 Q112 25 114 52 L106 47 Q104 38 96 36 Q82 32 64 37 Q54 40 52 51Z" fill="#f1eee5" stroke="#6b3834" stroke-width="3"/><path d="M51 47 Q80 35 109 47 M53 51 Q80 41 107 51" fill="none" stroke="#a53e3e" stroke-width="3"/><path d="M49 49 L44 73 M111 49 L116 73" stroke="#f1eee5" stroke-width="8" stroke-linecap="round"/><path d="M49 49 L44 73 M111 49 L116 73" stroke="#a53e3e" stroke-width="2" stroke-dasharray="3 4"/>`;
   } else if (eq.head === "laurel") {
     headSVG = `<path d="M50 50 Q52 28 68 28 Q80 22 92 28 Q108 28 110 50" fill="none" stroke="#b58a36" stroke-width="5" stroke-linecap="round"/><g fill="#3c9a62"><ellipse cx="55" cy="42" rx="5" ry="9" transform="rotate(-35 55 42)"/><ellipse cx="65" cy="33" rx="5" ry="9" transform="rotate(-25 65 33)"/><ellipse cx="75" cy="29" rx="5" ry="8" transform="rotate(-10 75 29)"/><ellipse cx="105" cy="42" rx="5" ry="9" transform="rotate(35 105 42)"/><ellipse cx="95" cy="33" rx="5" ry="9" transform="rotate(25 95 33)"/><ellipse cx="85" cy="29" rx="5" ry="8" transform="rotate(10 85 29)"/></g>`;
+  } else if (eq.head === "calligrapher-band") {
+    headSVG = `<path d="M48 48 Q80 39 112 48 L109 58 Q80 51 51 58Z" fill="#294f55" stroke="#18383d" stroke-width="2"/><path d="M53 49 Q80 43 107 49" fill="none" stroke="#d9bd75" stroke-width="3"/><circle cx="80" cy="49" r="4" fill="#f3df9b" stroke="#9a7739" stroke-width="1.5"/>`;
   }
 
   return `
@@ -1442,6 +1474,7 @@ function accountView() {
   const unlockedOutfits = LOOT_ITEMS.filter(i => i.type === "outfit" && inv.includes(i.name));
   const unlockedBgs = LOOT_ITEMS.filter(i => i.type === "bg" && inv.includes(i.name));
   const unlockedTitles = LOOT_ITEMS.filter(i => i.type === "title" && inv.includes(i.name));
+  const unlockedAvatars = LOOT_ITEMS.filter(i => i.type === "avatar" && inv.includes(i.name));
 
   // Funzione helper per rendere sicura la chiamata onclick con apostrofi
   const safeAttr = str => esc(String(str));
@@ -1480,6 +1513,13 @@ function accountView() {
       ${renderDuoAvatar(eq, 160)}
       
       <div style="font-weight:bold; font-size:1.15rem; color:var(--ac); margin-top:8px;">${esc(eq.title || "Novizio d'Arabo")}</div>
+
+      <h4 style="margin:12px 0 8px;">🐾 Avatar speciali</h4>
+      <div class="chips" style="justify-content:center; margin-bottom:12px;">
+        <button class="btn ${!eq.avatar ? "on" : ""}" onclick="equipItem('avatar','')">Avatar originale</button>
+        ${unlockedAvatars.map(a=>`<button class="btn ${eq.avatar===a.val?'on':''}" onclick="equipItem('avatar',this.dataset.value)" data-value="${safeAttr(a.val)}">${esc(a.name.replace('Avatar: ',''))}</button>`).join('')}
+        ${unlockedAvatars.length===0?'<span class="sub">Trova nuovi personaggi nelle casse.</span>':''}
+      </div>
 
       <hr style="border:0; border-top:1px dashed var(--bd); margin:16px 0;">
 
@@ -1581,11 +1621,11 @@ function equipItem(type, val) {
 
 /* ===== Sistema Quest Giornaliere e Shop Casse ===== */
 const CHEST_TYPES = {
-  common: { name: "Cassa di Legno", price: 80, class: "chest-wooden" },
-  silver: { name: "Cassa d'Argento", price: 150, class: "chest-silver" },
-  rare: { name: "Cassa d'Oro", price: 300, class: "chest-gold" },
-  magical: { name: "Cassa Magica", price: 600, class: "chest-magical" },
-  legendary: { name: "Cassa Leggendaria", price: 1200, class: "chest-legendary" }
+  common: { name: "Cassa di Legno", price: 80, class: "chest-wooden", drops:[["common",80],["uncommon",20]] },
+  silver: { name: "Cassa d'Argento", price: 150, class: "chest-silver", drops:[["uncommon",70],["rare",30]] },
+  rare: { name: "Cassa d'Oro", price: 300, class: "chest-gold", drops:[["rare",60],["epic",40]] },
+  magical: { name: "Cassa Magica", price: 600, class: "chest-magical", drops:[["epic",50],["legendary",50]] },
+  legendary: { name: "Cassa Leggendaria", price: 1200, class: "chest-legendary", drops:[["legendary",70],["mythic",30]] }
 };
 
 const Quests = {
@@ -1649,9 +1689,10 @@ const LOOT_ITEMS = [
   { name: "+50 Monete", icon: "🪙", rarity: "common", class: "rarity-common", type: "coins", val: 50 },
   { name: "Titolo: Novizio d'Arabo", icon: "🌱", rarity: "common", class: "rarity-common", type: "title", val: "Novizio d'Arabo" },
   { name: "Titolo: Studente d'Arabo", icon: "📜", rarity: "common", class: "rarity-common", type: "title", val: "Studente d'Arabo" },
-  { name: "Avatar: Cammello Simpatico", icon: "🐪", rarity: "common", class: "rarity-common", type: "avatar", val: "🐪" },
+  { name: "Avatar: Cammello Simpatico", icon: "🐪", rarity: "common", class: "rarity-common", type: "avatar", val: "camel" },
   { name: "Capelli: Ricci del Deserto", icon: "🌀", rarity: "common", class: "rarity-common", type: "hair", val: "curly" },
   { name: "Capelli: Taglio Sfumato", icon: "💈", rarity: "common", class: "rarity-common", type: "hair", val: "fade" },
+  { name: "Capelli: Riflessi di Rame", icon: "🟠", rarity: "common", class: "rarity-common", type: "hair", val: "copper" },
   { name: "Occhiali: Tondi da Studioso", icon: "👓", rarity: "common", class: "rarity-common", type: "glasses", val: "round" },
   { name: "Capelli: Lunghi d’Inchiostro", icon: "🖤", rarity: "uncommon", class: "rarity-uncommon", type: "hair", val: "long" },
   { name: "Capelli: Onde del Deserto", icon: "🌊", rarity: "uncommon", class: "rarity-uncommon", type: "hair", val: "waves" },
@@ -1665,7 +1706,7 @@ const LOOT_ITEMS = [
   { name: "+120 Monete", icon: "💰", rarity: "uncommon", class: "rarity-uncommon", type: "coins", val: 120 },
   { name: "Titolo: Lettore Curioso", icon: "📖", rarity: "uncommon", class: "rarity-uncommon", type: "title", val: "Lettore Curioso" },
   { name: "Stile: Inchiostro Blu Reale", icon: "🖋️", rarity: "uncommon", class: "rarity-uncommon", type: "brush", val: "#2f3fb0" },
-  { name: "Avatar: Dattero Dorato", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "avatar", val: "🌴" },
+  { name: "Avatar: Dattero Dorato", icon: "🌴", rarity: "uncommon", class: "rarity-uncommon", type: "avatar", val: "palm" },
   { name: "Cappello: Elmo da Cavaliere", icon: "🪖", rarity: "uncommon", class: "rarity-uncommon", type: "head", val: "helmet" },
   { name: "Occhiali: Occhiali da Sole", icon: "🕶️", rarity: "uncommon", class: "rarity-uncommon", type: "glasses", val: "sunglasses" },
   { name: "Barba: Baffi da Sceicco", icon: "🥸", rarity: "uncommon", class: "rarity-uncommon", type: "facial", val: "mustache" },
@@ -1679,7 +1720,7 @@ const LOOT_ITEMS = [
   { name: "Titolo: Calligrafo Provetto", icon: "✍️", rarity: "rare", class: "rarity-rare", type: "title", val: "Calligrafo Provetto" },
   { name: "Titolo: Esploratore delle Dune", icon: "🏜️", rarity: "rare", class: "rarity-rare", type: "title", val: "Esploratore delle Dune" },
   { name: "Stile: Tratto Rubino", icon: "🎨", rarity: "rare", class: "rarity-rare", type: "brush", val: "#e74c3c" },
-  { name: "Avatar: Falcone del Deserto", icon: "🦅", rarity: "rare", class: "rarity-rare", type: "avatar", val: "🦅" },
+  { name: "Avatar: Falcone del Deserto", icon: "🦅", rarity: "rare", class: "rarity-rare", type: "avatar", val: "falcon" },
   { name: "Cappello: Turbante Arabo", icon: "👳", rarity: "rare", class: "rarity-rare", type: "head", val: "turban" },
   { name: "Occhiali: Monocolo da Erudito", icon: "🧐", rarity: "rare", class: "rarity-rare", type: "glasses", val: "monocle" },
   { name: "Barba: Barba Folta Reale", icon: "🧔", rarity: "rare", class: "rarity-rare", type: "facial", val: "fullbeard" },
@@ -1696,14 +1737,17 @@ const LOOT_ITEMS = [
   { name: "Abito: Tunica del Sapiente", icon: "📚", rarity: "rare", class: "rarity-rare", type: "outfit", val: "scholar" },
   { name: "Abito: Viandante del Deserto", icon: "🏜️", rarity: "uncommon", class: "rarity-uncommon", type: "outfit", val: "desert" },
   { name: "Abito: Calligrafo di Corte", icon: "🖋️", rarity: "epic", class: "rarity-epic", type: "outfit", val: "calligraphy" },
+  { name: "Abito: Mantello dell'Astronomo", icon: "🌠", rarity: "epic", class: "rarity-epic", type: "outfit", val: "astronomer" },
   { name: "Copricapo: Alloro del Sapiente", icon: "🌿", rarity: "epic", class: "rarity-epic", type: "head", val: "laurel" },
+  { name: "Copricapo: Fascia del Calligrafo", icon: "🪡", rarity: "epic", class: "rarity-epic", type: "head", val: "calligrapher-band" },
   { name: "Sfondo: Palazzo Reale", icon: "🕌", rarity: "epic", class: "rarity-epic", type: "bg", val: "palace" },
+  { name: "Sfondo: Alba sull'Oasi", icon: "🌅", rarity: "rare", class: "rarity-rare", type: "bg", val: "dawn" },
 
   // 🟡 LEGGENDARIO (Legendary)
   { name: "+1500 Monete", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "coins", val: 1500 },
   { name: "Titolo: Maestro delle 28 Lettere", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "title", val: "Maestro delle 28 Lettere" },
   { name: "Stile: Calamo d'Oro Puro", icon: "✨", rarity: "legendary", class: "rarity-legendary", type: "brush", val: "#f1c40f" },
-  { name: "Avatar: Genio della Lampada", icon: "🧞", rarity: "legendary", class: "rarity-legendary", type: "avatar", val: "🧞" },
+  { name: "Avatar: Genio della Lampada", icon: "🧞", rarity: "legendary", class: "rarity-legendary", type: "avatar", val: "genie" },
   { name: "Cappello: Corona Reale", icon: "👑", rarity: "legendary", class: "rarity-legendary", type: "head", val: "crown" },
   { name: "Abito: Mantello da Re", icon: "🧥", rarity: "legendary", class: "rarity-legendary", type: "outfit", val: "king" },
   { name: "Sfondo: Aura di Fuoco", icon: "🔥", rarity: "legendary", class: "rarity-legendary", type: "bg", val: "fire" },
@@ -1718,11 +1762,21 @@ function shopView() {
   const quests = Quests.getTodayQuests();
   if (!St.d.chests) St.d.chests = {};
   const chests = St.d.chests;
+  const inventory=St.d.inventory||[],collectibles=LOOT_ITEMS.filter(i=>i.type!=="coins"),found=collectibles.filter(i=>inventory.includes(i.name)).length;
   const totalChests = Object.values(chests).reduce((a, b) => a + (b || 0), 0);
+  const rarityNames={common:"Comune",uncommon:"Non comune",rare:"Raro",epic:"Epico",legendary:"Leggendario",mythic:"Mitico"};
 
   return `
     <h2>🎁 Quest & Shop</h2>
-    
+    <section class="gacha-hero">
+      <div class="gacha-hero-copy"><span class="eyebrow">IL BOTTINO TI ASPETTA</span><h2>Apri una cassa. Scopri una sorpresa.</h2><p>Raccogli monete con le lezioni, scegli la tua cassa e aggiungi nuovi oggetti alla collezione.</p>
+        <div class="gacha-progress"><span style="width:${Math.round(found/Math.max(1,collectibles.length)*100)}%"></span></div>
+        <small>Album premi: <b>${found}</b> di ${collectibles.length} oggetti scoperti · 🪙 ${St.d.coins||0} monete</small>
+      </div>
+      <div class="gacha-hero-art" aria-hidden="true"><span>✦</span><div class="chest-3d chest-magical"><div class="chest-lid"></div><div class="chest-lock"></div><div class="chest-body"></div></div><span>✧</span></div>
+      <button class="btn gacha-jump" onclick="document.getElementById('gacha-chests').scrollIntoView({behavior:'smooth',block:'center'})">Scegli una cassa <b>↓</b></button>
+    </section>
+
     <h3>📋 Quest Giornaliere</h3>
     <div class="panel" style="text-align:left; margin-bottom:20px;">
       ${quests.map(q => `
@@ -1740,41 +1794,33 @@ function shopView() {
       `).join('')}
     </div>
 
-    <h3>📦 Acquista Casse 3D</h3>
-    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px;">
+    <div class="gacha-section-head" id="gacha-chests"><div><span class="eyebrow">SCEGLI IL TUO BOTTINO</span><h3>📦 Le casse</h3><p class="sub">Le percentuali indicano la rarità: il premio è estratto tra gli oggetti di quella fascia. I doppioni diventano monete bonus.</p></div><span class="gacha-wallet">🪙 ${St.d.coins||0}</span></div>
+    <div class="grid gacha-chest-grid" style="grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap:14px;">
       ${Object.entries(CHEST_TYPES).map(([type, c]) => `
-        <div class="chest-3d-card">
+        <div class="chest-3d-card gacha-card ${c.class}" data-owned="${chests[type]||0}">
+          <div class="chest-card-top"><span class="chest-tier">${type==="common"?"Inizia da qui":type==="legendary"?"Bottino speciale":type==="magical"?"Alta rarità":"Buon equilibrio"}</span><span class="chest-owned">× ${chests[type]||0}</span></div>
           <div class="chest-3d ${c.class}">
             <div class="chest-lid"></div>
             <div class="chest-lock"></div>
             <div class="chest-body"></div>
           </div>
-          <b>${c.name}</b>
-          <p class="sub" style="font-size:0.8rem; margin:2px 0 8px;">Possedute: ${chests[type] || 0}</p>
-          <button class="btn p" style="width:100%; font-size:0.85rem;" onclick="Quests.buyChest('${type}')">🪙 ${c.price}</button>
+          <b class="chest-name">${c.name}</b>
+          <div class="chest-drop-rates">${c.drops.map(([r,p])=>`<span class="drop-chip ${"rarity-"+r}"><i></i>${p}% ${rarityNames[r]}</span>`).join("")}</div>
+          <button class="btn p chest-buy" style="width:100%;" onclick="Quests.buyChest('${type}')" ${St.d.coins<c.price?'disabled':''}>${St.d.coins<c.price?'Servono':'Compra'} · 🪙 ${c.price}</button>
         </div>
       `).join('')}
     </div>
 
-    <h3 style="margin-top:24px;">🔓 Le tue Casse Pronte</h3>
-    <div class="panel" style="text-align:center;">
-      <div class="chips" style="justify-content:center; gap:10px;">
+    <section class="ready-chests"><div class="ready-chests-heading"><div><span class="eyebrow">PRONTE PER TE</span><h3>✨ Le tue casse</h3></div><span class="ready-total">${totalChests} disponibili</span></div>
+      <div class="ready-chests-buttons">
         ${Object.entries(CHEST_TYPES).map(([type, c]) => 
-          (chests[type] || 0) > 0 ? `<button class="btn p" onclick="startChestOpening('${type}')">✨ Apri ${c.name} (${chests[type]})</button>` : ''
+          (chests[type] || 0) > 0 ? `<button class="btn p open-chest-btn ${c.class}" onclick="startChestOpening('${type}')"><span class="open-chest-icon">🎁</span><span>Apri ${c.name}<small>Hai ${chests[type]}</small></span><b>→</b></button>` : ''
         ).join('')}
       </div>
-      ${totalChests === 0 ? '<p style="font-size:0.9rem; color:var(--mu); margin:0;">Guadagna monete con le quest per comprare le casse!</p>' : ''}
-    </div>
+      ${totalChests === 0 ? '<p class="ready-empty">Completa le quest e le lezioni per guadagnare monete e scegliere la tua prima cassa.</p>' : ''}
+    </section>
 
-    <h3 style="margin-top:24px;">🎒 La tua Collezione</h3>
-    <div class="panel">
-      ${(!St.d.inventory || St.d.inventory.length === 0) ? 
-        '<p class="sub" style="text-align:center; margin:0;">Nessun oggetto sbloccato. Apri le casse per trovare titoli, stili e avatar!</p>' : 
-        '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">' + 
-          St.d.inventory.map(item => '<div style="background:var(--bg); border:1px solid var(--bd); padding:8px 14px; border-radius:20px; font-weight:bold; font-size:0.9rem;">✨ ' + item + '</div>').join('') + 
-        '</div>'
-      }
-    </div>
+    <details class="gacha-album"><summary><span>🏆 Album dei premi</span><b>${found}/${collectibles.length} scoperti</b></summary><div class="album-grid">${collectibles.map(item=>{const got=inventory.includes(item.name);return `<div class="album-item ${got?'is-found':'is-locked'} rarity-${item.rarity}"><div class="album-item-icon">${got?lootObjectMarkup(item,38):'<span class="album-locked">?</span>'}</div><span class="album-item-name">${got?esc(item.name):'Ricompensa da scoprire'}</span><small>${rarityNames[item.rarity]}</small></div>`}).join('')}</div></details>
   `;
 }
 
@@ -1828,7 +1874,49 @@ const ChestAudio = {
   }
 };
 
-let chestOpeningState = { spinning: false, wonItem: null, trackItems: [], targetOffset: 0 };
+const RARITY_LABELS={common:"Comune",uncommon:"Non comune",rare:"Raro",epic:"Epico",legendary:"Leggendario",mythic:"Mitico"};
+function rollChestReward(type){
+  const chest=CHEST_TYPES[type]||CHEST_TYPES.common,roll=Math.random()*100;let total=0,rarity=chest.drops[chest.drops.length-1][0];
+  for(const [r,p] of chest.drops){total+=p;if(roll<total){rarity=r;break}}
+  const eligible=LOOT_ITEMS.filter(item=>item.rarity===rarity);return pick(eligible.length?eligible:LOOT_ITEMS.filter(item=>item.rarity===chest.drops[0][0]));
+}
+function previewEquipmentFor(item){
+  const eq=Object.assign({},avatarEquipment());
+  eq.avatar="";
+  if(["hair","head","glasses","facial","outfit","bg","title"].includes(item.type))eq[item.type]=item.val;
+  return eq;
+}
+function lootObjectMarkup(item,size=52){
+  const wearable=["hair","head","glasses","facial","outfit","bg"].includes(item.type);
+  if(item.type==="avatar")return `<div class="loot-object-avatar">${renderDuoAvatar({avatar:item.val},size)}</div>`;
+  if(wearable)return `<div class="loot-object-avatar">${renderDuoAvatar(previewEquipmentFor(item),size)}</div>`;
+  if(item.type==="coins")return `<div class="loot-object-coin" aria-label="${item.val} monete"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="#f5bd3f" stroke="#a86d16" stroke-width="3"/><circle cx="24" cy="24" r="14" fill="none" stroke="#ffe89a" stroke-width="2"/><path d="M28 15c-1.5-2-8-2-8 2 0 5 9 3 9 8s-7 7-11 3m6-17v22" fill="none" stroke="#9b641a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><b>+${item.val}</b></div>`;
+  if(item.type==="title")return `<div class="loot-object-title"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 11h29l9 9v34H13z" fill="#f5e7c3" stroke="#a8864c" stroke-width="3"/><path d="M42 11v10h9M20 30h24M20 37h24M20 44h17" stroke="#947344" stroke-width="2.5" stroke-linecap="round"/></svg><b>${esc(item.val)}</b></div>`;
+  if(item.type==="brush")return `<div class="loot-object-tool"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="m16 44 27-28 9 9-28 27-10 2z" fill="#d6b56c" stroke="#6f5931" stroke-width="3"/><path d="m43 16 6-6q3-3 6 0t0 6l-6 6" fill="${esc(item.val)}" stroke="#674b2a" stroke-width="2"/><path d="m14 52 10-10" stroke="#fff0c5" stroke-width="3"/></svg><b>Stile</b></div>`;
+  if(item.type==="theme")return `<div class="loot-object-theme"><i></i><i></i><i></i><b>Tema</b></div>`;
+  return `<div class="loot-object-title"><b>${esc(item.name)}</b></div>`;
+}
+function rewardMarkup(item,result){
+  const wearable=["hair","head","glasses","facial","outfit","bg"].includes(item.type),avatar=item.type==="avatar";
+  const feedback=result&&result.kind==="duplicate"?`Doppione convertito in <b>+${result.amount} monete</b>.`:
+    result&&result.kind==="coins"?`Hai trovato <b>+${result.amount} monete</b>.`:
+    "Nuovo premio aggiunto al tuo album!";
+  const action=avatar?'<button class="btn p" onclick="equipItem(\'avatar\',this.dataset.value)" data-value="'+esc(item.val)+'">Equipaggia avatar</button>':wearable?'<button class="btn p" onclick="go(\'account\')">Provalo sull’avatar</button>':'';
+  return `<article class="reward-reveal rarity-${item.rarity}"><div class="reward-confetti" aria-hidden="true">✦　✧　✦</div><div class="reward-showcase">${lootObjectMarkup(item,132)}</div><span class="reward-rarity rarity-${item.rarity}">${RARITY_LABELS[item.rarity]||item.rarity}</span><h3>${esc(item.name)}</h3><p>${feedback}</p><div class="reward-actions">${action}<button class="btn" onclick="go('shop')">Torna alle casse</button></div></article>`;
+}
+let chestOpeningSequence=0;
+let chestOpeningState = { spinning: false, wonItem: null, trackItems: [], targetOffset: 0, type:null, rewardResult:null, sequence:0 };
+
+function settleChestOpening(sequence){
+  if(chestOpeningState.sequence!==sequence||!chestOpeningState.spinning)return;
+  chestOpeningState.spinning=false;
+  const rewardResult=applyReward(chestOpeningState.wonItem);
+  chestOpeningState.rewardResult=rewardResult;
+  ChestAudio.playWin();
+  const statusText=$("chest_status_text"),winBox=$("chest_win_box");
+  if(statusText)statusText.textContent="🎉 La cassa si è aperta!";
+  if(winBox)winBox.innerHTML=rewardMarkup(chestOpeningState.wonItem,rewardResult);
+}
 
 function startChestOpening(type) {
   if (!St.d.chests) St.d.chests = {};
@@ -1841,37 +1929,23 @@ function startChestOpening(type) {
   St.save();
   if (window.saveCloudProgress) window.saveCloudProgress();
 
-  // Genera la sequenza fissa per la roulette
-  let trackItems = [];
-  for (let i = 0; i < 35; i++) {
-    trackItems.push(pick(LOOT_ITEMS));
-  }
-
-  const rand = Math.random() * 100;
-  let won;
-  if (type === "legendary") {
-    won = rand < 30 ? pick(LOOT_ITEMS.filter(x => x.rarity === "mythic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "legendary"));
-  } else if (type === "magical") {
-    won = rand < 50 ? pick(LOOT_ITEMS.filter(x => x.rarity === "legendary")) : pick(LOOT_ITEMS.filter(x => x.rarity === "epic"));
-  } else if (type === "rare") {
-    won = rand < 40 ? pick(LOOT_ITEMS.filter(x => x.rarity === "epic")) : pick(LOOT_ITEMS.filter(x => x.rarity === "rare"));
-  } else if (type === "silver") {
-    won = rand < 30 ? pick(LOOT_ITEMS.filter(x => x.rarity === "rare")) : pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon"));
-  } else {
-    won = rand < 20 ? pick(LOOT_ITEMS.filter(x => x.rarity === "uncommon")) : pick(LOOT_ITEMS.filter(x => x.rarity === "common"));
-  }
-  if (!won) won = LOOT_ITEMS[0];
+  // Ogni rullo mostra solo premi compatibili con le probabilità della cassa.
+  const trackItems=Array.from({length:52},()=>rollChestReward(type));
+  const won=rollChestReward(type);
   
-  const targetIndex = 26;
+  const targetIndex = 40;
   trackItems[targetIndex] = won;
 
-  chestOpeningState = { spinning: true, wonItem: won, trackItems: trackItems, targetOffset: 0 };
+  const sequence=++chestOpeningSequence;
+  chestOpeningState = { spinning: true, wonItem: won, trackItems, targetOffset: 0, type, rewardResult:null, sequence };
   go("chest_open");
 
   setTimeout(() => {
+    if(chestOpeningState.sequence!==sequence)return;
     const track = $("roulette_track");
     const container = document.querySelector(".roulette-container");
-    if (!track || !container) return;
+    // Se l'utente cambia schermata durante l'apertura, assegna comunque il premio.
+    if (!track || !container) { settleChestOpening(sequence); return; }
 
     const itemWidth = 90;
     const containerWidth = container.offsetWidth;
@@ -1882,17 +1956,18 @@ function startChestOpening(type) {
     track.style.transform = "translateX(0px)";
 
     setTimeout(() => {
-      track.style.transition = "transform 4.5s cubic-bezier(0.15, 0.9, 0.15, 1)";
+      if(chestOpeningState.sequence!==sequence)return;
+      track.style.transition = "transform 8.2s cubic-bezier(0.08, 0.82, 0.12, 1)";
       track.style.transform = `translateX(-${offset}px)`;
 
       // Riproduce il suono del rullo che gira
       let tickCount = 0;
-      const totalTicks = 22;
+      const totalTicks = 36;
       const playNextTick = () => {
         if (tickCount < totalTicks && chestOpeningState.spinning) {
           ChestAudio.playTick();
           tickCount++;
-          const delay = 80 + Math.pow(tickCount, 2) * 6;
+          const delay = 35 + Math.pow(tickCount, 2) * 0.38;
           setTimeout(playNextTick, delay);
         }
       };
@@ -1901,68 +1976,51 @@ function startChestOpening(type) {
 
     // Al termine: blocca le icone senza farle scambiare e suona la fanfara
     setTimeout(() => {
-      chestOpeningState.spinning = false;
-      applyReward(won);
-      ChestAudio.playWin();
-      
-      const winBox = $("chest_win_box");
-      const statusText = $("chest_status_text");
-      if (statusText) statusText.textContent = "🎉 Complimenti! Ecco il tuo premio:";
-      if (winBox) {
-        winBox.innerHTML = `
-          <div style="font-size:3.5rem; animation: pulse 0.5s;">${won.icon}</div>
-          <h3 style="font-size:1.4rem; margin:8px 0; color:var(--ac);">${won.name}</h3>
-          <p class="sub">Rarità: <b style="text-transform:capitalize;">${won.rarity}</b></p>
-          <button class="btn p" style="margin-top:12px; padding:12px 24px;" onclick="go('shop')">Torna allo Shop</button>
-        `;
-      }
-    }, 4600);
+      settleChestOpening(sequence);
+    }, 8300);
   }, 100);
 }
 
 function applyReward(item) {
+  let result;
   if (item.type === "coins") {
     St.d.coins = (St.d.coins || 0) + item.val;
+    result={kind:"coins",amount:item.val};
   } else {
     if (!St.d.inventory) St.d.inventory = [];
-    if (!St.d.inventory.includes(item.name)) St.d.inventory.push(item.name);
+    if (St.d.inventory.includes(item.name)) {
+      const conversion={common:15,uncommon:35,rare:80,epic:180,legendary:450,mythic:1000};
+      result={kind:"duplicate",amount:conversion[item.rarity]||15};St.d.coins=(St.d.coins||0)+result.amount;
+    } else {St.d.inventory.push(item.name);result={kind:"unlocked",amount:0}}
   }
   St.save();
-  if (window.saveCloudProgress) window.saveCloudProgress();
-  // Rimosso del tutto l'effetto vocale in arabo
+  return result;
 }
 
 function chestOpenView() {
   const s = chestOpeningState;
   if (!s.trackItems || s.trackItems.length === 0) return shopView();
-
+  const chest=CHEST_TYPES[s.type]||CHEST_TYPES.common;
   const transformStyle = s.spinning ? '' : `transform: translateX(-${s.targetOffset}px);`;
 
   return `
-    <h2>✨ Apertura Cassa</h2>
-    <div class="panel" style="text-align:center; padding:30px 16px;">
-      <p id="chest_status_text" class="sub">${s.spinning ? "Apertura in corso... Buona fortuna!" : "🎉 Complimenti! Ecco il tuo premio:"}</p>
-
-      <div class="roulette-container">
-        <div class="roulette-marker"></div>
+    <div class="opening-page"><div class="opening-heading"><button class="btn" onclick="go('shop')">← Shop</button><div><span class="eyebrow">APERTURA PREMI</span><h2>${chest.name}</h2></div><span class="opening-glow">✦</span></div>
+    <div class="panel opening-panel ${s.spinning?'is-spinning':''}">
+      <p id="chest_status_text" class="opening-status">${s.spinning ? "La cassa si sta aprendo…" : "La cassa si è aperta!"}</p>
+      <p class="sub opening-caption">Guarda il selettore fermarsi sul tuo prossimo premio.</p>
+      <div class="roulette-container ${s.spinning?'is-spinning':''}">
+        <div class="roulette-marker"><span>▼</span></div>
         <div id="roulette_track" class="roulette-track" style="${transformStyle}">
           ${s.trackItems.map(it => `
-            <div class="roulette-item ${it.class}">
-              <span>${it.icon}</span>
+            <div class="roulette-item ${it.class}" title="${esc(it.name)} · ${RARITY_LABELS[it.rarity]||it.rarity}">
+              <div class="roulette-visual">${lootObjectMarkup(it,50)}</div><small>${RARITY_LABELS[it.rarity]||it.rarity}</small>
             </div>
           `).join('')}
         </div>
       </div>
-
-      <div id="chest_win_box" style="margin-top:20px;">
-        ${!s.spinning && s.wonItem ? `
-          <div style="font-size:3.5rem;">${s.wonItem.icon}</div>
-          <h3 style="font-size:1.4rem; margin:8px 0; color:var(--ac);">${s.wonItem.name}</h3>
-          <p class="sub">Rarità: <b style="text-transform:capitalize;">${s.wonItem.rarity}</b></p>
-          <button class="btn p" style="margin-top:12px; padding:12px 24px;" onclick="go('shop')">Torna allo Shop</button>
-        ` : `<p style="font-size:1.1rem; color:var(--mu);">I rulli stanno girando...</p>`}
-      </div>
-    </div>
+      <div class="spin-progress" aria-hidden="true"><i></i></div>
+      <div id="chest_win_box" style="margin-top:24px;">${!s.spinning&&s.wonItem?rewardMarkup(s.wonItem,s.rewardResult):'<div class="spin-hint">✨ Il premio sta arrivando…</div>'}</div>
+    </div></div>
   `;
 }
 
