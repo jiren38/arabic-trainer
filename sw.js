@@ -1,4 +1,4 @@
-const CACHE = "arabic-trainer-v66";
+const CACHE = "arabic-trainer-v67";
 const APP_SHELL = [
   "./",
   "./index.html",
